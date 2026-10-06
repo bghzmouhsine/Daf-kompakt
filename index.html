@@ -1,0 +1,1944 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="الدروس 1 إلى 5 من DaF kompakt A1 مبسّطة بالعربية، مع النطق الألماني وبطاقات المراجعة ووضع الاستماع.">
+<meta name="theme-color" content="#f2f3ed" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f120c" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DaF kompakt">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>DaF kompakt مبسّط</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<style>
+/* Layout: a phone-first study app. One column, app bar on top, tab bar at the bottom, full-screen lesson player. German always set in a serif with color-coded articles; the book's berry and lime are the working colors. */
+:root{
+  --bg:#f2f3ed; --surface:#ffffff; --sunk:#e8ebe1; --ink:#161b12; --ink-2:#3a4233; --muted:#666f5b; --line:#dde2d2;
+  --accent:#9b1b58; --on-accent:#ffffff; --accent-soft:#f6e3ec;
+  --hero:#8a1550; --hero-ink:#ffffff; --hero-mute:#f3c7db;
+  --ok:#4e7a0e; --ok-soft:#e5eecf; --bad:#b3332a; --bad-soft:#f7e2df;
+  --der:#2056a8; --das:#16775a; --die:#c0392b;
+  --shadow:0 1px 2px rgba(22,27,18,.05),0 8px 24px rgba(22,27,18,.07);
+  --f-ui:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+  --f-de:"Source Serif 4",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f120c; --surface:#181c13; --sunk:#12150e; --ink:#e8ecdf; --ink-2:#c8cebc; --muted:#99a28b; --line:#2a3023;
+  --accent:#f07aae; --on-accent:#2b0717; --accent-soft:#3a1d2b;
+  --hero:#45142d; --hero-ink:#fde8f1; --hero-mute:#d79bb8;
+  --ok:#a6d14f; --ok-soft:#232f19; --bad:#f08a7e; --bad-soft:#3a1f1c;
+  --der:#86adf2; --das:#5fcca4; --die:#f3897a;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 28px rgba(0,0,0,.3); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f120c; --surface:#181c13; --sunk:#12150e; --ink:#e8ecdf; --ink-2:#c8cebc; --muted:#99a28b; --line:#2a3023;
+  --accent:#f07aae; --on-accent:#2b0717; --accent-soft:#3a1d2b;
+  --hero:#45142d; --hero-ink:#fde8f1; --hero-mute:#d79bb8;
+  --ok:#a6d14f; --ok-soft:#232f19; --bad:#f08a7e; --bad-soft:#3a1f1c;
+  --der:#86adf2; --das:#5fcca4; --die:#f3897a;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 28px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.7;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+h1,h2,h3,h4{margin:0;line-height:1.35;text-wrap:balance}
+p{margin:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic .f{fill:currentColor;stroke:none}
+.de{font-family:var(--f-de);direction:ltr;unicode-bidi:isolate;font-size:1.06em}
+.g{font-weight:600}.g-der{color:var(--der)}.g-das{color:var(--das)}.g-die{color:var(--die)}
+.de.tap{cursor:pointer;border-bottom:1px dotted color-mix(in srgb,var(--muted) 70%,transparent);border-radius:3px;transition:background .15s}
+.de.tap:hover{background:var(--accent-soft)}
+.de.tap.is-playing{background:var(--accent-soft);border-bottom-color:var(--accent)}
+.muted{color:var(--muted)}
+.hint{font-size:14px;color:var(--muted)}
+
+/* app shell */
+#app{max-width:680px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;gap:12px;padding-inline:16px;padding-block:10px}
+.brand{display:flex;align-items:baseline;gap:8px;flex:1;min-width:0}
+.brand b{font-family:var(--f-de);font-weight:700;font-size:19px;letter-spacing:-.01em;direction:ltr;unicode-bidi:isolate}
+.brand span{font-size:13px;color:var(--muted)}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
+.sync-dot.on{background:var(--ok)}
+.icon-btn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--ink-2)}
+.icon-btn:hover{background:var(--sunk)}
+#screen{flex:1;padding-inline:16px;padding-block:4px calc(96px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:18px}
+.tabbar{position:fixed;inset-inline:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar-in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding-block:9px 8px;font-size:12px;color:var(--muted);position:relative}
+.tab[aria-current="page"]{color:var(--accent);font-weight:600}
+.tab[aria-current="page"]::before{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
+.tab .badge{position:absolute;top:5px;inset-inline-start:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--on-accent);font-size:11px;line-height:18px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:12px 18px;font-weight:600;font-size:15px;min-height:46px}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn-ghost{background:var(--surface);border:1px solid var(--line);color:var(--ink-2)}
+.btn-ok{background:var(--ok);color:var(--surface)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-block{width:100%}
+.chip-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:14px;color:var(--ink-2)}
+.chip-btn .ic{width:18px;height:18px}
+.chip-btn.on{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:600}
+.pbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--accent);background:var(--accent-soft);flex:none;position:relative}
+.pbtn .ic{width:19px;height:19px}
+.pbtn.is-playing{background:var(--accent);color:var(--on-accent)}
+.pbtn.is-playing::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--accent);opacity:.5;animation:pulse 1s ease-out infinite}
+.pbtn.is-loading{opacity:.6}
+.btn.pbtn{width:auto;height:auto;border-radius:12px;display:inline-flex}
+@keyframes pulse{from{transform:scale(.9);opacity:.6}to{transform:scale(1.25);opacity:0}}
+
+/* home */
+.greet{display:flex;flex-direction:column;gap:0;padding-top:6px}
+.greet .de{font-size:30px;font-weight:600;line-height:1.25;width:max-content;max-width:100%;border-bottom:0}
+.greet p{color:var(--muted);font-size:14px}
+.hero{background:var(--hero);color:var(--hero-ink);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset-inline-end:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--hero-ink) 10%,transparent),transparent 70%);pointer-events:none}
+.hero-top{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--hero-mute);flex-wrap:wrap}
+.hero-day{font-family:var(--f-de);font-size:54px;font-weight:700;line-height:1;letter-spacing:-.02em;direction:ltr;text-align:right}
+.hero h2{font-size:22px;font-weight:700}
+.hero p{color:var(--hero-mute);font-size:15px}
+.hero .de{color:var(--hero-ink);border-bottom-color:var(--hero-mute)}
+.hero .de.tap:hover,.hero .de.tap.is-playing{background:color-mix(in srgb,var(--hero-ink) 14%,transparent)}
+.hero .g{color:inherit}
+.hero-steps{display:flex;gap:4px;margin-top:4px}
+.hero-steps span{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--hero-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-steps span::before{content:"";height:4px;border-radius:2px;background:color-mix(in srgb,var(--hero-ink) 22%,transparent)}
+.hero-steps span.on::before{background:var(--hero-ink)}
+.btn-hero{background:var(--hero-ink);color:var(--hero);margin-top:6px;font-size:16px;min-height:50px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{background:var(--surface);border-radius:16px;padding:14px 12px;display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);min-width:0}
+.tile .num{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2;display:flex;align-items:center;gap:6px}
+.tile .num .ic{width:22px;height:22px;color:var(--accent)}
+.tile small{font-size:12px;color:var(--muted);line-height:1.4}
+.ring{width:30px;height:30px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:4}
+.ring .bg{stroke:var(--sunk)}.ring .fg{stroke:var(--ok);stroke-linecap:round}
+.week{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;direction:ltr}
+.week div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted);font-family:var(--f-de)}
+.week i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-family:var(--f-ui);font-size:13px;font-variant-numeric:tabular-nums;background:var(--sunk);color:var(--ink-2)}
+.week .done i{background:var(--ok);color:var(--surface)}
+.week .today i{box-shadow:inset 0 0 0 2px var(--accent)}
+.week .today{color:var(--accent);font-weight:600}
+.quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.qa{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.qa .ic{width:26px;height:26px;color:var(--accent)}
+.qa b{font-size:15px}
+.qa small{font-size:13px;color:var(--muted);line-height:1.5}
+.qa:hover{border-color:var(--accent)}
+.say-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.eyebrow{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.say-card .de{font-size:21px;line-height:1.45;border-bottom:0}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* course */
+.scr-h{display:flex;flex-direction:column;gap:6px;padding-top:6px}
+.scr-h h1{font-size:26px;font-weight:700}
+.scr-h p{color:var(--muted);font-size:14px}
+.bar{height:6px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:3px;transition:width .3s}
+.unit{display:flex;flex-direction:column;gap:8px}
+.unit-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.unit-l{font-family:var(--f-de);font-weight:700;font-size:18px;direction:ltr;unicode-bidi:isolate}
+.unit-t{font-family:var(--f-de);color:var(--muted);font-size:15px;direction:ltr;unicode-bidi:isolate}
+.unit-c{margin-inline-start:auto;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.days-list{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.days-list li+li{border-top:1px solid var(--line)}
+.day-row{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px}
+.day-row:hover{background:var(--bg)}
+.day-num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-variant-numeric:tabular-nums;background:var(--sunk);color:var(--ink-2);flex:none;font-size:15px}
+.day-row.done .day-num{background:var(--ok);color:var(--surface)}
+.day-row.cur .day-num{background:var(--accent);color:var(--on-accent)}
+.day-main{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}
+.day-main b{font-weight:600;font-size:15px}
+.day-main small{font-size:12px;color:var(--muted)}
+.pill{font-size:12px;border-radius:999px;padding:2px 10px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill-ok{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.pill-cur{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.pill-res{background:var(--sunk);color:var(--muted)}
+
+/* cards */
+.boxes{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.boxes-chart{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:end;height:110px}
+.boxes-chart div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;font-size:12px;color:var(--muted)}
+.boxes-chart i{width:100%;max-width:40px;border-radius:6px 6px 2px 2px;background:var(--ok);min-height:3px}
+.boxes-chart div:first-child i{background:var(--line)}
+.boxes-chart b{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.boxes-legend{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;text-align:center;font-size:11px;color:var(--muted)}
+.seg{display:inline-flex;background:var(--sunk);border-radius:12px;padding:3px;gap:3px;align-self:flex-start}
+.seg button{padding:7px 14px;border-radius:9px;font-size:14px;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.cs-top{display:flex;align-items:center;gap:12px;padding-top:6px}
+.cs-top .bar{flex:1}
+.cs-top span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.flash{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px 20px;text-align:center;cursor:pointer}
+.flash .front .de{font-size:clamp(28px,8vw,40px);font-weight:600;line-height:1.25;border-bottom:0}
+.flash .front .ar{font-size:26px;font-weight:600}
+.flash .back{display:flex;flex-direction:column;align-items:center;gap:6px;border-top:1px dashed var(--line);padding-top:14px;width:100%}
+.flash .back .ar{font-size:20px;font-weight:600}
+.flash .back .de{font-size:26px;font-weight:600;border-bottom:0}
+.flash .pr{color:var(--muted);font-size:14px}
+.flash .from{font-size:12px;color:var(--muted)}
+.grades{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grade-btn{border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:0;font-weight:600;border:1px solid var(--line);background:var(--surface)}
+.grade-btn small{font-weight:400;font-size:12px;color:var(--muted)}
+.grade-btn.no{color:var(--bad)}.grade-btn.no:hover{background:var(--bad-soft)}
+.grade-btn.hard{color:var(--ink-2)}.grade-btn.hard:hover{background:var(--sunk)}
+.grade-btn.ok{color:var(--ok)}.grade-btn.ok:hover{background:var(--ok-soft)}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:24px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+
+/* listen */
+.ls-days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;direction:rtl}
+.ls-days::-webkit-scrollbar{display:none}
+.ls-days button{flex:none;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-variant-numeric:tabular-nums;font-size:14px}
+.ls-days button.on{background:var(--accent);color:var(--on-accent);border-color:transparent;font-weight:600}
+.ls-now{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-height:170px;justify-content:center;box-shadow:var(--shadow)}
+.ls-now .de{font-size:clamp(24px,6.5vw,32px);font-weight:600;line-height:1.3;border-bottom:0}
+.ls-now .pr{color:var(--muted);font-size:14px}
+.ls-now .ar{font-size:17px}
+.ls-now .cnt{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ls-ctrl{display:flex;align-items:center;justify-content:center;gap:22px;direction:ltr}
+.ls-play{width:68px;height:68px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;box-shadow:var(--shadow)}
+.ls-play .ic{width:30px;height:30px}
+.ls-skip{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2)}
+.ls-skip:hover{background:var(--sunk)}
+.ls-opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ls-list{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.ls-list li+li{border-top:1px solid var(--line)}
+.ls-list button{width:100%;display:flex;align-items:center;gap:12px;padding:10px 14px;text-align:start}
+.ls-list .n{width:26px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.ls-list .t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}
+.ls-list .t .de{font-size:16px}
+.ls-list .t small{font-size:13px;color:var(--muted)}
+.ls-list .cur{background:var(--accent-soft)}
+.ls-list .cur .n{color:var(--accent);font-weight:600}
+
+/* lesson player */
+.player{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column}
+.pl-head{padding-top:env(safe-area-inset-top,0px);background:var(--surface);border-bottom:1px solid var(--line)}
+.pl-head-in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 12px 8px}
+.pl-title{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.pl-title small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-title b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-timer{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;direction:ltr;background:var(--sunk);border-radius:999px;padding:4px 10px}
+.pl-timer .ic{width:16px;height:16px}
+.pl-steps{max-width:720px;margin:0 auto;width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:2px 12px 10px}
+.pl-step{display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--muted);text-align:center;min-width:0}
+.pl-step i{height:4px;border-radius:2px;background:var(--sunk)}
+.pl-step.past i{background:var(--ok)}
+.pl-step.cur i{background:var(--accent)}
+.pl-step.cur{color:var(--accent);font-weight:600}
+.pl-step span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pl-body-in{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:18px 28px;display:flex;flex-direction:column;gap:16px}
+.pl-foot{background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.pl-foot-in{max-width:720px;margin:0 auto;display:flex;gap:10px;padding:10px 16px}
+.pl-foot-in .btn{flex:1}
+.step-h{display:flex;align-items:baseline;gap:10px}
+.step-h h3{font-size:22px;font-weight:700}
+.step-h .min{margin-inline-start:auto;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 10px;white-space:nowrap}
+.step-h .score{margin-inline-start:auto;font-size:13px;font-weight:600;color:var(--ok);background:var(--ok-soft);border-radius:999px;padding:2px 12px;font-variant-numeric:tabular-nums}
+.note-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.block{display:flex;flex-direction:column;gap:10px}
+.block h4{font-size:16px;font-weight:700}
+.recall{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.recall button{width:100%;display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-height:54px}
+.recall .q{flex:1;min-width:0}
+.recall .a{font-family:var(--f-de);direction:ltr;unicode-bidi:isolate;color:var(--muted);filter:blur(5px);transition:filter .2s;font-size:17px}
+.recall .shown .a{filter:none;color:var(--ink)}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.vlist{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.vrow{display:grid;grid-template-columns:40px minmax(0,1.2fr) minmax(0,1fr);gap:4px 12px;align-items:center;padding:10px 12px;cursor:pointer}
+.vrow+.vrow{border-top:1px solid var(--line)}
+.vrow.seq{background:var(--accent-soft)}
+.vde{min-width:0;display:flex;flex-direction:column;line-height:1.4}
+.vde .de{font-size:18px;border-bottom:0}
+.vde small{font-size:13px;color:var(--muted)}
+.var{min-width:0;font-size:15px}
+.hide-de .vde .de,.hide-de .vde small{filter:blur(6px);transition:filter .2s}
+.hide-de .vrow.peek .vde .de,.hide-de .vrow.peek .vde small{filter:none}
+@media (max-width:480px){.vrow{grid-template-columns:40px minmax(0,1fr)}.var{grid-column:2}}
+.rule{display:flex;flex-direction:column;gap:12px}
+.rule h4{font-size:17px;font-weight:700;padding-top:6px}
+.rule ul,.rule ol{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.note{background:var(--accent-soft);border-radius:10px;padding:10px 14px;font-size:15px}
+.tw{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.tbl{border-collapse:collapse;width:100%;font-size:15px;min-width:max-content}
+.tbl th,.tbl td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{font-weight:600;font-size:13px;color:var(--muted);background:var(--bg)}
+.tbl td b,.rule b.end{color:var(--accent)}
+.grid-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:6px}
+.grid-n{grid-template-columns:repeat(auto-fill,minmax(112px,1fr))}
+.gcell{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 4px;text-align:center;display:flex;flex-direction:column;line-height:1.3}
+.gcell:hover,.gcell.is-playing{border-color:var(--accent);background:var(--accent-soft)}
+.gcell .de{font-size:19px}
+.gcell small{font-size:12px;color:var(--muted)}
+.exlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.exc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.exc.ok{border-color:color-mix(in srgb,var(--ok) 55%,var(--line))}
+.exc.no{border-color:color-mix(in srgb,var(--bad) 55%,var(--line))}
+.exc.ok .exn{background:var(--ok);color:var(--surface)}
+.exc.no .exn{background:var(--bad);color:var(--surface)}
+.exq{display:flex;gap:10px}
+.exn{width:26px;height:26px;border-radius:50%;background:var(--sunk);font-size:13px;font-weight:600;display:grid;place-items:center;flex:none;margin-top:2px;font-variant-numeric:tabular-nums}
+.exq>div{min-width:0}
+.btn-reveal{align-self:flex-start;font-size:14px;font-weight:600;color:var(--accent);padding:4px 0}
+.exa{background:var(--ok-soft);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.exa-l{font-size:12px;color:var(--ok);font-weight:600}
+.exfull{display:flex;align-items:center;gap:10px;border-top:1px dashed color-mix(in srgb,var(--ok) 40%,transparent);padding-top:8px}
+.exfull .pbtn{width:34px;height:34px}
+.exfull .de{font-size:17px}
+.grade{display:flex;gap:8px}
+.grade button{flex:1;border-radius:10px;padding:8px;font-size:14px;font-weight:600;border:1px solid var(--line);background:var(--surface)}
+.grade .g-ok{color:var(--ok)}.grade .g-no{color:var(--bad)}
+.grade .g-ok.sel{background:var(--ok);color:var(--surface);border-color:transparent}
+.grade .g-no.sel{background:var(--bad);color:var(--surface);border-color:transparent}
+.say-big{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.say-big .de{font-size:clamp(22px,6vw,28px);line-height:1.45;font-weight:600}
+.say-big .ar{color:var(--muted)}
+.reps{display:flex;align-items:center;gap:16px}
+.rep-ring{width:96px;height:96px;position:relative;flex:none;display:grid;place-items:center;border-radius:50%}
+.rep-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.rep-ring circle{fill:none;stroke-width:7}
+.rep-ring .bg{stroke:var(--sunk)}.rep-ring .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .25s}
+.rep-ring b{font-size:28px;font-variant-numeric:tabular-nums;line-height:1}
+.rep-ring small{position:absolute;bottom:22px;font-size:11px;color:var(--muted)}
+.rep-ring.full .fg{stroke:var(--ok)}
+.finish{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding-top:20px}
+.finish-badge{width:92px;height:92px;border-radius:50%;background:var(--ok);color:var(--surface);display:grid;place-items:center;animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+.finish-badge .ic{width:46px;height:46px;stroke-width:2.6}
+.finish h3{font-size:24px}
+.finish .de{font-size:20px;color:var(--accent)}
+.finish-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;max-width:420px;margin-top:6px}
+.finish-stats div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 6px;display:flex;flex-direction:column}
+.finish-stats b{font-size:24px;font-variant-numeric:tabular-nums}
+.finish-stats span{font-size:12px;color:var(--muted)}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* sheet & toast */
+.sheet{position:fixed;inset:0;z-index:30;display:flex;align-items:flex-end;justify-content:center;background:rgba(10,12,8,.45)}
+.sheet-panel{background:var(--surface);width:100%;max-width:680px;max-height:88vh;overflow-y:auto;border-radius:22px 22px 0 0;padding-inline:18px;padding-block:10px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;animation:up .22s ease-out}
+.sheet-grip{width:40px;height:4px;border-radius:2px;background:var(--line);align-self:center}
+.sheet-panel h2{font-size:20px}
+.sheet-panel h3{font-size:16px;padding-top:4px}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.sw input{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw input::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:inset-inline-start .2s}
+.sw input:checked{background:var(--accent)}
+.sw input:checked::after{inset-inline-start:21px}
+.guide{margin:0;padding-inline-start:18px;display:grid;gap:6px;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px}
+.sync-box{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border-radius:12px;padding:12px;font-size:14px}
+.btn-danger{color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 40%,var(--line));background:var(--surface)}
+.btn-danger.arm{background:var(--bad);color:var(--surface)}
+.cs-top span,.ls-now .cnt,.step-h .score,.finish-stats b,.pill-ok{direction:ltr;unicode-bidi:isolate}
+.bk-in{width:100%;font:inherit;font-size:13px;direction:ltr;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg);color:var(--ink);resize:vertical}
+.steps-ol{margin:0;padding-inline-start:20px;display:grid;gap:4px;font-size:15px}
+.toast{position:fixed;z-index:40;inset-inline:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none}
+.toast span{background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;font-size:14px;max-width:480px;box-shadow:var(--shadow)}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.enter{animation:fade .2s ease-out}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div id="app" dir="rtl" lang="ar">
+  <header class="appbar">
+    <div class="brand"><b>DaF kompakt</b><span>A1 · مبسّط بالعربية</span></div>
+    <button class="chip-btn on" type="button" data-act="install" id="installBtn" hidden>تثبيت التطبيق</button>
+    <span class="sync-dot" id="syncDot" title="حالة المزامنة"></span>
+    <button class="icon-btn" type="button" data-act="settings" aria-label="الإعدادات" id="setBtn"></button>
+  </header>
+  <main id="screen"></main>
+  <nav class="tabbar" aria-label="التنقل"><div class="tabbar-in" id="tabbar"></div></nav>
+  <div class="player" id="player" hidden></div>
+  <div class="sheet" id="sheet" hidden></div>
+  <div class="toast" id="toast" hidden><span></span></div>
+</div>
+
+<script>
+/* Shared by the build scripts and the app, so audio keys always match. */
+const ABC = [['A','آ','Ah'],['B','بي','Beh'],['C','تسي','Zeh'],['D','دي','Deh'],['E','إي','Eh'],['F','إف','Eff'],['G','ڭي','Geh'],['H','ها','Hah'],['I','إي','Ih'],['J','يوت','Jott'],['K','كا','Kah'],['L','إل','Ell'],['M','إم','Emm'],['N','إن','Enn'],['O','أو','Oh'],['P','پي','Peh'],['Q','كو','Kuh'],['R','إر','Err'],['S','إس','Ess'],['T','تي','Teh'],['U','أو','Uh'],['V','فاو','Fau'],['W','ڤي','Weh'],['X','إكس','Ix'],['Y','إپسيلون','Üpsilon'],['Z','تسيت','Zett'],['Ä','إ','Ä'],['Ö','eu','Ö'],['Ü','u','Ü'],['ß','إس تسيت','Eszett']];
+const NUMS = [[0,'null'],[1,'eins'],[2,'zwei'],[3,'drei'],[4,'vier'],[5,'fünf'],[6,'sechs'],[7,'sieben'],[8,'acht'],[9,'neun'],[10,'zehn'],[11,'elf'],[12,'zwölf'],[13,'dreizehn'],[16,'sechzehn'],[17,'siebzehn'],[20,'zwanzig'],[21,'einundzwanzig'],[30,'dreißig'],[40,'vierzig'],[50,'fünfzig'],[60,'sechzig'],[70,'siebzig'],[80,'achtzig'],[90,'neunzig'],[100,'hundert'],[1000,'tausend']];
+const MONTHS = [['Januar','يناير'],['Februar','فبراير'],['März','مارس'],['April','أبريل'],['Mai','ماي'],['Juni','يونيو'],['Juli','يوليوز'],['August','غشت'],['September','شتنبر'],['Oktober','أكتوبر'],['November','نونبر'],['Dezember','دجنبر']];
+const COMMON = ['Guten Morgen!','Guten Tag!','Guten Abend!','Richtig!','Sehr gut! Weiter so!'];
+
+const CORE = (function(){
+  function stripTags(s){ return s.replace(/<[^>]+>/g,''); }
+  function norm(s){
+    return stripTags(String(s)).replace(/،/g,',').replace(/\[(der|den|das|die)\]/g,'$1').replace(/\s+/g,' ').trim();
+  }
+  function spans(s){ const out=[]; String(s).replace(/«([^»]+)»/g,(m,t)=>{ out.push(norm(t)); return m; }); return out; }
+  function playable(k){ return /[A-Za-zÄÖÜäöüß]{2,}/.test(k) && k.indexOf('___')<0; }
+  /* Fill the blanks of an exercise with its answer to get the full German sentence. */
+  function complete(ex){
+    const qs = spans(ex.q).filter(k=>k.indexOf('___')>=0);
+    if(!qs.length) return null;
+    let fills = [];
+    spans(ex.a).forEach(k=>{ k.split('…').forEach(p=>{ p=p.trim(); if(p) fills.push(p); }); });
+    const blanks = qs.reduce((n,k)=>n+(k.match(/___/g)||[]).length,0);
+    if(!blanks || fills.length!==blanks) return null;
+    let i=0;
+    const done = qs.map(k=>{
+      let s = k.replace(/___([.?!,]?)/g,(m,p)=>{ let f=fills[i++]; if(p) f=f.replace(/[.?!]+$/,''); return f+p; });
+      s = s.replace(/\s*\([^)]*\)/g,'').replace(/●\s*/g,'').replace(/\s+([.?!,])/g,'$1').replace(/\s+/g,' ').trim();
+      return s.charAt(0).toUpperCase()+s.slice(1);
+    });
+    return done.join(' – ');
+  }
+  return {norm, spans, playable, complete};
+})();
+
+
+
+const LESSONS = [
+  {l:1, name:`Ich und die anderen`, days:[1,2,3,4,5]},
+  {l:2, name:`Menschen und Dinge`, days:[6,7,8,9]},
+  {l:3, name:`Studentenleben`, days:[10,11,12]},
+  {l:4, name:`Wirtschaft trifft Kultur`, days:[13,14,15,16]},
+  {l:5, name:`Spiel und Spaß`, days:[17,18,19]},
+  {l:0, name:`مراجعة`, days:[20]}
+];
+
+const SEGS = [[`مراجعة`,10],[`مفردات`,15],[`القاعدة`,15],[`تمارين`,15],[`جملة اليوم`,5]];
+
+const DAYS = [
+/* ---------- Lektion 1 ---------- */
+{ref:`Lektion 1 – A · ص 8–9`, title:`التحية والتعارف`,
+ goal:`تحيّي الناس، تقدّم نفسك، وتسأل عن الاسم والبلد بطريقة رسمية وغير رسمية.`,
+ review:`هذا أول يوم، فاستعمل دقائق المراجعة للتعرّف على الكتاب: افتح الصفحة 4 (فهرس الدروس). الكتاب فيه 8 دروس، وكل درس مقسّم إلى ثلاثة أجزاء A وB وC، ثم صفحتان بعنوان «Alles auf einen Blick» فيهما كل مفردات الدرس وقواعده. هذا البرنامج يغطي الدروس 1 إلى 5 من الملف الذي أرسلته.`,
+ vocab:[
+  [`Guten Morgen!`,`ڭوتن مورڭن`,`صباح الخير`],
+  [`Guten Tag!`,`ڭوتن تاك`,`نهارك سعيد (تحية رسمية)`],
+  [`Hallo!`,`هالو`,`مرحباً`],
+  [`Grüß dich!`,`ڭروس ديش`,`أهلاً (للأصدقاء)`],
+  [`Ich heiße …`,`إيش هايسه`,`اسمي …`],
+  [`Ich bin …`,`إيش بين`,`أنا …`],
+  [`Wie heißen Sie?`,`ڤي هايسن زي`,`ما اسمك؟ (رسمي)`],
+  [`Wie heißt du?`,`ڤي هايست دو`,`ما اسمك؟ (غير رسمي)`],
+  [`Woher kommen Sie?`,`ڤوهير كومن زي`,`من أين أنت؟ (رسمي)`],
+  [`Ich komme aus Marokko.`,`إيش كومه آوس ماروكو`,`أنا من المغرب.`],
+  [`Freut mich!`,`فرويت ميش`,`تشرّفنا`],
+  [`Herzlich willkommen!`,`هيرتسليش ڤيلكومن`,`أهلاً وسهلاً`],
+  [`Auf Wiedersehen!`,`آوف ڤيدرزيهن`,`إلى اللقاء (رسمي)`],
+  [`Tschüss!`,`تشوس`,`باي (غير رسمي)`]
+ ],
+ rule:`<h4>Sie أم du؟</h4>
+<p>في الألمانية طريقتان لمخاطبة الشخص، واختيار الخطأ يُعتبر قلّة أدب أو برودة:</p>
+<div class="tw"><table class="tbl"><thead><tr><th></th><th>رسمي «Sie»</th><th>غير رسمي «du»</th></tr></thead><tbody>
+<tr><td>مع من؟</td><td>الأستاذ، المدير، شخص لا تعرفه</td><td>العائلة، الأصدقاء، الطلبة</td></tr>
+<tr><td>الاسم</td><td>«Wie heißen Sie?»</td><td>«Wie heißt du?»</td></tr>
+<tr><td>البلد</td><td>«Woher kommen Sie?»</td><td>«Woher kommst du?»</td></tr>
+<tr><td>التحية</td><td>«Guten Tag!»</td><td>«Hallo! / Grüß dich!»</td></tr>
+<tr><td>الوداع</td><td>«Auf Wiedersehen!»</td><td>«Tschüss!»</td></tr>
+</tbody></table></div>
+<p>مع الرسمي نستعمل الاسم العائلي: «Frau Brandt» (السيدة برانت)، «Herr Amri» (السيد عمري).</p>
+<h4>ثلاث قواعد نطق تحتاجها من اليوم</h4>
+<ul><li>«w» تُنطق ڤ: «Wie» = ڤي</li><li>«ei» تُنطق آي: «heiße» = هايسه، و«ie» تُنطق إي طويلة: «Sie» = زي</li><li>«ß» سين واضحة: «heißen» = هايسن</li></ul>
+<p class="note">كل الأسماء في الألمانية تبدأ بحرف كبير: «Tag»، «Morgen»، «Marokko». و«Sie» الرسمية تُكتب دائماً بحرف كبير.</p>`,
+ ex:[
+  {q:`أكمل الحوار (ص 8): «● ___. Ich bin Ihre Deutschlehrerin. Ich heiße Christiane Brandt. Und ___?»`, a:`«Guten Morgen.» ثم «wie heißen Sie?»`},
+  {q:`كيف تسأل أستاذتك عن بلدها؟`, a:`«Woher kommen Sie?»`},
+  {q:`كيف تسأل زميلاً في الدرس عن اسمه؟`, a:`«Wie heißt du?»`},
+  {q:`ترجم: أنا من المغرب، من الرشيدية.`, a:`«Ich komme aus Marokko, aus Errachidia.»`},
+  {q:`زميل يقول لك «Hallo!». بماذا ترد، وكيف تودّعه في الأخير؟`, a:`«Hallo!» أو «Grüß dich!»، وفي الأخير «Tschüss!»`},
+  {q:`قدّم نفسك في ثلاث جمل بطريقة رسمية.`, a:`«Guten Tag! Ich heiße Mouhsine. Ich komme aus Marokko.»`}
+ ],
+ say:[`Guten Tag! Ich heiße Mouhsine. Ich komme aus Marokko.`,`نهارك سعيد! اسمي محسن. أنا من المغرب.`]
+},
+{ref:`Lektion 1 – A2 حتى B2 · ص 9–10`, title:`البلدان واللغات وكيف حالك؟`,
+ goal:`تقول من أين أنت وما اللغات التي تتكلمها، وتسأل عن الحال وتجيب.`,
+ review:`قل بصوت عالٍ دون النظر: كيف تحيّي أستاذك؟ كيف تسأل زميلاً عن اسمه وبلده؟ ثم قدّم نفسك مرتين: مرة بطريقة رسمية ومرة لصديق.`,
+ vocab:[
+  [`Deutschland`,`دويتشلانت`,`ألمانيا`],
+  [`Österreich`,`أوسترايش`,`النمسا`],
+  [`[die] Schweiz`,`دي شڤايتس`,`سويسرا`],
+  [`[die] Türkei`,`دي توركاي`,`تركيا`],
+  [`Frankreich`,`فرانكرايش`,`فرنسا`],
+  [`Arabisch`,`آرابيش`,`العربية`],
+  [`Französisch`,`فرانتسوزيش`,`الفرنسية`],
+  [`Englisch`,`إنڭليش`,`الإنجليزية`],
+  [`Deutsch`,`دويتش`,`الألمانية`],
+  [`Was studierst du?`,`ڤاس شتوديرست دو`,`ماذا تدرس؟`],
+  [`Ich arbeite schon.`,`إيش آربايته شون`,`أنا أعمل (لم أعد أدرس)`],
+  [`Wie geht es Ihnen?`,`ڤي ڭيت إس إينن`,`كيف حالك؟ (رسمي)`],
+  [`Wie geht es dir?`,`ڤي ڭيت إس دير`,`كيف حالك؟ (غير رسمي)`],
+  [`Danke, gut.`,`دانكه، ڭوت`,`بخير، شكراً`],
+  [`Es geht.`,`إس ڭيت`,`لا بأس`],
+  [`ein bisschen`,`آين بيسشن`,`قليلاً`]
+ ],
+ rule:`<h4>من أين أنت؟ «aus» + البلد</h4>
+<p>أغلب البلدان بدون أداة: «Ich komme aus Marokko.» «Er kommt aus Deutschland.»</p>
+<p>بعض البلدان لها أداة، فتتغير بعد «aus»:</p>
+<div class="tw"><table class="tbl"><thead><tr><th>النوع</th><th>البلد</th><th>بعد aus</th></tr></thead><tbody>
+<tr><td>مؤنث</td><td>«[die] Schweiz، [die] Türkei»</td><td>«aus <b>der</b> Schweiz، aus <b>der</b> Türkei»</td></tr>
+<tr><td>مذكر</td><td>«[der] Iran، [der] Irak»</td><td>«aus <b>dem</b> Iran، aus <b>dem</b> Irak»</td></tr>
+<tr><td>جمع</td><td>«die USA، die Niederlande»</td><td>«aus <b>den</b> USA، aus <b>den</b> Niederlanden»</td></tr>
+</tbody></table></div>
+<h4>اللغات</h4>
+<p>أسماء اللغات تنتهي غالباً بـ «-isch»: «Arabisch، Spanisch، Englisch، Französisch». الاستثناء الأشهر: «Deutsch».</p>
+<p>الفعل «sprechen» (يتكلم) يغيّر حرفه مع du وer: «ich spreche، du sprichst، er spricht».</p>
+<h4>الدراسة</h4>
+<p>«Was studierst du?» – «Ich studiere Informatik.» من التخصصات: «Informatik» معلوميات، «Medizin» طب، «Wirtschaft» اقتصاد، «Jura» قانون. إن كنت تعمل: «Ich arbeite schon.»</p>
+<h4>كيف حالك؟</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>الجواب</th><th>المعنى</th></tr></thead><tbody>
+<tr><td>«Sehr gut, danke.»</td><td>جيد جداً، شكراً</td></tr>
+<tr><td>«Danke, gut.»</td><td>بخير، شكراً</td></tr>
+<tr><td>«Na ja, es geht.»</td><td>لا بأس</td></tr>
+<tr><td>«Nicht so gut.»</td><td>لست بخير</td></tr>
+</tbody></table></div>
+<p class="note">بعد الجواب أرجع السؤال: «Und Ihnen?» (رسمي) أو «Und dir?» (غير رسمي).</p>`,
+ ex:[
+  {q:`أكمل: «Ich komme aus ___ Türkei.»`, a:`«der»`},
+  {q:`أكمل: «Sie kommt aus ___ USA.»`, a:`«den»`},
+  {q:`أكمل: «Er kommt aus ___ Irak.»`, a:`«dem»`},
+  {q:`ترجم: أتكلم العربية والفرنسية وقليلاً من الألمانية.`, a:`«Ich spreche Arabisch, Französisch und ein bisschen Deutsch.»`},
+  {q:`أجب بأدب عن سؤال «Wie geht es Ihnen?»`, a:`«Danke, gut. Und Ihnen?»`},
+  {q:`أكمل بالفعل studieren: «Was ___ du?» – «Ich ___ Wirtschaft.»`, a:`«studierst» ثم «studiere»`}
+ ],
+ say:[`Ich spreche Arabisch, Französisch und ein bisschen Deutsch.`,`أتكلم العربية والفرنسية وقليلاً من الألمانية.`]
+},
+{ref:`Lektion 1 – B3 حتى B5 · ص 11 و15`, title:`تصريف الأفعال ومكان الفعل في الجملة`,
+ goal:`تصرّف أي فعل منتظم في المضارع، وتعرف أين تضع الفعل في الجملة والسؤال.`,
+ review:`قل بلدك ولغاتك في جملتين. ثم أجب عن «Wie geht es dir?» بثلاث أجوبة مختلفة.`,
+ vocab:[
+  [`ich`,`إيش`,`أنا`],
+  [`du`,`دو`,`أنت (غير رسمي)`],
+  [`er / sie / es`,`إير / زي / إس`,`هو / هي / هو (للمحايد)`],
+  [`wir`,`ڤير`,`نحن`],
+  [`ihr`,`إير`,`أنتم (غير رسمي)`],
+  [`sie / Sie`,`زي`,`هم / حضرتك (رسمي)`],
+  [`kommen`,`كومن`,`يأتي`],
+  [`wohnen`,`ڤونن`,`يسكن`],
+  [`heißen`,`هايسن`,`يُدعى`],
+  [`arbeiten`,`آربايتن`,`يعمل`],
+  [`lernen`,`ليرنن`,`يتعلم`],
+  [`machen`,`ماخن`,`يفعل`],
+  [`sein`,`زاين`,`يكون`],
+  [`Wo wohnst du?`,`ڤو ڤونست دو`,`أين تسكن؟`]
+ ],
+ rule:`<h4>1. تصريف الفعل في المضارع</h4>
+<p>احذف «-en» من المصدر لتحصل على الجذر: «komm-en» ← «komm». ثم أضف النهاية حسب الضمير:</p>
+<div class="tw"><table class="tbl"><thead><tr><th>الضمير</th><th>النهاية</th><th>kommen</th><th>wohnen</th><th>arbeiten</th><th>heißen</th></tr></thead><tbody>
+<tr><td>«ich»</td><td>-e</td><td>«komm<b>e</b>»</td><td>«wohn<b>e</b>»</td><td>«arbeit<b>e</b>»</td><td>«heiß<b>e</b>»</td></tr>
+<tr><td>«du»</td><td>-st</td><td>«komm<b>st</b>»</td><td>«wohn<b>st</b>»</td><td>«arbeit<b>est</b>»</td><td>«heiß<b>t</b>»</td></tr>
+<tr><td>«er/sie/es»</td><td>-t</td><td>«komm<b>t</b>»</td><td>«wohn<b>t</b>»</td><td>«arbeit<b>et</b>»</td><td>«heiß<b>t</b>»</td></tr>
+<tr><td>«wir»</td><td>-en</td><td>«komm<b>en</b>»</td><td>«wohn<b>en</b>»</td><td>«arbeit<b>en</b>»</td><td>«heiß<b>en</b>»</td></tr>
+<tr><td>«ihr»</td><td>-t</td><td>«komm<b>t</b>»</td><td>«wohn<b>t</b>»</td><td>«arbeit<b>et</b>»</td><td>«heiß<b>t</b>»</td></tr>
+<tr><td>«sie/Sie»</td><td>-en</td><td>«komm<b>en</b>»</td><td>«wohn<b>en</b>»</td><td>«arbeit<b>en</b>»</td><td>«heiß<b>en</b>»</td></tr>
+</tbody></table></div>
+<ul><li>جذر ينتهي بـ t أو d (مثل «arbeit»): نزيد e قبل النهاية: «du arbeitest، er arbeitet».</li><li>جذر ينتهي بـ s أو ß أو z (مثل «heiß»): مع du نضيف t فقط: «du heißt».</li><li>لاحظ: wir وsie/Sie لهما نفس الشكل دائماً، وهو المصدر نفسه.</li></ul>
+<h4>2. الفعل «sein» شاذّ، احفظه كما هو</h4>
+<p>«ich bin · du bist · er/sie/es ist · wir sind · ihr seid · sie/Sie sind»</p>
+<h4>3. مكان الفعل: المرتبة الثانية</h4>
+<p>في الجملة الخبرية وفي السؤال الذي يبدأ بـ W (Wie، Wo، Woher) الفعل دائماً في المرتبة 2:</p>
+<div class="tw"><table class="tbl"><thead><tr><th>المرتبة 1</th><th>المرتبة 2</th><th>الباقي</th></tr></thead><tbody>
+<tr><td>«Ich»</td><td>«<b>wohne</b>»</td><td>«in Tübingen.»</td></tr>
+<tr><td>«Wo»</td><td>«<b>wohnst</b>»</td><td>«du?»</td></tr>
+<tr><td>«In Tübingen»</td><td>«<b>studiere</b>»</td><td>«ich Medizin.»</td></tr>
+</tbody></table></div>
+<p>في سؤال نعم/لا يأتي الفعل في المرتبة 1: «<b>Wohnst</b> du in Stuttgart?» – «Nein, ich wohne in Tübingen.»</p>`,
+ ex:[
+  {q:`أكمل: «Du ___ (arbeiten) in Rabat.»`, a:`«arbeitest»`},
+  {q:`أكمل: «Er ___ (heißen) Tarik.»`, a:`«heißt»`},
+  {q:`أكمل: «Ihr ___ (sein) neu im Kurs.»`, a:`«seid»`},
+  {q:`أكمل: «Ich ___ (lernen) Deutsch. Wir ___ (lernen) zusammen.»`, a:`«lerne» ثم «lernen»`},
+  {q:`حوّل إلى سؤال نعم/لا: «Du kommst aus Marokko.»`, a:`«Kommst du aus Marokko?»`},
+  {q:`رتّب الكلمات: «wohnst / wo / du / ?»`, a:`«Wo wohnst du?»`}
+ ],
+ say:[`Wo wohnst du? – Ich wohne in Errachidia.`,`أين تسكن؟ – أسكن في الرشيدية.`]
+},
+{ref:`Lektion 1 – C · ص 12–13`, title:`الحروف والأرقام والاستمارات`,
+ goal:`تتهجّى اسمك، تقرأ الأرقام وتكتبها، وتملأ استمارة بمعلوماتك.`,
+ review:`صرّف «sein» و«kommen» مع كل الضمائر بصوت عالٍ، ثم كوّن سؤال نعم/لا وسؤال W.`,
+ vocab:[
+  [`Wie schreibt man das?`,`ڤي شرايبت مان داس`,`كيف يُكتب ذلك؟`],
+  [`Buchstabieren Sie bitte!`,`بوخشتابيرن زي بيته`,`تهجَّ من فضلك`],
+  [`[der] Vorname`,`دير فورنامه`,`الاسم الشخصي`],
+  [`[der] Familienname`,`دير فاميليننامه`,`الاسم العائلي`],
+  [`[die] Adresse`,`دي آدريسه`,`العنوان`],
+  [`[die] Straße`,`دي شتراسه`,`الشارع`],
+  [`[die] Hausnummer`,`دي هاوس نومر`,`رقم المنزل`],
+  [`[die] Postleitzahl`,`دي پوستلايت تسال`,`الرمز البريدي`],
+  [`[der] Wohnort`,`دير ڤون أورت`,`مكان السكن`],
+  [`[die] Telefonnummer`,`دي تيليفون نومر`,`رقم الهاتف`],
+  [`[die] Handynummer`,`دي هيندي نومر`,`رقم المحمول`],
+  [`[die] Muttersprache`,`دي موترشپراخه`,`اللغة الأم`],
+  [`Wie alt bist du?`,`ڤي آلت بيست دو`,`كم عمرك؟`],
+  [`Ich bin 30 Jahre alt.`,`إيش بين درايسيش ياره آلت`,`عمري 30 سنة`]
+ ],
+ rule:`<h4>الحروف الألمانية</h4>
+<p>اضغط على أي حرف لتسمعه. الحروف الصعبة على العربي: E وI (كلاهما «إي»)، وV (فاو)، وW (ڤي)، وZ (تسيت).</p>
+<div class="grid-l" id="abc"></div>
+<h4>الأرقام</h4>
+<div class="grid-l grid-n" id="nums"></div>
+<p class="note">الخبر السار: الأرقام من 21 إلى 99 تُقرأ مثل العربية تماماً، الآحاد أولاً: «einundzwanzig» = واحد وعشرون. و«193» = «einhundertdreiundneunzig» (مئة ثلاثة وتسعون).</p>
+<ul><li>انتبه للأشكال القصيرة: «sechzehn» (16) و«sechzig» (60) بدون s، و«siebzehn» (17) و«siebzig» (70) بدون en.</li><li>«dreißig» (30) بحرف ß، بينما باقي العشرات بـ zig.</li><li>أرقام الهاتف تُقرأ رقماً رقماً: «0711» = «null sieben eins eins».</li><li>عند التهجئة: «tt» = «zwei t» أو «Doppel-t».</li></ul>`,
+ ex:[
+  {q:`اكتب بالحروف: 47`, a:`«siebenundvierzig»`},
+  {q:`اكتب بالحروف: 16 و 70`, a:`«sechzehn» و «siebzig»`},
+  {q:`اكتب بالحروف: 99`, a:`«neunundneunzig»`},
+  {q:`اكتب بالحروف: 365`, a:`«dreihundertfünfundsechzig»`},
+  {q:`تهجَّ اسم «Mouhsine» بأسماء الحروف الألمانية.`, a:`«M – O – U – H – S – I – N – E» = إم – أو – أو – ها – إس – إي – إن – إي`},
+  {q:`املأ: «Vorname: … / Wohnort: … / Herkunftsland: … / Muttersprache: …»`, a:`«Vorname: Mouhsine / Wohnort: Errachidia / Herkunftsland: Marokko / Muttersprache: Arabisch»`}
+ ],
+ say:[`Wie ist Ihre Telefonnummer? – Meine Telefonnummer ist …`,`ما رقم هاتفك؟ – رقم هاتفي هو …`]
+},
+{ref:`Lektion 1 – Kurssprache · ص 14–17`, title:`الأسماء وجمعها، وتعليمات الكتاب`,
+ goal:`تعرف أداة الاسم وجمعه، وتفهم تعليمات تمارين الكتاب، وتراجع الدرس 1 كاملاً.`,
+ review:`اكتب الأرقام 13 و21 و58 و100 بالحروف، ثم تهجَّ اسمك العائلي بصوت عالٍ.`,
+ vocab:[
+  [`[der] Kugelschreiber`,`دير كوڭلشرايبر`,`قلم حبر`],
+  [`[der] Bleistift`,`دير بلايشتيفت`,`قلم رصاص`],
+  [`[das] Buch`,`داس بوخ`,`كتاب`],
+  [`[das] Heft`,`داس هيفت`,`دفتر`],
+  [`[die] Tafel`,`دي تافل`,`سبورة`],
+  [`[der] Tisch`,`دير تيش`,`طاولة`],
+  [`[das] Wörterbuch`,`داس ڤورتربوخ`,`قاموس`],
+  [`[der] Radiergummi`,`دير راديرڭومي`,`ممحاة`],
+  [`Hören Sie.`,`هورن زي`,`استمع`],
+  [`Lesen Sie.`,`ليزن زي`,`اقرأ`],
+  [`Schreiben Sie.`,`شرايبن زي`,`اكتب`],
+  [`Ergänzen Sie.`,`إرڭينتسن زي`,`أكمل`],
+  [`Ordnen Sie zu.`,`أوردنن زي تسو`,`صِل / طابق`],
+  [`Kreuzen Sie an.`,`كرويتسن زي آن`,`ضع علامة`],
+  [`Wie heißt das auf Deutsch?`,`ڤي هايست داس آوف دويتش`,`ماذا يُسمّى هذا بالألمانية؟`]
+ ],
+ rule:`<h4>der · das · die</h4>
+<p>كل اسم ألماني له جنس: مذكر «[der]»، محايد «[das]»، مؤنث «[die]». والجمع دائماً «die». الجنس لا يُخمَّن في الغالب، لذلك احفظ كل اسم مع أداته وجمعه، كما في قائمة الكتاب ص 14: «[das] Buch, ¨-er» تعني أن الجمع «die Bücher».</p>
+<p class="note">نصيحة الكتاب (ص 17): اكتب أسماء الأشياء في بيتك ومكتبك على أوراق صغيرة والصقها عليها، مع الأداة. واستعمل الألوان كما في هذه الصفحة: أزرق للمذكر، أخضر للمحايد، أحمر للمؤنث.</p>
+<h4>علامات الجمع</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>العلامة</th><th>المفرد</th><th>الجمع</th></tr></thead><tbody>
+<tr><td>-e</td><td>«[das] Heft»</td><td>«die Heft<b>e</b>»</td></tr>
+<tr><td>¨-e</td><td>«[der] Ball»</td><td>«die B<b>ä</b>ll<b>e</b>»</td></tr>
+<tr><td>-n</td><td>«[die] Gruppe»</td><td>«die Gruppe<b>n</b>»</td></tr>
+<tr><td>-en</td><td>«[der] Projektor»</td><td>«die Projektor<b>en</b>»</td></tr>
+<tr><td>-nen</td><td>«[die] Lehrerin»</td><td>«die Lehrerin<b>nen</b>»</td></tr>
+<tr><td>بدون تغيير</td><td>«[der] Kugelschreiber»</td><td>«die Kugelschreiber»</td></tr>
+<tr><td>¨</td><td>«[der] Apfel»</td><td>«die <b>Ä</b>pfel»</td></tr>
+<tr><td>¨-er</td><td>«[das] Buch»</td><td>«die B<b>ü</b>ch<b>er</b>»</td></tr>
+<tr><td>-er</td><td>«[das] Bild»</td><td>«die Bild<b>er</b>»</td></tr>
+<tr><td>-s</td><td>«[das] Tablet»</td><td>«die Tablet<b>s</b>»</td></tr>
+</tbody></table></div>
+<h4>كلمتان صغيرتان في الكلام: «denn» و«ja»</h4>
+<p>«Was macht ihr denn hier?» – «denn» في السؤال تعبّر عن الاهتمام والفضول. «Das ist ja super!» – «ja» للتأكيد والتعجب.</p>`,
+ ex:[
+  {q:`ما أداة «Buch» وما جمعه؟`, a:`«das Buch – die Bücher»`},
+  {q:`ما جمع «Lehrerin»؟`, a:`«die Lehrerinnen»`},
+  {q:`ما معنى التعليمة «Kreuzen Sie an.»؟`, a:`ضع علامة (✗) على الجواب الصحيح.`},
+  {q:`مراجعة الدرس 1 – أكمل: «Woher ___ du?» – «Ich ___ aus Marokko.»`, a:`«kommst» ثم «komme»`},
+  {q:`مراجعة – قدّم زميلاً بالشخص الثالث: اسمه Tarik، من المغرب، يدرس المعلوميات.`, a:`«Das ist Tarik. Er kommt aus Marokko. Er studiert Informatik.»`},
+  {q:`مراجعة – تشير إلى قلم ولا تعرف اسمه. ماذا تسأل؟`, a:`«Wie heißt das auf Deutsch?» والجواب: «Das heißt …» أو «Das weiß ich nicht.»`}
+ ],
+ say:[`Wie heißt das auf Deutsch? – Das heißt „der Kugelschreiber“.`,`ماذا يُسمّى هذا بالألمانية؟ – يُسمّى «قلم الحبر».`]
+},
+/* ---------- Lektion 2 ---------- */
+{ref:`Lektion 2 – A1 حتى A4 · ص 18–19`, title:`النكرة والمعرفة والنفي`,
+ goal:`تستعمل ein وder وkein بشكل صحيح، وتتكلم عن أجهزة الماضي واليوم.`,
+ review:`قل أداة وجمع هذه الأسماء دون النظر: Buch، Heft، Lehrerin، Apfel، Tablet.`,
+ vocab:[
+  [`[das] Telefon`,`داس تيليفون`,`هاتف`],
+  [`[die] Kamera`,`دي كاميرا`,`كاميرا`],
+  [`[der] Computer`,`دير كومپيوتر`,`حاسوب`],
+  [`[der] Laptop`,`دير ليپتوپ`,`حاسوب محمول`],
+  [`[das] Smartphone`,`داس سمارتفون`,`هاتف ذكي`],
+  [`[das] Handy`,`داس هيندي`,`هاتف محمول`],
+  [`[die] Kreditkarte`,`دي كريديتكارته`,`بطاقة ائتمان`],
+  [`[das] Foto`,`داس فوتو`,`صورة`],
+  [`früher`,`فروهر`,`في الماضي`],
+  [`heute`,`هويته`,`اليوم / حالياً`],
+  [`modern ≠ altmodisch`,`مودرن / آلتموديش`,`عصري ≠ قديم الطراز`],
+  [`funktionieren`,`فونكتسيونيرن`,`يشتغل (جهاز)`],
+  [`brauchen`,`براوخن`,`يحتاج`],
+  [`benutzen`,`بنوتسن`,`يستعمل`]
+ ],
+ rule:`<h4>ثلاث أدوات قبل الاسم</h4>
+<ul><li><b class="end">ein / eine</b> = نكرة، معلومة جديدة: «Das ist ein Plattenspieler.»</li><li><b class="end">der / das / die</b> = معرفة، شيء ذُكر من قبل: «Der Plattenspieler funktioniert noch.»</li><li><b class="end">kein / keine</b> = نفي الاسم (ليس / لا يوجد): «Das ist kein Telefon.»</li></ul>
+<div class="tw"><table class="tbl"><thead><tr><th>حالة الفاعل</th><th>مذكر</th><th>محايد</th><th>مؤنث</th><th>جمع</th></tr></thead><tbody>
+<tr><td>معرفة</td><td>«[der] Computer»</td><td>«[das] Telefon»</td><td>«[die] Kamera»</td><td>«die Kassetten»</td></tr>
+<tr><td>نكرة</td><td>«ein Computer»</td><td>«ein Telefon»</td><td>«ein<b>e</b> Kamera»</td><td>«Kassetten» (بدون أداة)</td></tr>
+<tr><td>نفي</td><td>«kein Computer»</td><td>«kein Telefon»</td><td>«kein<b>e</b> Kamera»</td><td>«kein<b>e</b> Kassetten»</td></tr>
+</tbody></table></div>
+<p class="note">لاحظ: ein وkein لهما نفس النهاية في المفرد. والجمع ليس له نكرة: «Das sind Disketten.»</p>`,
+ ex:[
+  {q:`أكمل (نكرة): «Das ist ___ Kamera.»`, a:`«eine»`},
+  {q:`أكمل (معرفة): «___ Kamera macht gute Fotos.»`, a:`«Die»`},
+  {q:`أكمل (نفي): «Das ist ___ Handy.»`, a:`«kein»`},
+  {q:`أكمل (نفي، جمع): «Das sind ___ Kreditkarten.»`, a:`«keine»`},
+  {q:`ترجم: هذا حاسوب. الحاسوب جديد.`, a:`«Das ist ein Computer. Der Computer ist neu.»`}
+ ],
+ say:[`Das ist kein Telefon. Das ist ein Smartphone.`,`هذا ليس هاتفاً عادياً. هذا هاتف ذكي.`]
+},
+{ref:`Lektion 2 – A5 حتى A7 · ص 19 و25`, title:`المفعول به (Akkusativ) والفعل haben`,
+ goal:`تفرّق بين الفاعل والمفعول به، وتقول ماذا عندك اليوم وماذا كان عندك.`,
+ review:`كوّن 3 جمل: واحدة بـ ein، وواحدة بـ der/die/das، وواحدة بـ kein.`,
+ vocab:[
+  [`haben`,`هابن`,`يملك / عنده`],
+  [`ich habe`,`إيش هابه`,`عندي`],
+  [`du hast`,`دو هاست`,`عندك`],
+  [`er hat`,`إير هات`,`عنده`],
+  [`ich hatte`,`إيش هاته`,`كان عندي`],
+  [`es gibt`,`إس ڭيبت`,`يوجد`],
+  [`[das] Tablet`,`داس تابلت`,`لوح إلكتروني`],
+  [`[das] Navi`,`داس ناڤي`,`جهاز تحديد الطريق`],
+  [`[die] App`,`دي إيپ`,`تطبيق`],
+  [`kaufen`,`كاوفن`,`يشتري`],
+  [`telefonieren`,`تيليفونيرن`,`يتصل هاتفياً`],
+  [`hören`,`هورن`,`يسمع`],
+  [`lesen`,`ليزن`,`يقرأ`]
+ ],
+ rule:`<h4>الفاعل أم المفعول به؟</h4>
+<p>السؤال «Wer / Was» (من؟ ماذا؟) عن الفاعل = <b class="end">Nominativ</b>. السؤال «Wen / Was» عن المفعول به = <b class="end">Akkusativ</b>.</p>
+<p>«Ich habe einen Computer. Ich brauche den Computer für die Arbeit. Der Computer ist sehr praktisch.»</p>
+<p>التغيير يحدث <b class="end">في المذكر فقط</b>: der ← den، ein ← einen، kein ← keinen. المحايد والمؤنث والجمع لا تتغير.</p>
+<div class="tw"><table class="tbl"><thead><tr><th></th><th>مذكر</th><th>محايد</th><th>مؤنث</th><th>جمع</th></tr></thead><tbody>
+<tr><td>فاعل</td><td>«der / ein / kein Computer»</td><td>«das / ein / kein Telefon»</td><td>«die / eine / keine Kamera»</td><td>«die / – / keine Kassetten»</td></tr>
+<tr><td>مفعول به</td><td>«<b>den / einen / keinen</b> Computer»</td><td>«das / ein / kein Telefon»</td><td>«die / eine / keine Kamera»</td><td>«die / – / keine Kassetten»</td></tr>
+</tbody></table></div>
+<p>أفعال تأخذ مفعولاً به: «haben، brauchen، benutzen، kaufen، nehmen، es gibt».</p>
+<h4>الفعل «haben»</h4>
+<div class="tw"><table class="tbl"><thead><tr><th></th><th>الحاضر</th><th>الماضي</th></tr></thead><tbody>
+<tr><td>«ich»</td><td>«habe»</td><td>«hatte»</td></tr>
+<tr><td>«du»</td><td>«hast»</td><td>«hattest»</td></tr>
+<tr><td>«er/sie/es»</td><td>«hat»</td><td>«hatte»</td></tr>
+<tr><td>«wir»</td><td>«haben»</td><td>«hatten»</td></tr>
+<tr><td>«ihr»</td><td>«habt»</td><td>«hattet»</td></tr>
+<tr><td>«sie/Sie»</td><td>«haben»</td><td>«hatten»</td></tr>
+</tbody></table></div>`,
+ ex:[
+  {q:`أكمل (نكرة، der Laptop): «Ich habe ___ Laptop.»`, a:`«einen»`},
+  {q:`أكمل (معرفة): «Er braucht ___ Computer.»`, a:`«den»`},
+  {q:`أكمل (نفي، das Navi): «Wir haben ___ Navi.»`, a:`«kein» (المحايد لا يتغير)`},
+  {q:`أكمل (نكرة): «Hast du ___ Kamera?»`, a:`«eine»`},
+  {q:`أكمل بـ haben: «Du ___ ein Tablet.»`, a:`«hast»`},
+  {q:`ترجم: في الماضي لم يكن عندي هاتف محمول.`, a:`«Früher hatte ich kein Handy.» (الفعل بقي في المرتبة 2)`}
+ ],
+ say:[`Früher hatte ich kein Handy. Heute habe ich ein Smartphone.`,`في الماضي لم يكن عندي هاتف محمول. اليوم عندي هاتف ذكي.`]
+},
+{ref:`Lektion 2 – B · ص 20–21 و25`, title:`العائلة وأدوات الملكية`,
+ goal:`تقدّم أفراد عائلتك، وتستعمل mein وdein وsein وihr، وتربط الجمل بـ und وoder وaber.`,
+ review:`صرّف haben في الحاضر والماضي. ثم قل: عندي حاسوب ولكن ليس عندي حاسوب محمول.`,
+ vocab:[
+  [`[die] Familie`,`دي فاميليه`,`العائلة`],
+  [`[der] Vater`,`دير فاتر`,`الأب`],
+  [`[die] Mutter`,`دي موتر`,`الأم`],
+  [`die Eltern`,`دي إلترن`,`الوالدان`],
+  [`[der] Bruder`,`دير برودر`,`الأخ (الجمع Brüder)`],
+  [`[die] Schwester`,`دي شڤيستر`,`الأخت`],
+  [`die Geschwister`,`دي ڭيشڤيستر`,`الإخوة والأخوات`],
+  [`[der] Sohn`,`دير زون`,`الابن`],
+  [`[die] Tochter`,`دي توختر`,`البنت`],
+  [`[das] Kind`,`داس كينت`,`الطفل (الجمع Kinder)`],
+  [`[der] Opa`,`دير أوپا`,`الجد`],
+  [`[die] Oma`,`دي أوما`,`الجدة`],
+  [`[der] Onkel`,`دير أونكل`,`العم / الخال`],
+  [`[die] Tante`,`دي تانته`,`العمة / الخالة`],
+  [`verheiratet`,`فيرهايراتت`,`متزوج`],
+  [`ledig`,`ليديش`,`أعزب`]
+ ],
+ rule:`<h4>أدوات الملكية</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>الضمير</th><th>مذكر / محايد</th><th>مؤنث / جمع</th><th>المعنى</th></tr></thead><tbody>
+<tr><td>«ich»</td><td>«mein»</td><td>«mein<b>e</b>»</td><td>ـي (لي)</td></tr>
+<tr><td>«du»</td><td>«dein»</td><td>«dein<b>e</b>»</td><td>ـكَ</td></tr>
+<tr><td>«er / es»</td><td>«sein»</td><td>«sein<b>e</b>»</td><td>ـه</td></tr>
+<tr><td>«sie» (هي)</td><td>«ihr»</td><td>«ihr<b>e</b>»</td><td>ـها</td></tr>
+<tr><td>«wir»</td><td>«unser»</td><td>«unser<b>e</b>»</td><td>ـنا</td></tr>
+<tr><td>«ihr» (أنتم)</td><td>«euer»</td><td>«eur<b>e</b>»</td><td>ـكم</td></tr>
+<tr><td>«sie / Sie»</td><td>«ihr / Ihr»</td><td>«ihr<b>e</b> / Ihr<b>e</b>»</td><td>ـهم / ـك (رسمي)</td></tr>
+</tbody></table></div>
+<p>النهاية مثل ein/eine تماماً: «mein Vater، mein Kind، meine Mutter، meine Eltern».</p>
+<p class="note">الصعوبة للعربي: الأداة تتبع <b>صاحب الشيء</b> (هو أم هي) ثم جنس <b>الشيء نفسه</b>. «Jan hat eine Schwester. <b>Seine</b> Schwester heißt Karolin.» و«Oma Gisela hat einen Freund. <b>Ihr</b> Freund heißt Bernhard.»</p>
+<h4>أدوات الربط «und، oder، aber»</h4>
+<p>«und» (و)، «oder» (أو)، «aber» (لكن) تأخذ المرتبة 0، أي لا تغيّر ترتيب الجملة بعدها:</p>
+<div class="tw"><table class="tbl"><thead><tr><th>الجملة 1</th><th>مرتبة 0</th><th>م1</th><th>م2</th><th>الباقي</th></tr></thead><tbody>
+<tr><td>«Man bekommt Kinder,»</td><td>«aber»</td><td>«man»</td><td>«heiratet»</td><td>«nicht immer.»</td></tr>
+<tr><td>«Meine Mutter ist nicht verheiratet»</td><td>«und»</td><td>«sie»</td><td>«erzieht»</td><td>«mich allein.»</td></tr>
+</tbody></table></div>`,
+ ex:[
+  {q:`أكمل (أنا): «Das ist ___ Bruder.»`, a:`«mein»`},
+  {q:`أكمل (هو): «Das ist ___ Schwester.»`, a:`«seine»`},
+  {q:`أكمل (أنتَ): «Wie heißt ___ Mutter?»`, a:`«deine»`},
+  {q:`أكمل: «Maria hat einen Sohn. ___ Sohn heißt Leo.»`, a:`«Ihr» (صاحبته Maria)`},
+  {q:`اربط بـ aber: «Ich habe einen Bruder. Ich habe keine Schwester.»`, a:`«Ich habe einen Bruder, aber ich habe keine Schwester.»`},
+  {q:`ترجم: هذه عائلتي: أبي وأمي وإخوتي.`, a:`«Das ist meine Familie: mein Vater, meine Mutter und meine Geschwister.»`}
+ ],
+ say:[`Das ist meine Mutter. Sie heißt … Und das sind meine Brüder.`,`هذه أمي. اسمها … وهؤلاء إخوتي.`]
+},
+{ref:`Lektion 2 – C · ص 22–25`, title:`في المطعم: الأيام والطلب والدفع`,
+ goal:`تعرف أيام الأسبوع، تقول متى (am / um)، تطلب أكلاً وتدفع، وتراجع الدرس 2.`,
+ review:`قدّم ثلاثة أفراد من عائلتك بأدوات الملكية (mein / meine / sein / ihr).`,
+ vocab:[
+  [`[der] Montag`,`دير مونتاك`,`الإثنين`],
+  [`[der] Dienstag`,`دير دينستاك`,`الثلاثاء`],
+  [`[der] Mittwoch`,`دير ميتڤوخ`,`الأربعاء`],
+  [`[der] Donnerstag`,`دير دونرستاك`,`الخميس`],
+  [`[der] Freitag`,`دير فرايتاك`,`الجمعة`],
+  [`[der] Samstag`,`دير زامستاك`,`السبت`],
+  [`[der] Sonntag`,`دير زونتاك`,`الأحد`],
+  [`Wir möchten bestellen.`,`ڤير موشتن بشتيلن`,`نريد أن نطلب`],
+  [`Ich nehme …`,`إيش نيمه`,`سآخذ …`],
+  [`Ich möchte …`,`إيش موشته`,`أودّ …`],
+  [`[die] Suppe`,`دي زوپه`,`حساء`],
+  [`[das] Wasser`,`داس ڤاسر`,`ماء`],
+  [`Wir möchten zahlen.`,`ڤير موشتن تسالن`,`نريد أن ندفع`],
+  [`Zusammen oder getrennt?`,`تسوزامن أودر ڭيترينت`,`معاً أم كل واحد وحده؟`],
+  [`Das macht 20 Euro.`,`داس ماخت تسڤانتسيش أويرو`,`المجموع 20 يورو`],
+  [`[das] Trinkgeld`,`داس ترينكڭيلت`,`البقشيش`]
+ ],
+ rule:`<h4>متى؟ am + اليوم، um + الساعة</h4>
+<p>كل أيام الأسبوع مذكرة: «[der] Montag». «Wir gehen <b>am</b> Donnerstag <b>um</b> 19 Uhr essen.»</p>
+<h4>الفاعل في المرتبة 1 أو بعد الفعل مباشرة</h4>
+<p>«Das Topkapı ist am Montag geschlossen.» = «Am Montag ist das Topkapı geschlossen.» المعنى واحد، والفعل يبقى دائماً في المرتبة 2. الكتاب ينصحك بالتنويع بين الطريقتين في كتابتك.</p>
+<h4>أفعال يتغير حرفها: nehmen و essen</h4>
+<p>«ich nehme، du <b>nimmst</b>، er <b>nimmt</b>» – «ich esse، du <b>isst</b>، er <b>isst</b>». الجمع عادي: «wir nehmen، wir essen».</p>
+<h4>«möchte» للطلب بأدب</h4>
+<ul><li>مع اسم: «Ich möchte ein Bier.»</li><li>مع فعل، والفعل يذهب إلى آخر الجملة: «Wir möchten bezahlen.»</li></ul>
+<div class="tw"><table class="tbl"><thead><tr><th>الزبون</th><th>النادل</th></tr></thead><tbody>
+<tr><td>«Wir möchten gerne bestellen.»</td><td>«Ja gern. Was bekommen Sie?»</td></tr>
+<tr><td>«Ich nehme einen Salat und ein Wasser.»</td><td>«Und was möchten Sie trinken?»</td></tr>
+<tr><td>«Wir möchten bitte zahlen.»</td><td>«Zusammen oder getrennt?»</td></tr>
+<tr><td>«Getrennt, bitte.»</td><td>«Das macht 14,90 Euro.»</td></tr>
+</tbody></table></div>`,
+ ex:[
+  {q:`أكمل: «___ Freitag ___ 20 Uhr.»`, a:`«Am» ثم «um»`},
+  {q:`ابدأ الجملة بـ «Am Sonntag»: «Das Restaurant ist am Sonntag geöffnet.»`, a:`«Am Sonntag ist das Restaurant geöffnet.»`},
+  {q:`أكمل: «Du ___ (nehmen) ein Schnitzel.»`, a:`«nimmst»`},
+  {q:`اطلب حساء البطاطس وماءً معدنياً.`, a:`«Ich nehme eine Kartoffelsuppe und ein Mineralwasser.»`},
+  {q:`كيف تقول للنادل إنكم تريدون الدفع؟`, a:`«Wir möchten bitte zahlen.»`},
+  {q:`مراجعة الدرس 2: أكمل بالمفعول به: «Ich brauche ___ Laptop (نكرة) und ___ Kamera (معرفة).»`, a:`«einen» ثم «die»`}
+ ],
+ say:[`Ich möchte bitte bestellen. Ich nehme eine Suppe und ein Wasser.`,`أودّ أن أطلب من فضلك. سآخذ حساءً وماءً.`]
+},
+/* ---------- Lektion 3 ---------- */
+{ref:`Lektion 3 – A · ص 26–27 و33`, title:`الساعة والمواعيد`,
+ goal:`تقول الساعة بالطريقتين الرسمية والعادية، وتحدد موعداً، وتفرّق بين nicht وkein.`,
+ review:`قل أيام الأسبوع السبعة بالترتيب، ثم اطلب وجبة ومشروباً كأنك في مطعم.`,
+ vocab:[
+  [`am Morgen`,`آم مورڭن`,`في الصباح (5–9)`],
+  [`am Vormittag`,`آم فورميتاك`,`قبل الظهر (9–11:30)`],
+  [`am Mittag`,`آم ميتاك`,`عند الظهر`],
+  [`am Nachmittag`,`آم ناخميتاك`,`بعد الظهر`],
+  [`am Abend`,`آم آبنت`,`في المساء`],
+  [`in der Nacht`,`إن دير ناخت`,`في الليل`],
+  [`Wie spät ist es?`,`ڤي شپيت إست إس`,`كم الساعة؟`],
+  [`Viertel nach zehn`,`فيرتل ناخ تسين`,`العاشرة والربع`],
+  [`Viertel vor zehn`,`فيرتل فور تسين`,`العاشرة إلا ربع`],
+  [`halb zwei`,`هالپ تسڤاي`,`الواحدة والنصف (!)`],
+  [`Hast du Zeit?`,`هاست دو تسايت`,`هل عندك وقت؟`],
+  [`Tut mir leid.`,`توت مير لايت`,`آسف`],
+  [`[der] Termin`,`دير تيرمين`,`موعد`],
+  [`[die] Vorlesung`,`دي فورليزونڭ`,`محاضرة`]
+ ],
+ rule:`<h4>الساعة بطريقتين</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>الساعة</th><th>رسمي (راديو، قطار، عمل)</th><th>في الكلام اليومي</th></tr></thead><tbody>
+<tr><td>10:15</td><td>«zehn Uhr fünfzehn»</td><td>«Viertel nach zehn»</td></tr>
+<tr><td>9:45</td><td>«neun Uhr fünfundvierzig»</td><td>«Viertel vor zehn»</td></tr>
+<tr><td>13:30</td><td>«dreizehn Uhr dreißig»</td><td>«halb zwei»</td></tr>
+<tr><td>13:25</td><td>«dreizehn Uhr fünfundzwanzig»</td><td>«fünf vor halb zwei»</td></tr>
+<tr><td>13:35</td><td>«dreizehn Uhr fünfunddreißig»</td><td>«fünf nach halb zwei»</td></tr>
+</tbody></table></div>
+<p class="note">أكبر فخ للعربي والفرنسي: «halb zwei» ليست الثانية والنصف، بل <b>الواحدة والنصف</b>. فكّر هكذا: «نصف الطريق نحو الثانية».</p>
+<h4>متى؟</h4>
+<ul><li>«am» + يوم أو وقت من اليوم: «am Donnerstag، am Vormittag، am Montagvormittag». استثناء: «in der Nacht».</li><li>«um» + ساعة: «um Viertel nach zehn».</li><li>«von … bis» + من … إلى: «von drei bis fünf».</li></ul>
+<h4>nicht أم kein؟</h4>
+<ul><li>«kein-» تنفي <b>الاسم</b>: «Ich habe keine Zeit.»</li><li>«nicht» تنفي الفعل أو الصفة أو الجملة كلها: «Am Montag geht es nicht.» «Das passt nicht so gut.»</li></ul>`,
+ ex:[
+  {q:`اكتبها بالطريقة اليومية: 10:15`, a:`«Viertel nach zehn»`},
+  {q:`اكتبها بالطريقة اليومية: 7:30`, a:`«halb acht»`},
+  {q:`اكتبها بالطريقة اليومية: 9:45`, a:`«Viertel vor zehn»`},
+  {q:`اكتبها بالطريقة اليومية: 2:25`, a:`«fünf vor halb drei»`},
+  {q:`أكمل بـ nicht أو kein: «Ich habe ___ Zeit.» / «Samstagabend passt ___ so gut.»`, a:`«keine» ثم «nicht»`},
+  {q:`اسأل زميلاً: هل عندك وقت يوم الأربعاء بعد الظهر؟`, a:`«Hast du am Mittwochnachmittag Zeit?»`}
+ ],
+ say:[`Hast du am Samstag Zeit? – Tut mir leid, am Samstag kann ich nicht.`,`هل عندك وقت يوم السبت؟ – آسف، يوم السبت لا أستطيع.`]
+},
+{ref:`Lektion 3 – B · ص 28–29 و33`, title:`في السوق: الأكل والكميات`,
+ goal:`تشتري حاجياتك، تطلب كمية معينة، وتسأل عن الثمن.`,
+ review:`قل الساعات التالية بالطريقة اليومية: 8:15، 11:30، 4:45. ثم حدد موعداً مع صديق.`,
+ vocab:[
+  [`[der] Apfel`,`دير آپفل`,`تفاحة (الجمع Äpfel)`],
+  [`[das] Brot`,`داس بروت`,`خبز`],
+  [`[das] Brötchen`,`داس بروتشن`,`خبزة صغيرة`],
+  [`[die] Milch`,`دي ميلش`,`حليب`],
+  [`[der] Käse`,`دير كيزه`,`جبن`],
+  [`[die] Butter`,`دي بوتر`,`زبدة`],
+  [`[das] Ei`,`داس آي`,`بيضة (الجمع Eier)`],
+  [`[das] Fleisch`,`داس فلايش`,`لحم`],
+  [`[die] Flasche`,`دي فلاشه`,`قنينة`],
+  [`[das] Glas`,`داس ڭلاس`,`برطمان / كأس`],
+  [`[die] Packung`,`دي پاكونڭ`,`علبة`],
+  [`[das] Kilo`,`داس كيلو`,`كيلوغرام`],
+  [`teuer ≠ billig`,`تويَر / بيليش`,`غالٍ ≠ رخيص`],
+  [`Was kostet das?`,`ڤاس كوستت داس`,`بكم هذا؟`],
+  [`Ich hätte gern …`,`إيش هيته ڭيرن`,`أريد من فضلك …`]
+ ],
+ rule:`<h4>Wie viel أم Wie viele؟</h4>
+<ul><li>«Wie viel» للكمية التي لا تُعدّ: «Wie viel Hackfleisch möchten Sie?» – «250 Gramm.»</li><li>«Wie viele» للأشياء المعدودة: «Wie viele Würstchen nehmen Sie?» – «3 Würstchen.»</li></ul>
+<h4>الكمية + الاسم مباشرة</h4>
+<p>لا توجد «من» بين الكمية والاسم كما في العربية والفرنسية (un kilo <i>de</i> pommes): «eine Flasche Wasser»، «ein Kilo Äpfel»، «500 Gramm Käse». وللكمية غير المحددة بدون أداة: «Ich kaufe Wasser und Milch.»</p>
+<h4>حوار البيع</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>البائع</th><th>الزبون</th></tr></thead><tbody>
+<tr><td>«Was darf es sein?»</td><td>«Ich hätte gern Rindfleisch.»</td></tr>
+<tr><td>«Wie viel möchten Sie?»</td><td>«Ich nehme ein Kilo.»</td></tr>
+<tr><td>«Darf es sonst noch etwas sein?»</td><td>«Nein, danke. Das ist alles.»</td></tr>
+<tr><td>«Das macht 12,99 Euro.»</td><td>«Vielen Dank. Auf Wiedersehen.»</td></tr>
+</tbody></table></div>
+<p class="note">الثمن يُكتب «1,30 €» ويُقرأ «ein Euro dreißig».</p>`,
+ ex:[
+  {q:`أكمل: «Wie ___ Äpfel möchten Sie?»`, a:`«viele»`},
+  {q:`أكمل: «Wie ___ Milch brauchst du?»`, a:`«viel»`},
+  {q:`ترجم: قنينتا ماء وكيلو تفاح.`, a:`«zwei Flaschen Wasser und ein Kilo Äpfel»`},
+  {q:`اقرأ الثمن: 2,49 €`, a:`«zwei Euro neunundvierzig»`},
+  {q:`رتّب الحوار: «Ich hätte gern 200 Gramm Käse. / Guten Tag. Was darf es sein? / Nein, danke. Das ist alles. / Darf es sonst noch etwas sein?»`, a:`«Guten Tag. Was darf es sein?» ← «Ich hätte gern 200 Gramm Käse.» ← «Darf es sonst noch etwas sein?» ← «Nein, danke. Das ist alles.»`}
+ ],
+ say:[`Ich hätte gern ein Kilo Äpfel. Was kostet das?`,`أريد كيلو تفاح من فضلك. بكم هذا؟`]
+},
+{ref:`Lektion 3 – C · ص 30–33`, title:`الطقس، وضمائر المفعول به، وsein في الماضي`,
+ goal:`تصف الطقس، تستعمل mich وdich وihn، وتحكي ما كان بـ war.`,
+ review:`اشترِ في خيالك 4 أشياء من السوق مع الكمية، واسأل عن الثمن.`,
+ vocab:[
+  [`Die Sonne scheint.`,`دي زونه شاينت`,`الشمس مشرقة`],
+  [`Es regnet.`,`إس ريڭنت`,`إنها تمطر`],
+  [`Es schneit.`,`إس شنايت`,`إنها تثلج`],
+  [`Es ist windig.`,`إس إست ڤينديش`,`الجو عاصف`],
+  [`Es ist bewölkt.`,`إس إست بڤولكت`,`الجو غائم`],
+  [`Es ist kalt / warm.`,`إس إست كالت / ڤارم`,`الجو بارد / دافئ`],
+  [`Es sind 22 Grad.`,`إس زينت تسڤاي أونت تسڤانتسيش ڭرات`,`الحرارة 22 درجة`],
+  [`[das] Wochenende`,`داس ڤوخن إنده`,`عطلة نهاية الأسبوع`],
+  [`[der] Strand`,`دير شترانت`,`الشاطئ`],
+  [`besuchen`,`بزوخن`,`يزور`],
+  [`treffen`,`تريفن`,`يلتقي بـ`],
+  [`gestern`,`ڭيسترن`,`البارحة`],
+  [`leider`,`لايدر`,`للأسف`],
+  [`hoffentlich`,`هوفنتليش`,`إن شاء الله / أتمنى`],
+  [`zum Glück`,`تسوم ڭلوك`,`لحسن الحظ`]
+ ],
+ rule:`<h4>ضمائر المفعول به</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>فاعل</th><th>مفعول به</th><th>مثال</th></tr></thead><tbody>
+<tr><td>«ich»</td><td>«<b>mich</b>»</td><td>«Ihr besucht mich morgen.»</td></tr>
+<tr><td>«du»</td><td>«<b>dich</b>»</td><td>«Ich höre dich ganz schlecht.»</td></tr>
+<tr><td>«er»</td><td>«<b>ihn</b>»</td><td>«Leider sehe ich ihn nur selten.»</td></tr>
+<tr><td>«es»</td><td>«es»</td><td>«Ich kenne es nicht.»</td></tr>
+<tr><td>«sie» (هي)</td><td>«sie»</td><td>«Ich kenne sie noch nicht.»</td></tr>
+<tr><td>«wir»</td><td>«<b>uns</b>»</td><td>«Besuchst du uns?»</td></tr>
+<tr><td>«ihr»</td><td>«<b>euch</b>»</td><td>«Ich sehe euch morgen.»</td></tr>
+<tr><td>«sie / Sie»</td><td>«sie / Sie»</td><td>«Ich sehe sie morgen in der Uni.»</td></tr>
+</tbody></table></div>
+<p class="note">التغيير الحقيقي فقط في: mich، dich، ihn، uns، euch. الباقي يبقى كما هو.</p>
+<h4>«sein» في الماضي</h4>
+<p>«ich war · du warst · er/sie/es war · wir waren · ihr wart · sie/Sie waren»</p>
+<p>«Leider war das Wetter nicht so gut. Es waren nur 12 Grad.» تذكّر أن «haben» في الماضي هي «hatte».</p>`,
+ ex:[
+  {q:`عوّض الاسم بضمير: «Ich sehe Nina morgen.»`, a:`«Ich sehe sie morgen.»`},
+  {q:`عوّض الاسم بضمير: «Ich finde den Hafen schön.»`, a:`«Ich finde ihn schön.»`},
+  {q:`أكمل (wir): «Besuchst du ___ morgen?»`, a:`«uns»`},
+  {q:`أكمل (du): «Ich höre ___ schlecht.»`, a:`«dich»`},
+  {q:`أكمل بـ sein في الماضي: «Gestern ___ wir am Strand.»`, a:`«waren»`},
+  {q:`صف طقس اليوم عندك في جملتين أو ثلاث.`, a:`مثال: «Heute ist es warm. Die Sonne scheint. Es sind 25 Grad.»`}
+ ],
+ say:[`Heute ist es warm und die Sonne scheint.`,`اليوم الجو دافئ والشمس مشرقة.`]
+},
+/* ---------- Lektion 4 ---------- */
+{ref:`Lektion 4 – A · ص 34–35 و41`, title:`müssen و können، والقوس في الجملة`,
+ goal:`تقول ما يجب عليك وما تستطيع فعله، وتضع الفعلين في مكانهما الصحيح.`,
+ review:`صف طقس البارحة بـ war. ثم عوّض الأسماء بضمائر: Ich besuche meinen Bruder / meine Schwester.`,
+ vocab:[
+  [`müssen`,`موسن`,`يجب عليه`],
+  [`können`,`كونن`,`يستطيع`],
+  [`man`,`مان`,`المرء / الناس (ضمير عام)`],
+  [`früh`,`فروه`,`مبكراً`],
+  [`lange schlafen`,`لانڭه شلافن`,`ينام طويلاً`],
+  [`[das] Büro`,`داس بورو`,`المكتب (المكان)`],
+  [`[der] Schreibtisch`,`دير شرايبتيش`,`طاولة المكتب`],
+  [`[der] Kollege`,`دير كوليڭه`,`الزميل`],
+  [`[die] Kollegin`,`دي كوليڭين`,`الزميلة`],
+  [`[die] Stadt`,`دي شتات`,`المدينة`],
+  [`wandern`,`ڤاندرن`,`يتجول مشياً في الطبيعة`],
+  [`ins Theater gehen`,`إنس تياتر ڭيهن`,`يذهب إلى المسرح`],
+  [`freundlich`,`فرويندليش`,`ودود`],
+  [`nett`,`نيت`,`لطيف`]
+ ],
+ rule:`<h4>تصريف müssen و können</h4>
+<div class="tw"><table class="tbl"><thead><tr><th></th><th>müssen</th><th>können</th></tr></thead><tbody>
+<tr><td>«ich»</td><td>«m<b>u</b>ss»</td><td>«k<b>a</b>nn»</td></tr>
+<tr><td>«du»</td><td>«m<b>u</b>sst»</td><td>«k<b>a</b>nnst»</td></tr>
+<tr><td>«er/sie/es»</td><td>«m<b>u</b>ss»</td><td>«k<b>a</b>nn»</td></tr>
+<tr><td>«wir»</td><td>«müssen»</td><td>«können»</td></tr>
+<tr><td>«ihr»</td><td>«müsst»</td><td>«könnt»</td></tr>
+<tr><td>«sie/Sie»</td><td>«müssen»</td><td>«können»</td></tr>
+</tbody></table></div>
+<ul><li>ich وer بدون نهاية: «ich muss، er muss».</li><li>في المفرد يتغير الحرف: ü ← u، ö ← a.</li></ul>
+<h4>القوس (Satzklammer)</h4>
+<p>فعل الصيغة (müssen، können…) يأخذ المرتبة 2، والفعل الأصلي يذهب بالمصدر إلى <b class="end">آخر الجملة</b>:</p>
+<div class="tw"><table class="tbl"><thead><tr><th>م1</th><th>م2</th><th>الوسط</th><th>آخر الجملة</th></tr></thead><tbody>
+<tr><td>«Beatriz»</td><td>«<b>muss</b>»</td><td>«oft früh im Büro»</td><td>«<b>sein</b>.»</td></tr>
+<tr><td>«Am Wochenende»</td><td>«<b>kann</b>»</td><td>«sie lange»</td><td>«<b>schlafen</b>.»</td></tr>
+<tr><td>«Wann»</td><td>«<b>muss</b>»</td><td>«Beatriz im Büro»</td><td>«<b>sein</b>?»</td></tr>
+</tbody></table></div>
+<p class="note">«man» تعني «الناس عموماً» وتُصرّف مثل er: «In Hall kann man viel machen.»</p>`,
+ ex:[
+  {q:`أكمل: «Ich ___ (müssen) früh im Büro sein.»`, a:`«muss»`},
+  {q:`أكمل: «Du ___ (können) gut Deutsch sprechen.»`, a:`«kannst»`},
+  {q:`رتّب: «muss / ich / arbeiten / am Samstag»`, a:`«Am Samstag muss ich arbeiten.» أو «Ich muss am Samstag arbeiten.»`},
+  {q:`رتّب: «man / kann / in Hall / viel machen»`, a:`«In Hall kann man viel machen.»`},
+  {q:`ترجم: يجب أن أكون في المكتب على الساعة 9.`, a:`«Ich muss um 9 Uhr im Büro sein.»`},
+  {q:`ترجم: يوم الأحد أستطيع أن أنام طويلاً.`, a:`«Am Sonntag kann ich lange schlafen.»`}
+ ],
+ say:[`In der Woche muss ich früh im Büro sein. Am Wochenende kann ich lange schlafen.`,`خلال الأسبوع يجب أن أكون في المكتب مبكراً. في عطلة الأسبوع أستطيع أن أنام طويلاً.`]
+},
+{ref:`Lektion 4 – B · ص 36–37 و41`, title:`dürfen و wollen و möchten`,
+ goal:`تسأل عمّا هو مسموح، وتعبّر عمّا تريد بقوة أو بأدب.`,
+ review:`قل جملتين عن عملك: ماذا يجب عليك؟ وماذا تستطيع أن تفعل بعد العمل؟`,
+ vocab:[
+  [`dürfen`,`دورفن`,`يُسمح له`],
+  [`wollen`,`ڤولن`,`يريد (بإصرار)`],
+  [`möchten`,`موشتن`,`يودّ (بأدب)`],
+  [`mögen`,`موڭن`,`يحب`],
+  [`rauchen`,`راوخن`,`يدخّن`],
+  [`grillen`,`ڭريلن`,`يشوي`],
+  [`[das] Picknick`,`داس پيكنيك`,`نزهة بالأكل`],
+  [`[das] Kino`,`داس كينو`,`السينما`],
+  [`ins Kino gehen`,`إنس كينو ڭيهن`,`يذهب إلى السينما`],
+  [`eine Radtour machen`,`آينه رات تور ماخن`,`يقوم بجولة بالدراجة`],
+  [`erlaubt`,`إرلاوپت`,`مسموح`],
+  [`laut`,`لاوت`,`بصوت عالٍ`],
+  [`zu spät kommen`,`تسو شپيت كومن`,`يتأخر`],
+  [`einladen`,`آينلادن`,`يدعو (لضيافة)`]
+ ],
+ rule:`<h4>التصريف</h4>
+<div class="tw"><table class="tbl"><thead><tr><th></th><th>dürfen</th><th>wollen</th><th>mögen</th><th>möchten</th></tr></thead><tbody>
+<tr><td>«ich»</td><td>«darf»</td><td>«will»</td><td>«mag»</td><td>«möchte»</td></tr>
+<tr><td>«du»</td><td>«darfst»</td><td>«willst»</td><td>«magst»</td><td>«möchtest»</td></tr>
+<tr><td>«er/sie/es»</td><td>«darf»</td><td>«will»</td><td>«mag»</td><td>«möchte»</td></tr>
+<tr><td>«wir»</td><td>«dürfen»</td><td>«wollen»</td><td>«mögen»</td><td>«möchten»</td></tr>
+<tr><td>«ihr»</td><td>«dürft»</td><td>«wollt»</td><td>«mögt»</td><td>«möchtet»</td></tr>
+<tr><td>«sie/Sie»</td><td>«dürfen»</td><td>«wollen»</td><td>«mögen»</td><td>«möchten»</td></tr>
+</tbody></table></div>
+<ul><li>«Ich will …» قوية وتبدو كأمر. «Ich möchte …» مؤدبة، استعملها مع الناس.</li><li>نفس القوس: «Man <b>darf</b> im Bus nicht laut Musik <b>hören</b>.»</li><li>في سؤال نعم/لا: «<b>Darf</b> man hier <b>rauchen</b>?»</li></ul>
+<p class="note">أحياناً لا نذكر الفعل الأصلي لأنه مفهوم: «Ich möchte ein Bier.» (= haben). «Ich kann Englisch.» (= sprechen). و«mögen» تأتي غالباً مع اسم: «Ich mag die Stadt.»</p>`,
+ ex:[
+  {q:`أكمل: «Hier ___ man nicht rauchen.»`, a:`«darf»`},
+  {q:`أكمل (wollen): «___ du am Wochenende ins Kino gehen?»`, a:`«Willst»`},
+  {q:`أكمل (möchten): «Wir ___ ein Picknick machen.»`, a:`«möchten»`},
+  {q:`أكمل (mögen): «Er ___ die Stadt.»`, a:`«mag»`},
+  {q:`ترجم: هل يُسمح بالتدخين في المكتب؟ – لا، هذا غير مسموح.`, a:`«Darf man im Büro rauchen? – Nein, das darf man nicht.»`},
+  {q:`قلها بأدب: أريد قهوة.`, a:`«Ich möchte einen Kaffee.»`}
+ ],
+ say:[`Am Wochenende möchte ich lange schlafen und Deutsch lernen.`,`في عطلة الأسبوع أودّ أن أنام طويلاً وأتعلم الألمانية.`]
+},
+{ref:`Lektion 4 – A3 حتى A5 و C1 حتى C2 · ص 35 و38`, title:`المهن والتعليل بـ denn`,
+ goal:`تسمّي المهن بالمذكر والمؤنث، وتعلّل كلامك بـ denn (لأنّ).`,
+ review:`صرّف dürfen وmöchten. ثم قل شيئين مسموحين وشيئين ممنوعين في مكتبك.`,
+ vocab:[
+  [`[der] Beruf`,`دير بيروف`,`المهنة`],
+  [`[der] Lehrer`,`دير ليرر`,`المعلم`],
+  [`[die] Lehrerin`,`دي ليررين`,`المعلمة`],
+  [`[der] Arzt`,`دير آرتست`,`الطبيب`],
+  [`[die] Ärztin`,`دي إيرتستين`,`الطبيبة`],
+  [`[der] Koch`,`دير كوخ`,`الطباخ`],
+  [`[der] Informatiker`,`دير إنفورماتيكر`,`مختص المعلوميات`],
+  [`[der] Verkäufer`,`دير فيركويفر`,`البائع`],
+  [`[der] Betriebswirt`,`دير بتريپسڤيرت`,`خريج الاقتصاد والتسيير`],
+  [`denn`,`دين`,`لأنّ`],
+  [`Geld verdienen`,`ڭيلت فيردينن`,`يكسب المال`],
+  [`Menschen helfen`,`مينشن هيلفن`,`يساعد الناس`],
+  [`kreativ sein`,`كرياتيف زاين`,`يكون مبدعاً`],
+  [`interessant ≠ langweilig`,`إنتيريسانت / لانڭڤايليش`,`ممتع ≠ مملّ`]
+ ],
+ rule:`<h4>المهن: المذكر والمؤنث</h4>
+<p>نضيف «-in» للمؤنث: «Lehrer ← Lehrerin»، «Verkäufer ← Verkäuferin». أحياناً يتغير الحرف أيضاً: «Arzt ← Ärztin»، «Koch ← Köchin».</p>
+<p>بدون أداة بعد «sein»: «Ich bin Lehrer.» = «Ich arbeite als Lehrer.»</p>
+<h4>«denn» = لأنّ</h4>
+<p>«denn» تربط جملتين كاملتين، وتأخذ المرتبة 0 مثل und وaber، أي أن الجملة الثانية تبقى بترتيبها العادي. وقبلها <b class="end">فاصلة دائماً</b>.</p>
+<div class="tw"><table class="tbl"><thead><tr><th>الجملة 1</th><th>م0</th><th>م1</th><th>م2</th><th>الباقي</th></tr></thead><tbody>
+<tr><td>«Sie wohnt jetzt in Schwäbisch Hall,»</td><td>«<b>denn</b>»</td><td>«sie»</td><td>«mag»</td><td>«die Stadt.»</td></tr>
+<tr><td>«Ich muss viel lernen,»</td><td>«<b>denn</b>»</td><td>«ich»</td><td>«habe»</td><td>«bald eine Prüfung.»</td></tr>
+</tbody></table></div>
+<p class="note">«denn» لها معنيان: في السؤال كلمة اهتمام («Was macht ihr denn hier?»)، وبين جملتين تعني «لأنّ».</p>`,
+ ex:[
+  {q:`اربط بـ denn: «Ich lerne Deutsch. Ich möchte in Deutschland arbeiten.»`, a:`«Ich lerne Deutsch, denn ich möchte in Deutschland arbeiten.»`},
+  {q:`اربط بـ denn: «Leopold ist Schauspieler. Er liebt das Theater.»`, a:`«Leopold ist Schauspieler, denn er liebt das Theater.»`},
+  {q:`ما المؤنث من «Verkäufer» ومن «Arzt»؟`, a:`«Verkäuferin» و«Ärztin»`},
+  {q:`أكمل: «Ich finde die Arbeit als Arzt interessant, denn man kann ___ helfen.»`, a:`«Menschen»`},
+  {q:`أجب عن «Welchen Beruf findest du interessant?» بجملة فيها denn.`, a:`مثال: «Ich finde die Arbeit als Informatiker interessant, denn man kann kreativ sein.»`}
+ ],
+ say:[`Ich lerne jeden Tag eine Stunde Deutsch, denn ich möchte die B1-Prüfung schaffen.`,`أتعلم الألمانية ساعة كل يوم، لأنني أريد أن أنجح في امتحان B1.`]
+},
+{ref:`Lektion 4 – C3 حتى C6 · ص 38–39 و41`, title:`الشهور والتواريخ والرسالة الرسمية`,
+ goal:`تقول التاريخ، تستعمل im وam وum، وتكتب بداية ونهاية رسالة رسمية.`,
+ review:`اربط جملتين عن نفسك بـ denn. ثم قل مهنتك ومهنة شخص من عائلتك.`,
+ vocab:[
+  [`[der] Frühling`,`دير فرولينڭ`,`الربيع`],
+  [`[der] Sommer`,`دير زومر`,`الصيف`],
+  [`[der] Herbst`,`دير هيربست`,`الخريف`],
+  [`[der] Winter`,`دير ڤينتر`,`الشتاء`],
+  [`[der] Monat`,`دير مونات`,`الشهر`],
+  [`[das] Jahr`,`داس يار`,`السنة`],
+  [`[der] Geburtstag`,`دير ڭبورتستاك`,`عيد الميلاد`],
+  [`[der] Urlaub`,`دير أورلاوپ`,`العطلة / الإجازة`],
+  [`[das] Meeting`,`داس ميتينڭ`,`الاجتماع`],
+  [`Sehr geehrte Frau …`,`زير ڭإيرته فراو`,`السيدة المحترمة …`],
+  [`Sehr geehrter Herr …`,`زير ڭإيرتر هير`,`السيد المحترم …`],
+  [`Mit freundlichen Grüßen`,`ميت فرويندليشن ڭروسن`,`مع أطيب التحيات`],
+  [`Wann hast du Geburtstag?`,`ڤان هاست دو ڭبورتستاك`,`متى عيد ميلادك؟`]
+ ],
+ rule:`<h4>الشهور (كلها مذكرة)</h4>
+<div class="grid-l grid-n" id="months"></div>
+<h4>متى؟ im · am · um</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>الأداة</th><th>مع</th><th>مثال</th></tr></thead><tbody>
+<tr><td>«im»</td><td>الشهر والفصل</td><td>«im Juli، im Winter»</td></tr>
+<tr><td>«am»</td><td>اليوم والتاريخ ووقت اليوم</td><td>«am Montag، am 17. April، am Vormittag»</td></tr>
+<tr><td>«um»</td><td>الساعة</td><td>«um 10 Uhr»</td></tr>
+</tbody></table></div>
+<p>«Das Meeting ist am Montag, 17. April, am Vormittag um 10 Uhr.» الشهور والفصول وأوقات اليوم كلها مذكرة، والاستثناء «die Nacht».</p>
+<h4>الأعداد الترتيبية والتاريخ</h4>
+<ul><li>من 1 إلى 19 نضيف «-te»: «der zweite، der vierte». الشاذة: «der erste»، «der dritte»، «der siebte».</li><li>من 20 فما فوق نضيف «-ste»: «der zwanzigste، der fünfundzwanzigste».</li><li>في التاريخ مع am تصبح النهاية «-ten»: «am 2.8.» = «am zweiten Achten» أو «am zweiten August».</li><li>من … إلى: «vom 10. bis zum 21. Juni» = «vom zehnten bis zum einundzwanzigsten Juni».</li></ul>
+<h4>الرسالة الرسمية (ص 38)</h4>
+<p>البداية: «Sehr geehrte Frau Danner,» أو «Sehr geehrter Herr …,» ثم يبدأ النص في السطر التالي بحرف صغير. النهاية: «Mit freundlichen Grüßen» ثم الاسم.</p>`,
+ ex:[
+  {q:`أكمل: «Das Meeting ist ___ Montag, ___ Vormittag ___ 10 Uhr.»`, a:`«am» ثم «am» ثم «um»`},
+  {q:`أكمل: «Ich mache ___ August Urlaub.»`, a:`«im»`},
+  {q:`اقرأ التاريخ: «am 15.2.»`, a:`«am fünfzehnten Februar»`},
+  {q:`اقرأ: «vom 20.8. bis zum 3.9.»`, a:`«vom zwanzigsten August bis zum dritten September»`},
+  {q:`أجب: «Wann hast du Geburtstag?»`, a:`مثال: «Am zwölften März.» أو «Im März, am zwölften.»`},
+  {q:`اكتب بداية ونهاية رسالة رسمية إلى السيد Müller.`, a:`«Sehr geehrter Herr Müller, … Mit freundlichen Grüßen»`}
+ ],
+ say:[`Im Sommer mache ich Urlaub, vom ersten bis zum fünfzehnten August.`,`في الصيف آخذ عطلتي، من فاتح إلى خامس عشر غشت.`]
+},
+/* ---------- Lektion 5 ---------- */
+{ref:`Lektion 5 – A · ص 42–43 و49`, title:`الهوايات والأفعال التي يتغير حرفها`,
+ goal:`تتكلم عن وقت فراغك، وتقول ما تحب وما تفضّل، وتصرّف lesen وfahren وlaufen.`,
+ review:`قل تاريخ اليوم وتاريخ عيد ميلادك بالألمانية، ثم ابدأ رسالة رسمية بصوت عالٍ.`,
+ vocab:[
+  [`[das] Hobby`,`داس هوبي`,`هواية`],
+  [`[die] Freizeit`,`دي فرايتسايت`,`وقت الفراغ`],
+  [`Fußball spielen`,`فوسبال شپيلن`,`يلعب كرة القدم`],
+  [`Rad fahren`,`رات فارن`,`يركب الدراجة`],
+  [`schwimmen`,`شڤيمن`,`يسبح`],
+  [`Musik hören`,`موزيك هورن`,`يستمع للموسيقى`],
+  [`im Internet surfen`,`إم إنترنت سورفن`,`يتصفح الإنترنت`],
+  [`Schach spielen`,`شاخ شپيلن`,`يلعب الشطرنج`],
+  [`tanzen`,`تانتسن`,`يرقص`],
+  [`laufen`,`لاوفن`,`يجري / يمشي`],
+  [`wissen`,`ڤيسن`,`يعرف (معلومة)`],
+  [`gern`,`ڭيرن`,`بكل سرور / يحب أن`],
+  [`lieber`,`ليبر`,`يفضّل`],
+  [`Spielst du gern Fußball?`,`شپيلست دو ڭيرن فوسبال`,`هل تحب لعب كرة القدم؟`]
+ ],
+ rule:`<h4>أفعال يتغير حرفها مع du و er/sie/es فقط</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>التغيير</th><th>المصدر</th><th>du</th><th>er/sie/es</th></tr></thead><tbody>
+<tr><td>e ← ie</td><td>«lesen»</td><td>«l<b>ie</b>st»</td><td>«l<b>ie</b>st»</td></tr>
+<tr><td>e ← i</td><td>«sprechen»</td><td>«spr<b>i</b>chst»</td><td>«spr<b>i</b>cht»</td></tr>
+<tr><td>e ← i</td><td>«treffen»</td><td>«tr<b>i</b>ffst»</td><td>«tr<b>i</b>fft»</td></tr>
+<tr><td>a ← ä</td><td>«fahren»</td><td>«f<b>ä</b>hrst»</td><td>«f<b>ä</b>hrt»</td></tr>
+<tr><td>a ← ä</td><td>«schlafen»</td><td>«schl<b>ä</b>fst»</td><td>«schl<b>ä</b>ft»</td></tr>
+<tr><td>au ← äu</td><td>«laufen»</td><td>«l<b>äu</b>fst»</td><td>«l<b>äu</b>ft»</td></tr>
+</tbody></table></div>
+<p>«wissen» يتغير حتى مع ich: «ich weiß، du weißt، er weiß، wir wissen، ihr wisst، sie wissen».</p>
+<p class="note">ich وwir وihr وsie تبقى عادية: «ich lese، wir lesen، ihr lest». تعرّفت سابقاً على «nehmen ← nimmst» و«essen ← isst»، وهي من نفس العائلة.</p>
+<h4>gern · lieber · nicht gern</h4>
+<p>«gern» تأتي بعد الفعل: «Ich spiele gern Fußball.» (أحب لعب الكرة). «Ich lese lieber.» (أفضّل القراءة). «Ich tanze nicht gern.» (لا أحب الرقص).</p>
+<p>الأجوبة: «Ja, sehr gern.» – «Nein, nicht so gern.» – «Nein, überhaupt nicht gern.» – «Nein, ich laufe lieber.»</p>`,
+ ex:[
+  {q:`أكمل: «Er ___ (lesen) gern.»`, a:`«liest»`},
+  {q:`أكمل: «___ du Englisch? (sprechen)»`, a:`«Sprichst»`},
+  {q:`أكمل: «Sie ___ (fahren) gern Rad.»`, a:`«fährt»`},
+  {q:`أكمل: «Du ___ (schlafen) lange.»`, a:`«schläfst»`},
+  {q:`أكمل: «Ich ___ (wissen) das nicht.»`, a:`«weiß»`},
+  {q:`ترجم: أحب القراءة، لكني أفضّل السباحة.`, a:`«Ich lese gern, aber ich schwimme lieber.»`}
+ ],
+ say:[`Ich lese gern, aber ich schwimme lieber.`,`أحب القراءة، لكني أفضّل السباحة.`]
+},
+{ref:`Lektion 5 – B · ص 44–45 و49`, title:`الأفعال المنفصلة`,
+ goal:`تستعمل أفعالاً مثل aufstehen وanfangen، وتعرف أين تذهب البادئة.`,
+ review:`قل ثلاث هوايات تحبها وواحدة لا تحبها، ثم صرّف lesen وfahren مع du وer.`,
+ vocab:[
+  [`anfangen`,`آنفانڭن`,`يبدأ`],
+  [`aufstehen`,`آوفشتيهن`,`ينهض من النوم`],
+  [`anrufen`,`آنروفن`,`يتصل بـ`],
+  [`ausprobieren`,`آوسپروبيرن`,`يجرّب`],
+  [`stattfinden`,`شتاتفيندن`,`يُقام / ينعقد`],
+  [`mitkommen`,`ميتكومن`,`يأتي مع`],
+  [`mitmachen`,`ميتماخن`,`يشارك`],
+  [`mitnehmen`,`ميتنيمن`,`يأخذ معه`],
+  [`fernsehen`,`فيرنزيهن`,`يشاهد التلفاز`],
+  [`einkaufen`,`آينكاوفن`,`يتسوّق`],
+  [`[das] Training`,`داس ترينينڭ`,`التدريب`],
+  [`jeden Tag`,`ييدن تاك`,`كل يوم`],
+  [`[der] Sport`,`دير شپورت`,`الرياضة`],
+  [`fit bleiben`,`فيت بلايبن`,`يبقى في لياقة`]
+ ],
+ rule:`<h4>البادئة تذهب إلى آخر الجملة</h4>
+<p>في أفعال مثل «<b>auf</b>stehen» و«<b>an</b>fangen» تنفصل البادئة (an، auf، aus، mit، statt، fern، ein) وتذهب إلى آخر الجملة، مثل القوس الذي رأيته مع müssen:</p>
+<div class="tw"><table class="tbl"><thead><tr><th>المصدر</th><th>م1</th><th>م2</th><th>الوسط</th><th>آخر الجملة</th></tr></thead><tbody>
+<tr><td>«anfangen»</td><td>«Wann»</td><td>«<b>fängt</b>»</td><td>«das Training»</td><td>«<b>an</b>?»</td></tr>
+<tr><td>«aufstehen»</td><td>«Ich»</td><td>«<b>stehe</b>»</td><td>«um 7 Uhr»</td><td>«<b>auf</b>.»</td></tr>
+<tr><td>«anrufen»</td><td>«Ich»</td><td>«<b>rufe</b>»</td><td>«dich später»</td><td>«<b>an</b>.»</td></tr>
+<tr><td>«stattfinden»</td><td>«Das Training»</td><td>«<b>findet</b>»</td><td>«jeden Mittwoch»</td><td>«<b>statt</b>.»</td></tr>
+</tbody></table></div>
+<h4>مع فعل الصيغة: لا انفصال</h4>
+<p>إذا كان في الجملة müssen أو können أو möchten، يبقى الفعل المنفصل كاملاً في آخر الجملة: «Ich möchte beim Lauftraining <b>mitmachen</b>.» «Tim kann uns im Auto <b>mitnehmen</b>.»</p>
+<p class="note">النبرة دائماً على البادئة: <b>ÁN</b>fangen، <b>ÁUF</b>stehen، <b>MÍT</b>kommen.</p>`,
+ ex:[
+  {q:`أكمل (aufstehen): «Ich ___ um 6 Uhr ___.»`, a:`«stehe … auf»`},
+  {q:`أكمل (anrufen): «___ du mich morgen ___?»`, a:`«Rufst … an»`},
+  {q:`أكمل (anfangen): «Der Kurs ___ am Montag ___.»`, a:`«fängt … an»`},
+  {q:`أكمل مع können: «Kannst du morgen ___? (mitkommen)»`, a:`«mitkommen» (لا ينفصل)`},
+  {q:`ترجم: أنهض كل يوم على الساعة السادسة.`, a:`«Ich stehe jeden Tag um 6 Uhr auf.»`},
+  {q:`ترجم: الدرس يُقام يوم الجمعة.`, a:`«Der Kurs findet am Freitag statt.»`}
+ ],
+ say:[`Ich stehe um sieben Uhr auf. Um neun fängt meine Arbeit an.`,`أنهض على الساعة السابعة. على التاسعة يبدأ عملي.`]
+},
+{ref:`Lektion 5 – C · ص 46–49`, title:`الماضي المركّب (Perfekt)`,
+ goal:`تحكي ما فعلته بالماضي المركّب للأفعال المنتظمة، وتختار بين haben وsein.`,
+ review:`صف يومك بثلاث جمل فيها أفعال منفصلة: متى تنهض؟ متى يبدأ عملك؟ متى تتسوق؟`,
+ vocab:[
+  [`trainieren`,`ترينيرن`,`يتدرّب`],
+  [`schaffen`,`شافن`,`ينجح في / يُنجز`],
+  [`starten`,`شتارتن`,`ينطلق / يشارك في سباق`],
+  [`feiern`,`فايرن`,`يحتفل`],
+  [`klappen`,`كلاپن`,`ينجح (الأمر)`],
+  [`passieren`,`پاسيرن`,`يحدث`],
+  [`stürzen`,`شتورتسن`,`يسقط`],
+  [`gestern`,`ڭيسترن`,`البارحة`],
+  [`schon mal`,`شون مال`,`من قبل`],
+  [`noch nie`,`نوخ ني`,`لم … أبداً`],
+  [`[der] Sieger`,`دير زيڭر`,`الفائز`],
+  [`[das] Ziel`,`داس تسيل`,`خط الوصول / الهدف`],
+  [`glücklich`,`ڭلوكليش`,`سعيد`],
+  [`zufrieden`,`تسوفريدن`,`راضٍ`]
+ ],
+ rule:`<h4>Perfekt = haben / sein + اسم المفعول في آخر الجملة</h4>
+<div class="tw"><table class="tbl"><thead><tr><th>م1</th><th>م2</th><th>الوسط</th><th>آخر الجملة</th></tr></thead><tbody>
+<tr><td>«Ich»</td><td>«<b>habe</b>»</td><td>«die 10 Kilometer in 39 Minuten»</td><td>«<b>geschafft</b>.»</td></tr>
+<tr><td>«Für die 10 km»</td><td>«<b>habe</b>»</td><td>«ich dieses Jahr nicht intensiv»</td><td>«<b>trainiert</b>.»</td></tr>
+<tr><td>«Beate Langer»</td><td>«<b>ist</b>»</td><td>«schon beim Ironman»</td><td>«<b>gestartet</b>.»</td></tr>
+</tbody></table></div>
+<h4>كيف نصنع اسم المفعول (Partizip)؟</h4>
+<ul><li>القاعدة: <b class="end">ge + الجذر + t</b>: «machen ← gemacht»، «spielen ← gespielt»، «schaffen ← geschafft».</li><li>جذر ينتهي بـ t أو d: <b class="end">ge + الجذر + et</b>: «starten ← gestartet»، «arbeiten ← gearbeitet».</li><li>أفعال تنتهي بـ «-ieren»: بدون ge: «trainieren ← trainiert»، «passieren ← passiert».</li></ul>
+<h4>haben أم sein؟</h4>
+<p><b class="end">sein</b> مع الأفعال التي فيها تغيير مكان أو حالة: «Ich bin gestartet.» «Er ist gestürzt.» «Was ist passiert?» و<b class="end">haben</b> مع كل الأفعال الأخرى، وهي الأغلبية.</p>
+<p class="note">مع haben وsein نفسيهما نستعمل في الكلام الماضي البسيط: «Ich hatte …» و«Es war …» بدل Perfekt.</p>`,
+ ex:[
+  {q:`اسم المفعول من «machen»؟`, a:`«gemacht»`},
+  {q:`اسم المفعول من «arbeiten»؟`, a:`«gearbeitet»`},
+  {q:`اسم المفعول من «telefonieren»؟`, a:`«telefoniert»`},
+  {q:`أكمل (spielen): «Ich ___ Tennis ___.»`, a:`«habe … gespielt»`},
+  {q:`أكمل (starten): «Er ___ beim Campus-Run ___.»`, a:`«ist … gestartet»`},
+  {q:`أجب بالنفي: «Hast du schon mal Klavier gespielt?»`, a:`«Nein, noch nie.»`},
+  {q:`ترجم: البارحة اشتغلتُ كثيراً.`, a:`«Gestern habe ich viel gearbeitet.»`}
+ ],
+ say:[`Gestern habe ich eine Stunde Deutsch gelernt.`,`البارحة تعلمت الألمانية لمدة ساعة.`]
+},
+/* ---------- Review ---------- */
+{ref:`مراجعة الدروس 1 إلى 5`, title:`المراجعة الكبرى والاختبار`,
+ goal:`تختبر نفسك في كل ما درسته خلال 19 يوماً، وتعرف ما يحتاج إعادة.`,
+ review:`قبل الاختبار: اقرأ قائمة القواعد السبع أسفله بسرعة، وارجع ليوم أي قاعدة لا تتذكرها جيداً.`,
+ vocab:[
+  [`Wer?`,`ڤير`,`من؟ (فاعل)`],
+  [`Wen?`,`ڤين`,`من؟ (مفعول به)`],
+  [`Was?`,`ڤاس`,`ماذا؟`],
+  [`Wie?`,`ڤي`,`كيف؟`],
+  [`Wo?`,`ڤو`,`أين؟`],
+  [`Woher?`,`ڤوهير`,`من أين؟`],
+  [`Wohin?`,`ڤوهين`,`إلى أين؟`],
+  [`Wann?`,`ڤان`,`متى؟`],
+  [`Wie viel?`,`ڤي فيل`,`كم؟ (كمية)`],
+  [`Wie viele?`,`ڤي فيله`,`كم؟ (عدد)`],
+  [`Warum?`,`ڤاروم`,`لماذا؟`]
+ ],
+ rule:`<h4>القواعد السبع التي تعلمتها</h4>
+<ol>
+<li>الفعل في المرتبة 2 دائماً، وفي سؤال نعم/لا في المرتبة 1 (اليوم 3).</li>
+<li>نهايات التصريف: «-e، -st، -t، -en، -t، -en»، و«sein» و«haben» شاذّان (اليوم 3 و7).</li>
+<li>«der / das / die»، وفي المفعول به المذكر فقط يتغير: «den، einen، keinen» (اليوم 6 و7).</li>
+<li>أدوات الملكية «mein، dein، sein، ihr…» بنفس نهايات ein/eine (اليوم 8).</li>
+<li>فعل الصيغة في المرتبة 2 والمصدر في آخر الجملة: «Ich muss heute arbeiten.» (اليوم 13 و14).</li>
+<li>البادئة المنفصلة إلى آخر الجملة: «Ich stehe um 7 Uhr auf.» (اليوم 18).</li>
+<li>Perfekt: «haben / sein + ge…t» في آخر الجملة (اليوم 19).</li>
+</ol>
+<p class="note">احسب نقطة لكل جواب صحيح. 10 فما فوق: انتقل للدرس 6. أقل من 10: أعد الأيام التي أخطأت في قواعدها قبل أن تكمل.</p>`,
+ ex:[
+  {q:`«Woher ___ (kommen) Sie?»`, a:`«kommen»`},
+  {q:`«Ich habe ___ Bruder.» (نكرة، مذكر)`, a:`«einen»`},
+  {q:`«Das ist ___ Schwester.» (أنا)`, a:`«meine»`},
+  {q:`«Wie ___ kostet das?»`, a:`«viel»`},
+  {q:`«Am Sonntag ___ ich lange schlafen.» (können)`, a:`«kann»`},
+  {q:`«Ich ___ um 6 Uhr ___.» (aufstehen)`, a:`«stehe … auf»`},
+  {q:`«Er ___ gern.» (lesen)`, a:`«liest»`},
+  {q:`«Wir ___ Fußball ___.» (spielen، Perfekt)`, a:`«haben … gespielt»`},
+  {q:`اكتب 3:30 بالطريقة اليومية.`, a:`«halb vier»`},
+  {q:`اربط بـ denn: «Ich bleibe zu Hause. Es regnet.»`, a:`«Ich bleibe zu Hause, denn es regnet.»`},
+  {q:`عوّض بضمير: «Ich sehe den Lehrer morgen.»`, a:`«Ich sehe ihn morgen.»`},
+  {q:`اكتب فقرة من 5 جمل تقدّم فيها نفسك.`, a:`مثال: «Ich heiße Mouhsine. Ich komme aus Marokko und wohne in Errachidia. Ich spreche Arabisch und Französisch. Ich arbeite im Büro. Ich lerne jeden Tag Deutsch, denn ich möchte die B1-Prüfung schaffen.»`}
+ ],
+ say:[`Ich lerne jeden Tag Deutsch. Das macht Spaß!`,`أتعلم الألمانية كل يوم. هذا ممتع!`]
+}
+];
+
+
+const M = {"sr":22050,"days":{"0":{"Guten Morgen!":[300,631,300,781],"Guten Tag!":[1231,571,1381,649],"Guten Abend!":[2103,629,2330,977],"Richtig!":[3032,512,3607,577],"Sehr gut! Weiter so!":[3844,1437,4484,1829]},"1":{"Guten Morgen!":[300,631,300,781],"Guten Tag!":[1231,571,1381,649],"Hallo!":[2103,457,2330,525],"Grüß dich!":[2860,598,3155,773],"Ich heiße …":[3758,569,4228,679],"Ich bin …":[4627,451,5207,628],"Wie heißen Sie?":[5378,761,6136,966],"Wie heißt du?":[6439,615,7402,755],"Woher kommen Sie?":[7354,943,8456,1155],"Ich komme aus Marokko.":[8597,1041,9912,1437],"Freut mich!":[9938,642,11648,888],"Herzlich willkommen!":[10880,915,12836,1177],"Auf Wiedersehen!":[12095,888,14313,1168],"Tschüss!":[13284,427,15781,527],"Guten Tag! Ich heiße Mouhsine. Ich komme aus Marokko.":[14011,3411,16608,4435],"Alles auf einen Blick":[17722,923,21343,1007],"Sie":[18945,325,22650,353],"du":[19570,235,23303,280],"Woher kommst du?":[20105,833,23883,963],"Hallo! / Grüß dich!":[21239,1421,25146,1962],"Frau Brandt":[22960,695,27407,956],"Herr Amri":[23955,624,28663,755],"Wie":[24878,340,29718,400],"ei":[25518,409,30417,414],"heiße":[26227,494,31131,559],"ie":[27022,302,31990,357],"heißen":[27623,549,32647,673],"Tag":[28472,253,33620,334],"Morgen":[29025,477,34254,588],"Marokko":[29802,562,35142,774],"Guten Morgen.":[30663,681,36215,804],"wie heißen Sie?":[31644,748,37320,900],"Guten Morgen. Ich bin Ihre Deutschlehrerin. Ich heiße Christiane Brandt. Und wie heißen Sie?":[32692,5627,38519,6635],"Ich komme aus Marokko, aus Errachidia.":[38618,2282,45454,2777]},"2":{"Deutschland":[300,635,300,791],"Österreich":[1235,688,1391,733],"die Schweiz":[2223,638,2423,853],"die Türkei":[3162,596,3576,840],"Frankreich":[4058,632,4716,863],"Arabisch":[4990,572,5879,742],"Französisch":[5862,703,6921,1012],"Englisch":[6865,481,8233,654],"Deutsch":[7646,456,9188,573],"Was studierst du?":[8402,846,10061,1061],"Ich arbeite schon.":[9548,886,11422,1093],"Wie geht es Ihnen?":[10734,918,12814,1113],"Wie geht es dir?":[11952,761,14227,1121],"Danke, gut.":[13013,743,15649,825],"Es geht.":[14056,448,16774,566],"ein bisschen":[14803,637,17641,863],"Ich spreche Arabisch, Französisch und ein bisschen Deutsch.":[15741,3075,18804,4027],"Guten Tag! Ich heiße Mouhsine. Ich komme aus Marokko.":[19116,3411,23131,4435],"aus":[22827,417,27867,490],"Ich komme aus Marokko.":[23544,1041,28657,1437],"Er kommt aus Deutschland.":[24886,1094,30393,1434],"die Schweiz, die Türkei":[26280,1404,32128,1753],"aus der Schweiz, aus der Türkei":[27983,1690,34181,2393],"der Iran, der Irak":[29973,1337,36874,1746],"aus dem Iran, aus dem Irak":[31610,1680,38920,2283],"die USA, die Niederlande":[33590,1498,41503,1967],"aus den USA, aus den Niederlanden":[35388,1941,43770,2568],"-isch":[37629,298,46638,341],"Arabisch, Spanisch, Englisch, Französisch":[38226,2459,47279,3612],"sprechen":[40985,613,51191,698],"ich spreche, du sprichst, er spricht":[41899,2016,52189,2325],"Ich studiere Informatik.":[44215,1243,54814,1610],"Informatik":[45758,721,56723,865],"Medizin":[46780,667,57889,899],"Wirtschaft":[47747,530,59088,661],"Jura":[48577,459,60049,598],"Sehr gut, danke.":[49336,1104,60947,1342],"Na ja, es geht.":[50740,994,62589,1281],"Nicht so gut.":[52034,653,64170,703],"Und Ihnen?":[52987,654,65173,895],"Und dir?":[53941,544,66368,818],"der":[54785,272,67486,341],"Ich komme aus der Türkei.":[55356,1185,68128,1403],"den":[56841,304,69831,400],"Sie kommt aus den USA.":[57445,1265,70531,1508],"dem":[59010,318,72339,407],"Er kommt aus dem Irak.":[59628,1191,73046,1413],"Danke, gut. Und Ihnen?":[61119,1646,74758,2141],"studierst":[63065,638,77199,835],"studiere":[64003,667,78334,959],"Was studierst du? – Ich studiere Wirtschaft.":[64970,2469,79593,3356]},"3":{"ich":[300,275,300,372],"du":[875,235,972,280],"er / sie / es":[1410,856,1552,1432],"wir":[2566,356,3283,435],"ihr":[3222,339,4019,441],"sie / Sie":[3861,628,4760,624],"kommen":[4789,502,5684,538],"wohnen":[5591,419,6522,605],"heißen":[6311,549,7428,673],"arbeiten":[7159,625,8400,742],"lernen":[8085,540,9442,675],"machen":[8925,432,10417,649],"sein":[9658,452,11366,582],"Wo wohnst du?":[10410,715,12248,765],"Wo wohnst du? – Ich wohne in Errachidia.":[11425,2300,13313,2924],"Ich spreche Arabisch, Französisch und ein bisschen Deutsch.":[14025,3075,16538,4027],"Wie geht es dir?":[17400,761,20865,1121],"-en":[18461,342,22286,420],"komm-en":[19103,497,23006,616],"komm":[19900,344,23922,459],"komme":[20545,419,24681,540],"wohne":[21264,453,25521,675],"arbeite":[22017,529,26496,625],"heiße":[22846,494,27421,559],"kommst":[23640,563,28280,600],"wohnst":[24503,459,29180,506],"arbeitest":[25262,607,29985,746],"heißt":[26169,521,31032,617],"er/sie/es":[26990,856,31948,1432],"kommt":[28146,405,33680,397],"wohnt":[28851,407,34377,493],"arbeitet":[29558,571,35170,654],"sie/Sie":[30429,628,36124,624],"arbeit":[31357,443,37048,633],"du arbeitest, er arbeitet":[32100,1515,37980,1837],"heiß":[33915,425,40117,616],"du heißt":[34640,600,41033,669],"ich bin · du bist · er/sie/es ist · wir sind · ihr seid · sie/Sie sind":[35539,4511,42002,5927],"Ich":[40350,249,48229,322],"in Tübingen.":[40899,731,48851,910],"Wo":[41930,270,50061,371],"du?":[42500,306,50732,378],"In Tübingen":[43106,673,51411,938],"studiere":[44080,667,52649,959],"ich Medizin.":[45046,716,53908,868],"Wohnst du in Stuttgart?":[46062,1035,55076,1297],"Nein, ich wohne in Tübingen.":[47397,1600,56673,2137],"Du arbeitest in Rabat.":[49298,1156,59110,1633],"Er heißt Tarik.":[50754,849,61043,1018],"seid":[51903,514,62361,536],"Ihr seid neu im Kurs.":[52717,1280,63196,1651],"lerne":[54297,450,65148,632],"Ich lerne Deutsch. Wir lernen zusammen.":[55048,2202,66080,2873],"Du kommst aus Marokko.":[57550,1082,69253,1361],"Kommst du aus Marokko?":[58932,995,70915,1191],"wohnst / wo / du / ?":[60227,1178,72406,1589]},"4":{"Wie schreibt man das?":[300,951,300,1217],"Buchstabieren Sie bitte!":[1551,1120,1817,1514],"der Vorname":[2971,770,3631,962],"der Familienname":[4041,1001,4892,1209],"die Adresse":[5342,675,6401,922],"die Straße":[6317,688,7623,894],"die Hausnummer":[7305,731,8817,1034],"die Postleitzahl":[8336,1008,10151,1224],"der Wohnort":[9644,660,11675,805],"die Telefonnummer":[10605,898,12780,1132],"die Handynummer":[11802,849,14212,1040],"die Muttersprache":[12951,950,15552,1157],"Wie alt bist du?":[14201,899,17009,1120],"Ich bin 30 Jahre alt.":[15400,1341,18429,1754],"Wie ist Ihre Telefonnummer? – Meine Telefonnummer ist …":[17041,2970,20483,3994],"Wo wohnst du? – Ich wohne in Errachidia.":[20311,2300,24777,2924],"sein":[22911,452,28001,582],"kommen":[23663,502,28883,538],"einundzwanzig":[24465,893,29721,959],"einhundertdreiundneunzig":[25658,1464,30980,1848],"sechzehn":[27423,702,33128,854],"sechzig":[28425,644,34282,798],"siebzehn":[29368,674,35380,833],"siebzig":[30342,542,36512,743],"dreißig":[31184,610,37555,776],"null sieben eins eins":[32094,1383,38631,1527],"tt":[33777,426,40458,655],"zwei t":[34503,736,41412,939],"Doppel-t":[35539,603,42651,722],"siebenundvierzig":[36442,969,43673,1168],"neunundneunzig":[37711,1004,45141,1243],"dreihundertfünfundsechzig":[39015,1307,46684,1824],"Mouhsine":[40622,531,48809,692],"Vorname: … / Wohnort: … / Herkunftsland: … / Muttersprache: …":[41453,2885,49800,4330],"Vorname: Mouhsine / Wohnort: Errachidia / Herkunftsland: Marokko / Muttersprache: Arabisch":[44638,6136,54430,7388],"A":[51075,280,62118,392],"B":[51655,338,62810,332],"C":[52293,380,63442,412],"D":[52973,294,64154,407],"E":[53567,294,64861,260],"F":[54161,222,65420,317],"G":[54683,255,66038,303],"H":[55238,381,66641,419],"I":[55920,261,67359,235],"J":[56481,276,67894,378],"K":[57057,374,68572,452],"L":[57732,300,69324,413],"M":[58332,286,70037,372],"N":[58918,295,70709,387],"O":[59513,353,71397,383],"P":[60167,371,72080,430],"Q":[60838,268,72810,363],"R":[61406,287,73473,370],"S":[61993,341,74142,378],"T":[62634,342,74820,443],"U":[63276,270,75563,394],"V":[63846,339,76257,588],"W":[64484,364,77145,425],"X":[65149,383,77870,493],"Y":[65832,750,78663,885],"Z":[66882,355,79848,432],"Ä":[67537,334,80580,413],"Ö":[68171,338,81293,428],"Ü":[68809,104,82021,310],"ß":[69213,576,82631,792],"null":[70089,385,83723,479],"eins":[70774,447,84501,582],"zwei":[71521,513,85383,648],"drei":[72334,410,86331,531],"vier":[73044,480,87162,490],"fünf":[73824,397,87952,407],"sechs":[74521,503,88659,623],"sieben":[75324,474,89581,512],"acht":[76098,373,90393,453],"neun":[76771,560,91146,555],"zehn":[77631,382,92001,534],"elf":[78313,407,92835,488],"zwölf":[79020,634,93623,650],"dreizehn":[79955,563,94573,773],"zwanzig":[80818,647,95646,796],"vierzig":[81765,593,96742,706],"fünfzig":[82658,615,97747,847],"achtzig":[83573,563,98895,760],"neunzig":[84436,689,99955,864],"hundert":[85425,464,101119,588],"tausend":[86189,498,102008,656]},"5":{"der Kugelschreiber":[300,920,300,1276],"der Bleistift":[1520,756,1876,986],"das Buch":[2576,506,3162,644],"das Heft":[3382,601,4106,682],"die Tafel":[4283,632,5088,820],"der Tisch":[5215,516,6208,631],"das Wörterbuch":[6030,861,7139,1137],"der Radiergummi":[7192,783,8576,863],"Hören Sie.":[8275,599,9739,847],"Lesen Sie.":[9174,638,10887,793],"Schreiben Sie.":[10112,665,11979,985],"Ergänzen Sie.":[11076,751,13264,932],"Ordnen Sie zu.":[12128,873,14496,999],"Kreuzen Sie an.":[13301,870,15795,1042],"Wie heißt das auf Deutsch?":[14471,1153,17136,1447],"Wie heißt das auf Deutsch? – Das heißt „der Kugelschreiber“.":[15924,2704,18884,3409],"Wie ist Ihre Telefonnummer? – Meine Telefonnummer ist …":[18928,2970,22593,3994],"der":[22198,272,26887,341],"das":[22770,329,27528,420],"die":[23399,285,28248,290],"das Buch, ¨-er":[23984,1213,28838,1606],"die Bücher":[25496,612,30744,744],"die Hefte":[26408,619,31788,784],"der Ball":[27327,440,32873,586],"die Bälle":[28067,557,33758,650],"die Gruppe":[28924,499,34708,569],"die Gruppen":[29723,519,35577,674],"der Projektor":[30542,812,36551,1055],"die Projektoren":[31654,971,37906,1091],"die Lehrerin":[32924,801,39297,889],"die Lehrerinnen":[34026,894,40486,1073],"die Kugelschreiber":[35219,967,41859,1238],"der Apfel":[36486,547,43397,751],"die Äpfel":[37332,687,44448,823],"das Bild":[38320,643,45571,711],"die Bilder":[39263,590,46582,692],"das Tablet":[40152,677,47574,908],"die Tablets":[41129,708,48782,930],"denn":[42137,362,50012,436],"ja":[42799,440,50748,425],"Was macht ihr denn hier?":[43539,1028,51473,1219],"Das ist ja super!":[44866,873,52992,1174],"Buch":[46039,324,54466,413],"das Buch – die Bücher":[46663,1213,55179,1606],"Lehrerin":[48176,610,57085,879],"kommst":[49086,563,58264,600],"komme":[49949,419,59163,540],"Woher kommst du? – Ich komme aus Marokko.":[50668,2327,60003,2806],"Das ist Tarik. Er kommt aus Marokko. Er studiert Informatik.":[53296,4069,63109,5032],"Das heißt …":[57664,640,68441,824],"Das weiß ich nicht.":[58604,850,69565,1127]},"6":{"das Telefon":[300,789,300,938],"die Kamera":[1389,703,1538,849],"der Computer":[2392,780,2687,969],"der Laptop":[3472,599,3956,687],"das Smartphone":[4371,793,4943,1044],"das Handy":[5464,630,6287,817],"die Kreditkarte":[6394,954,7404,1210],"das Foto":[7648,652,8914,862],"früher":[8600,465,10076,676],"heute":[9366,447,11052,600],"modern ≠ altmodisch":[10112,1400,11952,1791],"funktionieren":[11812,786,14042,968],"brauchen":[12898,535,15310,690],"benutzen":[13733,661,16300,810],"Das ist kein Telefon. Das ist ein Smartphone.":[14694,2608,17410,3199],"Wie heißt das auf Deutsch? – Das heißt „der Kugelschreiber“.":[17603,2704,20908,3409],"Das ist ein Plattenspieler.":[20607,1331,24618,1655],"Der Plattenspieler funktioniert noch.":[22238,1837,26573,2264],"Das ist kein Telefon.":[24375,1090,29137,1356],"die Kassetten":[25765,728,30793,923],"ein Computer":[26793,813,32016,999],"ein Telefon":[27906,733,33315,983],"eine Kamera":[28939,701,34598,891],"Kassetten":[29940,560,35789,679],"kein Computer":[30800,821,36768,1083],"kein Telefon":[31922,853,38151,980],"keine Kamera":[33075,951,39431,1025],"keine Kassetten":[34326,878,40756,997],"Das sind Disketten.":[35503,841,42053,1129],"eine":[36645,395,43482,555],"Das ist eine Kamera.":[37340,1044,44337,1191],"Die":[38684,294,45828,318],"Die Kamera macht gute Fotos.":[39277,1475,46446,1883],"kein":[41053,442,48629,572],"Das ist kein Handy.":[41795,987,49501,1154],"keine":[43082,436,50955,566],"Das sind keine Kreditkarten.":[43818,1465,51821,1843],"Das ist ein Computer. Der Computer ist neu.":[45584,2648,53964,3483]},"7":{"haben":[300,468,300,586],"ich habe":[1068,479,1186,651],"du hast":[1847,539,2136,635],"er hat":[2686,470,3071,514],"ich hatte":[3457,475,3885,616],"es gibt":[4231,545,4801,614],"das Tablet":[5076,677,5715,908],"das Navi":[6052,611,6923,743],"die App":[6964,400,7967,520],"kaufen":[7663,584,8787,788],"telefonieren":[8547,802,9875,1065],"hören":[9649,567,11241,644],"lesen":[10516,485,12185,674],"Früher hatte ich kein Handy. Heute habe ich ein Smartphone.":[11300,2966,13158,3827],"Das ist kein Telefon. Das ist ein Smartphone.":[14566,2608,17285,3199],"Wer / Was":[17475,796,20784,1095],"Wen / Was":[18571,875,22180,1111],"Ich habe einen Computer. Ich brauche den Computer für die Arbeit. Der Computer ist sehr praktisch.":[19746,5292,23590,7109],"der / ein / kein Computer":[25338,1484,30999,1911],"das / ein / kein Telefon":[27122,1576,33211,2100],"die / eine / keine Kamera":[28998,1532,35611,2201],"die / – / keine Kassetten":[30829,1573,38111,2196],"den / einen / keinen Computer":[32702,2014,40608,2469],"haben, brauchen, benutzen, kaufen, nehmen, es gibt":[35017,3479,43377,4955],"ich":[38795,275,48633,372],"habe":[39370,401,49305,541],"hatte":[40071,404,50146,534],"du":[40775,235,50980,280],"hast":[41311,455,51560,539],"hattest":[42066,528,52399,715],"er/sie/es":[42894,856,53414,1432],"hat":[44050,363,55146,424],"wir":[44712,356,55870,435],"hatten":[45369,445,56605,486],"ihr":[46114,339,57391,441],"habt":[46753,383,58133,506],"hattet":[47436,429,58939,567],"sie/Sie":[48165,628,59806,624],"einen":[49093,495,60730,587],"Ich habe einen Laptop.":[49888,1001,61618,1425],"den":[51189,304,63343,400],"Er braucht den Computer.":[51792,1174,64043,1458],"kein":[53266,442,65801,572],"Wir haben kein Navi.":[54008,1031,66673,1156],"eine":[55338,395,68129,555],"Hast du eine Kamera?":[56034,926,68984,1120],"Du hast ein Tablet.":[57259,793,70404,1083],"Früher hatte ich kein Handy.":[58352,1239,71787,1603]},"8":{"die Familie":[300,663,300,913],"der Vater":[1263,610,1513,800],"die Mutter":[2173,539,2613,629],"die Eltern":[3012,731,3543,875],"der Bruder":[4043,544,4717,682],"die Schwester":[4888,670,5699,859],"die Geschwister":[5857,767,6858,877],"der Sohn":[6924,487,8035,678],"die Tochter":[7711,706,9013,852],"das Kind":[8717,604,10165,804],"der Opa":[9620,588,11269,727],"die Oma":[10508,587,12296,720],"der Onkel":[11395,635,13317,791],"die Tante":[12330,644,14408,727],"verheiratet":[13274,747,15435,1065],"ledig":[14321,502,16800,625],"Das ist meine Mutter. Sie heißt … Und das sind meine Brüder.":[15123,3565,17725,4368],"Früher hatte ich kein Handy. Heute habe ich ein Smartphone.":[18988,2966,22393,3827],"ich":[22254,275,26520,372],"mein":[22829,428,27192,548],"meine":[23557,412,28040,595],"du":[24269,235,28935,280],"dein":[24805,436,29515,479],"deine":[25541,465,30294,561],"er / es":[26306,514,31154,545],"sein":[27120,452,31999,582],"seine":[27872,582,32881,669],"sie":[28754,337,33850,524],"ihr":[29391,339,34673,441],"ihre":[30030,465,35415,564],"wir":[30795,356,36279,435],"unser":[31451,408,37014,532],"unsere":[32159,489,37846,557],"euer":[32948,368,38703,487],"eure":[33616,429,39490,542],"sie / Sie":[34345,628,40332,624],"ihr / Ihr":[35273,609,41255,578],"ihre / Ihre":[36182,814,42134,1273],"mein Vater, mein Kind, meine Mutter, meine Eltern":[37296,2820,43707,3578],"Jan hat eine Schwester. Seine Schwester heißt Karolin.":[40416,2950,47585,3711],"Oma Gisela hat einen Freund. Ihr Freund heißt Bernhard.":[43667,3054,51596,4014],"und, oder, aber":[47020,1325,55911,2405],"und":[48645,302,58615,400],"oder":[49247,402,59315,540],"aber":[49949,397,60155,544],"Man bekommt Kinder,":[50647,994,60999,1287],"man":[51941,335,62585,407],"heiratet":[52576,664,63293,905],"nicht immer.":[53540,650,64498,926],"Meine Mutter ist nicht verheiratet":[54490,1560,65724,1931],"erzieht":[56350,484,67956,617],"mich allein.":[57135,689,68873,825],"Das ist mein Bruder.":[58123,928,69997,1155],"Das ist seine Schwester.":[59351,1066,71453,1409],"Wie heißt deine Mutter?":[60717,909,73161,1178],"Ihr":[61926,295,74640,422],"Maria hat einen Sohn. Ihr Sohn heißt Leo.":[62521,2545,75362,3131],"Ich habe einen Bruder. Ich habe keine Schwester.":[65366,2300,78793,2935],"Ich habe einen Bruder, aber ich habe keine Schwester.":[67966,2406,82028,2948],"Das ist meine Familie: mein Vater, meine Mutter und meine Geschwister.":[70672,3548,85276,4335]},"9":{"der Montag":[300,706,300,695],"der Dienstag":[1306,705,1295,908],"der Mittwoch":[2311,593,2502,836],"der Donnerstag":[3204,854,3638,999],"der Freitag":[4359,644,4937,808],"der Samstag":[5303,702,6045,888],"der Sonntag":[6305,700,7232,891],"Wir möchten bestellen.":[7305,1047,8423,1304],"Ich nehme …":[8652,522,10027,617],"Ich möchte …":[9474,523,10944,703],"die Suppe":[10297,489,11947,622],"das Wasser":[11086,612,12869,764],"Wir möchten zahlen.":[11998,932,13933,1173],"Zusammen oder getrennt?":[13230,1181,15406,1529],"Das macht 20 Euro.":[14711,1362,17234,1778],"das Trinkgeld":[16373,769,19312,986],"Ich möchte bitte bestellen. Ich nehme eine Suppe und ein Wasser.":[17442,3224,20598,4533],"Das ist meine Mutter. Sie heißt … Und das sind meine Brüder.":[20967,3565,25431,4368],"Wir gehen am Donnerstag um 19 Uhr essen.":[24832,2356,30099,3025],"Das Topkapı ist am Montag geschlossen.":[27487,2003,33424,2723],"Am Montag ist das Topkapı geschlossen.":[29791,2249,36447,2524],"ich nehme, du nimmst, er nimmt":[32340,1678,39270,2326],"ich esse, du isst, er isst":[34317,1724,41896,2497],"wir nehmen, wir essen":[36341,1259,44693,1705],"möchte":[37900,438,46698,581],"Ich möchte ein Bier.":[38638,892,47580,1105],"Wir möchten bezahlen.":[39830,1009,48984,1431],"Wir möchten gerne bestellen.":[41138,1301,50715,1674],"Ja gern. Was bekommen Sie?":[42739,2077,52689,2493],"Ich nehme einen Salat und ein Wasser.":[45116,1878,55482,2400],"Und was möchten Sie trinken?":[47294,1420,58182,1652],"Wir möchten bitte zahlen.":[49013,1225,60134,1448],"Getrennt, bitte.":[50538,1020,61882,1436],"Das macht 14,90 Euro.":[51859,1720,63618,2165],"Am":[53879,317,66082,446],"um":[54496,348,66829,456],"Am Freitag um 20 Uhr.":[55144,1587,67584,1885],"Am Sonntag":[57031,685,69770,849],"Das Restaurant ist am Sonntag geöffnet.":[58016,1927,70919,2701],"Am Sonntag ist das Restaurant geöffnet.":[60243,2004,73919,2606],"nimmst":[62547,482,76825,644],"Du nimmst ein Schnitzel.":[63329,1117,77770,1195],"Ich nehme eine Kartoffelsuppe und ein Mineralwasser.":[64746,2728,79265,3484],"einen":[67775,495,83049,587],"die":[68569,285,83936,290],"Ich brauche einen Laptop und die Kamera.":[69154,1982,84527,2610]},"10":{"am Morgen":[300,603,300,814],"am Vormittag":[1203,709,1414,865],"am Mittag":[2212,526,2579,692],"am Nachmittag":[3039,709,3571,997],"am Abend":[4048,610,4868,782],"in der Nacht":[4959,739,5950,917],"Wie spät ist es?":[5998,857,7167,1193],"Viertel nach zehn":[7154,1105,8661,1155],"Viertel vor zehn":[8560,936,10115,1118],"halb zwei":[9796,775,11534,955],"Hast du Zeit?":[10871,691,12788,904],"Tut mir leid.":[11863,792,13993,859],"der Termin":[12954,652,15152,865],"die Vorlesung":[13907,801,16317,1019],"Hast du am Samstag Zeit? – Tut mir leid, am Samstag kann ich nicht.":[15007,3880,17636,4713],"Ich möchte bitte bestellen. Ich nehme eine Suppe und ein Wasser.":[19187,3224,22649,4533],"zehn Uhr fünfzehn":[22711,1017,27482,1353],"neun Uhr fünfundvierzig":[24028,1232,29135,1727],"dreizehn Uhr dreißig":[25561,1182,31162,1444],"dreizehn Uhr fünfundzwanzig":[27042,1265,32906,1908],"fünf vor halb zwei":[28608,1173,35114,1611],"dreizehn Uhr fünfunddreißig":[30081,1480,37025,1908],"fünf nach halb zwei":[31861,1129,39234,1341],"am":[33289,325,40875,421],"am Donnerstag, am Vormittag, am Montagvormittag":[33915,2882,41596,3629],"um":[37096,348,45525,456],"um Viertel nach zehn":[37744,1139,46281,1420],"von … bis":[39182,531,48001,817],"von drei bis fünf":[40013,1124,49118,1400],"kein-":[41437,442,50817,530],"Ich habe keine Zeit.":[42179,1108,51647,1272],"nicht":[43587,403,53220,472],"Am Montag geht es nicht.":[44290,1403,53992,1659],"Das passt nicht so gut.":[45993,1027,55952,1232],"halb acht":[47320,687,57484,731],"fünf vor halb drei":[48307,1053,58515,1421],"keine":[49660,436,60236,566],"Ich habe keine Zeit. – Samstagabend passt nicht so gut.":[50396,2969,61101,3836],"Hast du am Mittwochnachmittag Zeit?":[53665,1563,65237,2144]},"11":{"der Apfel":[300,547,300,751],"das Brot":[1147,624,1351,831],"das Brötchen":[2071,738,2482,1019],"die Milch":[3108,508,3800,699],"der Käse":[3916,666,4800,813],"die Butter":[4882,554,5912,667],"das Ei":[5737,619,6880,779],"das Fleisch":[6656,656,7959,918],"die Flasche":[7612,550,9177,661],"das Glas":[8462,695,10138,854],"die Packung":[9457,661,11292,808],"das Kilo":[10418,713,12400,803],"teuer ≠ billig":[11431,1022,13504,1254],"Was kostet das?":[12753,835,15058,983],"Ich hätte gern …":[13888,674,16341,887],"Ich hätte gern ein Kilo Äpfel. Was kostet das?":[14862,2792,17527,3350],"Hast du am Samstag Zeit? – Tut mir leid, am Samstag kann ich nicht.":[17954,3880,21177,4713],"Wie viel":[22134,639,26191,813],"Wie viel Hackfleisch möchten Sie?":[23073,1513,27303,1984],"250 Gramm.":[24885,1582,29588,2104],"Wie viele":[26767,653,31991,903],"Wie viele Würstchen nehmen Sie?":[27720,1479,33194,2087],"3 Würstchen.":[29499,811,35581,1060],"eine Flasche Wasser":[30610,978,36941,1221],"ein Kilo Äpfel":[31888,992,38462,1294],"500 Gramm Käse":[33180,1374,40055,1660],"Ich kaufe Wasser und Milch.":[34854,1570,42015,2042],"Was darf es sein?":[36724,990,44357,1240],"Ich hätte gern Rindfleisch.":[38014,1205,45897,1533],"Wie viel möchten Sie?":[39519,1079,47729,1274],"Ich nehme ein Kilo.":[40898,1091,49303,1292],"Darf es sonst noch etwas sein?":[42289,1541,50896,2005],"Nein, danke. Das ist alles.":[44130,2017,53201,2785],"Das macht 12,99 Euro.":[46447,2038,56286,2825],"Vielen Dank. Auf Wiedersehen.":[48785,1836,59411,2225],"ein Euro dreißig":[50921,1062,61936,1506],"viele":[52284,519,63742,617],"Wie viele Äpfel möchten Sie?":[53103,1375,64659,1950],"viel":[54778,422,66909,478],"Wie viel Milch brauchst du?":[55500,1313,67687,1641],"zwei Flaschen Wasser und ein Kilo Äpfel":[57113,2521,69628,3331],"zwei Euro neunundvierzig":[59935,1486,73259,2058],"Ich hätte gern 200 Gramm Käse. / Guten Tag. Was darf es sein? / Nein, danke. Das ist alles. / Darf es sonst noch etwas sein?":[61721,8347,75617,10395],"Guten Tag. Was darf es sein?":[70368,1881,86312,2183],"Ich hätte gern 200 Gramm Käse.":[72549,1848,88795,2401]},"12":{"Die Sonne scheint.":[300,848,300,1067],"Es regnet.":[1448,652,1667,842],"Es schneit.":[2400,577,2810,774],"Es ist windig.":[3277,704,3884,946],"Es ist bewölkt.":[4280,975,5129,1232],"Es ist kalt / warm.":[5555,1251,6661,1706],"Es sind 22 Grad.":[7107,1678,8667,2056],"das Wochenende":[9085,761,11023,1055],"der Strand":[10146,669,12378,785],"besuchen":[11114,569,13463,858],"treffen":[11984,461,14621,629],"gestern":[12745,543,15550,578],"leider":[13588,495,16428,676],"hoffentlich":[14383,586,17404,786],"zum Glück":[15269,531,18491,587],"Heute ist es warm und die Sonne scheint.":[16100,2189,19378,2518],"Ich hätte gern ein Kilo Äpfel. Was kostet das?":[18589,2792,22196,3350],"ich":[21680,275,25846,372],"mich":[22255,325,26518,414],"Ihr besucht mich morgen.":[22881,1185,27232,1416],"du":[24366,235,28948,280],"dich":[24901,327,29528,447],"Ich höre dich ganz schlecht.":[25529,1190,30275,1404],"er":[27019,254,31980,335],"ihn":[27573,360,32614,319],"Leider sehe ich ihn nur selten.":[28233,1502,33233,2140],"es":[30034,289,35673,398],"Ich kenne es nicht.":[30623,962,36371,1243],"sie":[31885,337,37914,524],"Ich kenne sie noch nicht.":[32522,1048,38737,1267],"wir":[33870,356,40305,435],"uns":[34526,350,41040,442],"Besuchst du uns?":[35177,966,41782,1088],"ihr":[36442,339,43170,441],"euch":[37082,374,43911,543],"Ich sehe euch morgen.":[37755,1117,44755,1412],"sie / Sie":[39172,628,46467,624],"Ich sehe sie morgen in der Uni.":[40100,1506,47391,1842],"sein":[41906,452,49533,582],"ich war · du warst · er/sie/es war · wir waren · ihr wart · sie/Sie waren":[42658,4263,50415,5762],"Leider war das Wetter nicht so gut. Es waren nur 12 Grad.":[47222,3176,56477,3643],"haben":[50697,468,60420,586],"hatte":[51466,404,61305,534],"Ich sehe Nina morgen.":[52170,1177,62140,1372],"Ich sehe sie morgen.":[53647,912,63811,1198],"Ich finde den Hafen schön.":[54859,1278,65309,1568],"Ich finde ihn schön.":[56437,981,67178,1208],"Besuchst du uns morgen?":[57719,1138,68686,1390],"Ich höre dich schlecht.":[59157,906,70376,1124],"waren":[60363,474,71801,631],"Gestern waren wir am Strand.":[61137,1290,72732,1564],"Heute ist es warm. Die Sonne scheint. Es sind 25 Grad.":[62726,4049,74596,5203]},"13":{"müssen":[300,427,300,606],"können":[1027,379,1206,442],"man":[1706,335,1948,407],"früh":[2341,393,2655,518],"lange schlafen":[3034,798,3473,989],"das Büro":[4132,688,4762,806],"der Schreibtisch":[5120,794,5868,971],"der Kollege":[6214,617,7139,822],"die Kollegin":[7131,787,8261,938],"die Stadt":[8218,598,9500,708],"wandern":[9116,571,10508,681],"ins Theater gehen":[9987,1000,11489,1310],"freundlich":[11287,563,13099,725],"nett":[12150,319,14124,443],"In der Woche muss ich früh im Büro sein. Am Wochenende kann ich lange schlafen.":[12770,3969,14867,5136],"Heute ist es warm und die Sonne scheint.":[17038,2189,20303,2518],"ich":[19527,275,23122,372],"muss":[20102,407,23794,581],"kann":[20809,383,24675,439],"du":[21493,235,25414,280],"musst":[22028,437,25994,497],"kannst":[22765,383,26791,520],"er/sie/es":[23448,856,27612,1432],"wir":[24604,356,29343,435],"ihr":[25260,339,30079,441],"müsst":[25899,376,30820,532],"könnt":[26576,384,31652,507],"sie/Sie":[27260,628,32459,624],"ich muss, er muss":[28187,1115,33383,1233],"Beatriz":[29602,591,34916,793],"oft früh im Büro":[30493,1070,36009,1453],"sein.":[31864,441,37762,684],"Am Wochenende":[32604,788,38746,1037],"sie lange":[33693,556,40083,690],"schlafen.":[34548,530,41074,644],"Wann":[35378,340,42017,424],"Beatriz im Büro":[36018,1066,42741,1417],"sein?":[37384,543,44458,692],"In Hall kann man viel machen.":[38227,1394,45450,1778],"Ich muss früh im Büro sein.":[39920,1447,47528,1839],"Du kannst gut Deutsch sprechen.":[41667,1209,49667,1633],"muss / ich / arbeiten / am Samstag":[43176,2244,51600,3202],"Am Samstag muss ich arbeiten.":[45720,1442,55102,1878],"Ich muss am Samstag arbeiten.":[47462,1522,57280,2146],"man / kann / in Hall / viel machen":[49284,2295,59726,2823],"Ich muss um 9 Uhr im Büro sein.":[51880,1699,62849,2157],"Am Sonntag kann ich lange schlafen.":[53879,1713,65306,2349]},"14":{"dürfen":[300,457,300,606],"wollen":[1057,436,1206,470],"möchten":[1793,513,1976,646],"mögen":[2607,454,2922,622],"rauchen":[3361,517,3844,795],"grillen":[4178,510,4938,539],"das Picknick":[4988,659,5777,794],"das Kino":[5947,682,6871,923],"ins Kino gehen":[6929,860,8095,1135],"eine Radtour machen":[8088,1130,9530,1230],"erlaubt":[9519,592,11060,630],"laut":[10411,545,11990,595],"zu spät kommen":[11256,856,12885,996],"einladen":[12412,700,14181,837],"Am Wochenende möchte ich lange schlafen und Deutsch lernen.":[13411,2808,15319,3586],"In der Woche muss ich früh im Büro sein. Am Wochenende kann ich lange schlafen.":[16520,3969,19204,5136],"ich":[20788,275,24640,372],"darf":[21363,352,25312,504],"will":[22015,274,26116,363],"mag":[22588,255,26780,348],"möchte":[23144,438,27428,581],"du":[23882,235,28309,280],"darfst":[24417,445,28889,580],"willst":[25162,359,29769,688],"magst":[25821,521,30757,641],"möchtest":[26642,618,31699,716],"er/sie/es":[27560,856,32715,1432],"wir":[28716,356,34446,435],"ihr":[29373,339,35182,441],"dürft":[30012,422,35923,478],"wollt":[30733,385,36701,656],"mögt":[31418,244,37658,417],"möchtet":[31962,506,38375,590],"sie/Sie":[32768,628,39265,624],"Ich will …":[33696,469,40189,658],"Ich möchte …":[34465,523,41146,703],"Man darf im Bus nicht laut Musik hören.":[35288,2080,42150,2425],"Darf man hier rauchen?":[37668,1025,44874,1398],"Ich möchte ein Bier.":[38993,892,46572,1105],"Ich kann Englisch.":[40185,838,47977,1027],"Ich mag die Stadt.":[41323,837,49304,1048],"Hier darf man nicht rauchen.":[42460,1167,50652,1542],"Willst":[43927,421,52494,741],"Willst du am Wochenende ins Kino gehen?":[44648,1844,53534,2298],"Wir möchten ein Picknick machen.":[46792,1359,56132,1878],"Er mag die Stadt.":[48451,912,58310,1066],"Darf man im Büro rauchen? – Nein, das darf man nicht.":[49662,3111,59676,3980],"Ich möchte einen Kaffee.":[53074,1044,63957,1204]},"15":{"der Beruf":[300,589,300,713],"der Lehrer":[1189,695,1313,850],"die Lehrerin":[2184,801,2463,889],"der Arzt":[3285,576,3653,812],"die Ärztin":[4161,771,4765,913],"der Koch":[5231,526,5977,587],"der Informatiker":[6057,902,6864,1088],"der Verkäufer":[7259,782,8252,1063],"der Betriebswirt":[8342,904,9615,1213],"denn":[9546,362,11128,436],"Geld verdienen":[10208,834,11864,1025],"Menschen helfen":[11342,832,13189,1084],"kreativ sein":[12474,992,14573,1192],"interessant ≠ langweilig":[13766,1420,16065,1820],"Ich lerne jeden Tag eine Stunde Deutsch, denn ich möchte die B1-Prüfung schaffen.":[15486,4009,18185,5008],"Am Wochenende möchte ich lange schlafen und Deutsch lernen.":[19795,2808,23493,3586],"-in":[22903,313,27379,358],"Lehrer ← Lehrerin":[23516,1215,28037,1533],"Verkäufer ← Verkäuferin":[25031,1567,29869,2108],"Arzt ← Ärztin":[26898,1090,32277,1425],"Koch ← Köchin":[28288,828,34002,1022],"sein":[29416,452,35324,582],"Ich bin Lehrer.":[30168,771,36206,1031],"Ich arbeite als Lehrer.":[31239,1124,37537,1398],"Sie wohnt jetzt in Schwäbisch Hall,":[32662,1492,39236,1935],"sie":[34454,337,41471,524],"mag":[35091,255,42295,348],"die Stadt.":[35646,554,42943,613],"Ich muss viel lernen,":[36500,993,43856,1149],"ich":[37794,275,45304,372],"habe":[38368,401,45977,541],"bald eine Prüfung.":[39069,909,46818,1166],"Was macht ihr denn hier?":[40278,1028,48284,1219],"Ich lerne Deutsch. Ich möchte in Deutschland arbeiten.":[41606,2754,49803,3475],"Ich lerne Deutsch, denn ich möchte in Deutschland arbeiten.":[44660,2587,53578,3252],"Leopold ist Schauspieler. Er liebt das Theater.":[47547,2959,57129,3375],"Leopold ist Schauspieler, denn er liebt das Theater.":[50806,2694,60805,3517],"Verkäufer":[53800,593,64622,830],"Arzt":[54692,454,65751,610],"Verkäuferin":[55446,786,66661,1060],"Ärztin":[56532,657,68021,692],"Menschen":[57489,552,69013,574],"Ich finde die Arbeit als Arzt interessant, denn man kann Menschen helfen.":[58340,3467,69887,4154],"Welchen Beruf findest du interessant?":[62107,1697,74342,2074],"Ich finde die Arbeit als Informatiker interessant, denn man kann kreativ sein.":[64105,3747,76716,4816]},"16":{"der Frühling":[300,859,300,880],"der Sommer":[1459,698,1480,759],"der Herbst":[2457,679,2539,642],"der Winter":[3436,620,3481,788],"der Monat":[4355,627,4569,733],"das Jahr":[5282,549,5601,740],"der Geburtstag":[6131,781,6641,931],"der Urlaub":[7212,553,7872,717],"das Meeting":[8066,709,8889,820],"Sehr geehrte Frau …":[9074,1073,10009,1235],"Sehr geehrter Herr …":[10447,1030,11544,1238],"Mit freundlichen Grüßen":[11777,1188,13082,1596],"Wann hast du Geburtstag?":[13265,1239,14977,1516],"Im Sommer mache ich Urlaub, vom ersten bis zum fünfzehnten August.":[14805,3712,16794,4695],"Ich lerne jeden Tag eine Stunde Deutsch, denn ich möchte die B1-Prüfung schaffen.":[18816,4009,21789,5008],"im":[23125,344,27097,376],"im Juli, im Winter":[23769,1365,27773,1658],"am":[25435,325,29730,421],"am Montag, am 17. April, am Vormittag":[26060,2909,30452,3526],"um":[29269,348,34278,456],"um 10 Uhr":[29916,770,35034,979],"Das Meeting ist am Montag, 17. April, am Vormittag um 10 Uhr.":[30986,4443,36313,5938],"die Nacht":[35730,584,42550,742],"-te":[36613,359,43592,495],"der zweite, der vierte":[37272,1329,44387,1803],"der erste":[38901,632,46490,799],"der dritte":[39834,631,47589,810],"der siebte":[40765,661,48699,735],"-ste":[41726,431,49734,617],"der zwanzigste, der fünfundzwanzigste":[42457,2020,50651,2925],"-ten":[44777,405,53875,483],"am 2.8.":[45483,1121,54658,1402],"am zweiten Achten":[46903,1121,56361,1402],"am zweiten August":[48324,1206,58063,1521],"vom 10. bis zum 21. Juni":[49829,2439,59884,3216],"vom zehnten bis zum einundzwanzigsten Juni":[52568,2439,63400,3216],"Sehr geehrte Frau Danner,":[55306,1288,66916,1825],"Sehr geehrter Herr …,":[56894,1030,69041,1238],"Das Meeting ist am Montag, am Vormittag um 10 Uhr.":[58224,3131,70578,3923],"Ich mache im August Urlaub.":[61655,1273,74801,1675],"am 15.2.":[63228,1455,76776,1763],"am fünfzehnten Februar":[64983,1395,78839,1727],"vom 20.8. bis zum 3.9.":[66678,2619,80866,3214],"vom zwanzigsten August bis zum dritten September":[69597,2780,84380,3628],"Am zwölften März.":[72676,1215,88308,1526],"Im März, am zwölften.":[74191,1480,90134,1914],"Sehr geehrter Herr Müller, … Mit freundlichen Grüßen":[75971,3051,92348,3785],"Januar":[79322,491,96434,730],"Februar":[80113,527,97464,669],"März":[80940,448,98432,527],"April":[81688,549,99260,744],"Mai":[82537,416,100304,487],"Juni":[83252,507,101091,576],"Juli":[84059,498,101967,566],"August":[84857,574,102833,777],"September":[85731,695,103910,984],"Oktober":[86726,597,105194,793],"November":[87623,579,106287,678],"Dezember":[88501,702,107265,795]},"17":{"das Hobby":[300,564,300,709],"die Freizeit":[1164,719,1309,859],"Fußball spielen":[2183,1078,2467,1350],"Rad fahren":[3560,628,4117,821],"schwimmen":[4489,551,5238,583],"Musik hören":[5340,767,6121,982],"im Internet surfen":[6407,1121,7403,1397],"Schach spielen":[7828,811,9100,1124],"tanzen":[8939,512,10525,680],"laufen":[9750,573,11505,627],"wissen":[10624,458,12432,546],"gern":[11381,427,13278,470],"lieber":[12108,465,14048,596],"Spielst du gern Fußball?":[12873,1238,14944,1543],"Ich lese gern, aber ich schwimme lieber.":[14411,1922,16787,2317],"Im Sommer mache ich Urlaub, vom ersten bis zum fünfzehnten August.":[16633,3712,19404,4695],"lesen":[20645,485,24399,674],"liest":[21430,457,25373,688],"sprechen":[22186,613,26361,698],"sprichst":[23100,581,27359,748],"spricht":[23981,471,28407,732],"treffen":[24752,461,29439,629],"triffst":[25513,404,30368,571],"trifft":[26217,367,31240,440],"fahren":[26884,524,31980,671],"fährst":[27708,483,32951,546],"fährt":[28491,434,33797,607],"schlafen":[29225,564,34704,655],"schläfst":[30089,610,35660,717],"schläft":[30999,464,36677,636],"läufst":[31764,497,37613,789],"läuft":[32561,461,38701,657],"ich weiß, du weißt, er weiß, wir wissen, ihr wisst, sie wissen":[33322,3733,39659,4859],"ich lese, wir lesen, ihr lest":[37354,2160,44818,2716],"nehmen ← nimmst":[39814,1044,47834,1163],"essen ← isst":[41158,791,49297,1108],"Ich spiele gern Fußball.":[42249,1243,50706,1569],"Ich lese lieber.":[43792,811,52574,1013],"Ich tanze nicht gern.":[44903,1090,53887,1321],"Ja, sehr gern.":[46293,1277,55508,1714],"Nein, nicht so gern.":[47871,1162,57522,1801],"Nein, überhaupt nicht gern.":[49332,1620,59623,2003],"Nein, ich laufe lieber.":[51252,1339,61926,1846],"Er liest gern.":[52891,913,64072,943],"Sprichst":[54104,576,65316,803],"Sprichst du Englisch?":[54979,959,66419,1093],"Sie fährt gern Rad.":[56238,1061,67811,1174],"Du schläfst lange.":[57600,814,69285,1038],"weiß":[58714,515,70623,697],"Ich weiß das nicht.":[59529,860,71620,1122]},"18":{"anfangen":[300,571,300,739],"aufstehen":[1171,597,1339,782],"anrufen":[2067,713,2421,830],"ausprobieren":[3080,832,3551,1068],"stattfinden":[4212,771,4919,1099],"mitkommen":[5282,666,6318,810],"mitmachen":[6249,578,7428,873],"mitnehmen":[7127,634,8601,815],"fernsehen":[8061,628,9716,718],"einkaufen":[8989,654,10734,903],"das Training":[9942,704,11937,866],"jeden Tag":[10946,508,13103,686],"der Sport":[11755,596,14090,786],"fit bleiben":[12651,705,15176,1013],"Ich stehe um sieben Uhr auf. Um neun fängt meine Arbeit an.":[13656,3242,16490,4446],"Ich lese gern, aber ich schwimme lieber.":[17198,1922,21236,2317],"Wann":[19420,340,23853,424],"fängt":[20060,402,24577,597],"an?":[20761,374,25473,490],"Ich":[21436,249,26264,322],"stehe":[21985,453,26885,633],"um 7 Uhr":[22738,729,27819,933],"auf.":[23767,424,29051,571],"rufe":[24490,499,29922,618],"dich später":[25289,658,30840,777],"an.":[26246,356,31917,419],"Das Training":[26902,700,32636,833],"findet":[27903,492,33769,646],"jeden Mittwoch":[28695,772,34715,864],"statt.":[29767,438,35879,616],"Ich möchte beim Lauftraining mitmachen.":[30505,1715,36795,2208],"Tim kann uns im Auto mitnehmen.":[32519,1622,39303,1904],"stehe … auf":[34442,748,41507,876],"Ich stehe um 6 Uhr auf.":[35490,1529,42683,1867],"Rufst … an":[37319,667,44850,938],"Rufst du mich morgen an?":[38286,1152,46088,1411],"fängt … an":[39738,602,47799,710],"Der Kurs fängt am Montag an.":[40640,1486,48809,1946],"Kannst du morgen mitkommen?":[42426,1202,51055,1371],"Ich stehe jeden Tag um 6 Uhr auf.":[43929,2009,52726,2356],"Der Kurs findet am Freitag statt.":[46237,1624,55382,2215]},"19":{"trainieren":[300,652,300,826],"schaffen":[1252,529,1426,650],"starten":[2081,586,2376,704],"feiern":[2967,591,3380,591],"klappen":[3858,462,4272,554],"passieren":[4620,681,5126,848],"stürzen":[5601,593,6273,802],"gestern":[6494,543,7375,578],"schon mal":[7337,556,8253,843],"noch nie":[8194,504,9395,686],"der Sieger":[8998,652,10381,898],"das Ziel":[9950,688,11580,842],"glücklich":[10938,506,12721,586],"zufrieden":[11745,631,13607,810],"Gestern habe ich eine Stunde Deutsch gelernt.":[12676,1978,14717,2642],"Ich stehe um sieben Uhr auf. Um neun fängt meine Arbeit an.":[14954,3242,17660,4446],"Ich":[18496,249,22406,322],"habe":[19045,401,23027,541],"die 10 Kilometer in 39 Minuten":[19746,2776,23869,3695],"geschafft.":[22822,547,27864,765],"Für die 10 km":[23669,1202,28929,1421],"ich dieses Jahr nicht intensiv":[25171,1581,30650,1902],"trainiert.":[27051,571,32852,782],"Beate Langer":[27922,817,33934,895],"ist":[29040,299,35128,390],"schon beim Ironman":[29639,1031,35818,1217],"gestartet.":[30970,630,37335,748],"machen ← gemacht":[31900,913,38383,1214],"spielen ← gespielt":[33113,1204,39896,1605],"schaffen ← geschafft":[34616,1080,41801,1473],"starten ← gestartet":[35996,1299,43574,1672],"arbeiten ← gearbeitet":[37595,1354,45546,1753],"-ieren":[39249,433,47600,552],"trainieren ← trainiert":[39983,1304,48452,1376],"passieren ← passiert":[41587,1128,50127,1425],"Ich bin gestartet.":[43014,871,51853,1191],"Er ist gestürzt.":[44185,846,53343,1218],"Was ist passiert?":[45332,880,54862,1122],"Ich hatte …":[46512,474,56284,572],"Es war …":[47286,497,57155,639],"machen":[48083,432,58094,649],"gemacht":[48816,392,59043,664],"arbeiten":[49508,625,60007,742],"gearbeitet":[50433,670,61049,843],"telefonieren":[51403,802,62191,1065],"telefoniert":[52505,798,63556,858],"habe … gespielt":[53602,827,64714,980],"Ich habe Tennis gespielt.":[54729,1200,65994,1565],"ist … gestartet":[56229,867,67859,1107],"Er ist beim Campus-Run gestartet.":[57396,1706,69266,2319],"Hast du schon mal Klavier gespielt?":[59402,1402,71885,1646],"Nein, noch nie.":[61104,1001,73831,1411],"Gestern habe ich viel gearbeitet.":[62405,1541,75542,2031]},"20":{"Wer?":[300,409,300,654],"Wen?":[1009,390,1254,566],"Was?":[1699,405,2119,528],"Wie?":[2404,326,2948,464],"Wo?":[3030,337,3712,383],"Woher?":[3667,515,4395,580],"Wohin?":[4483,432,5275,583],"Wann?":[5214,419,6158,483],"Wie viel?":[5933,660,6942,778],"Wie viele?":[6893,655,8020,862],"Warum?":[7848,455,9181,582],"Ich lerne jeden Tag Deutsch. Das macht Spaß!":[8603,2479,10063,3395],"Gestern habe ich eine Stunde Deutsch gelernt.":[11382,1978,13758,2642],"-e, -st, -t, -en, -t, -en":[13660,2296,16700,3178],"sein":[16257,452,20178,582],"haben":[17009,468,21060,586],"der / das / die":[17777,906,21945,1305],"den, einen, keinen":[18983,1224,23550,1598],"mein, dein, sein, ihr…":[20508,1548,25448,2185],"Ich muss heute arbeiten.":[22356,1152,27933,1449],"Ich stehe um 7 Uhr auf.":[23808,1483,29682,1767],"haben / sein + ge…t":[25591,1865,31749,2385],"kommen":[27756,502,34434,538],"Woher kommen Sie?":[28558,943,35272,1155],"einen":[29801,495,36727,587],"Ich habe einen Bruder.":[30596,961,37615,1145],"meine":[31857,412,39060,595],"Das ist meine Schwester.":[32569,1087,39954,1352],"viel":[33955,422,41607,478],"Wie viel kostet das?":[34677,1097,42384,1454],"kann":[36075,383,44138,439],"Am Sonntag kann ich lange schlafen.":[36758,1713,44878,2349],"stehe … auf":[38771,748,47527,876],"Ich stehe um 6 Uhr auf.":[39819,1529,48703,1867],"liest":[41649,457,50870,688],"Er liest gern.":[42405,913,51858,943],"haben … gespielt":[43618,827,53101,1051],"Wir haben Fußball gespielt.":[44745,1364,54452,1625],"halb vier":[46409,668,56377,870],"Ich bleibe zu Hause. Es regnet.":[47377,2023,57547,2487],"Ich bleibe zu Hause, denn es regnet.":[49700,1965,60333,2484],"Ich sehe den Lehrer morgen.":[51965,1356,63117,1671],"Ich sehe ihn morgen.":[53621,1008,65089,1260],"Ich heiße Mouhsine. Ich komme aus Marokko und wohne in Errachidia. Ich spreche Arabisch und Französisch. Ich arbeite im Büro. Ich lerne jeden Tag Deutsch, denn ich möchte die B1-Prüfung schaffen.":[54929,11459,66649,14770]}}};
+(function(){
+'use strict';
+const $ = (s,r)=> (r||document).querySelector(s);
+const $$ = (s,r)=> Array.from((r||document).querySelectorAll(s));
+const esc = s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad2 = n=>String(n).padStart(2,'0');
+const isoOf = t=>t.getFullYear()+'-'+pad2(t.getMonth()+1)+'-'+pad2(t.getDate());
+const today = ()=>isoOf(new Date());
+const addDays = (iso,n)=>{ const p=iso.split('-').map(Number); return isoOf(new Date(p[0],p[1]-1,p[2]+n)); };
+const NDAYS = DAYS.length;
+const IN_CLAUDE = !!(window.claude && typeof window.claude.use==='function');
+const reduceMotion = ()=> window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const I = (body)=>'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+body+'</svg>';
+const ICON = {
+  home:I('<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/>'),
+  book:I('<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>'),
+  cards:I('<rect x="3.5" y="7.5" width="13" height="12.5" rx="2"/><path d="M7.5 7.5V5.5A1.5 1.5 0 0 1 9 4h9.5A1.5 1.5 0 0 1 20 5.5v9.5a1.5 1.5 0 0 1-1.5 1.5h-2"/>'),
+  phones:I('<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3.5" y="14" width="4" height="6" rx="1.5"/><rect x="16.5" y="14" width="4" height="6" rx="1.5"/>'),
+  sliders:I('<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'),
+  play:I('<path class="f" d="M8 5.2v13.6L19 12z"/>'),
+  pause:I('<rect class="f" x="6.5" y="5" width="4" height="14" rx="1"/><rect class="f" x="13.5" y="5" width="4" height="14" rx="1"/>'),
+  spk:I('<path class="f" d="M11 5 6.5 9H3.5v6h3L11 19z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>'),
+  close:I('<path d="M6 6l12 12M18 6 6 18"/>'),
+  check:I('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
+  flame:I('<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.1 0-3.3 2.4-5.2 3.6-7.6.5 1.6 1.5 2.7 2.6 3.1C12 7 13 4.6 14.6 3c.4 2.9 3.9 5.5 3.9 10.4 0 4.6-2.7 7.6-6.5 7.6z"/>'),
+  next:I('<path d="m14.5 6-6 6 6 6"/>'),
+  prev:I('<path d="m9.5 6 6 6-6 6"/>'),
+  skipB:I('<path class="f" d="M18 6.2v11.6L9.8 12z"/><path d="M6.5 6v12"/>'),
+  skipF:I('<path class="f" d="M6 6.2v11.6L14.2 12z"/><path d="M17.5 6v12"/>'),
+  eye:I('<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>'),
+  repeat:I('<path d="m17 3.5 3 3-3 3"/><path d="M4 11.5v-1a4 4 0 0 1 4-4h12"/><path d="m7 20.5-3-3 3-3"/><path d="M20 12.5v1a4 4 0 0 1-4 4H4"/>'),
+  timer:I('<circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13l2.5 1.5M9.5 2.5h5"/>'),
+  cloud:I('<path d="M7 18.5h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 9.5a4.5 4.5 0 0 0 0 9z"/>')
+};
+
+/* ---------------- state ---------------- */
+const LKEY = 'dafk-app-v2';
+function blank(){ return {v:2, done:{}, log:{}, cards:{}, pos:{}, set:{slow:false, auto:true, dir:'de'}, u:0}; }
+function clean(o){ const b=blank(); if(!o||typeof o!=='object') return b; ['done','log','cards','pos','set'].forEach(k=>{ if(o[k]&&typeof o[k]==='object') b[k]=Object.assign(b[k],o[k]); }); b.u=+o.u||0; return b; }
+let S = blank();
+try{ const raw=localStorage.getItem(LKEY); if(raw) S=clean(JSON.parse(raw)); }catch(e){}
+try{ const old=localStorage.getItem('dafk-done'); if(old && !Object.keys(S.done).length){ JSON.parse(old).forEach(n=>{ S.done[n]={d:today(),s:0,t:0,m:0}; }); } }catch(e){}
+function saveLocal(){ try{ localStorage.setItem(LKEY, JSON.stringify(S)); }catch(e){} }
+function merge(a,b){
+  const newer=(a.u||0)>=(b.u||0)?a:b, older=newer===a?b:a, r=blank();
+  r.set=Object.assign(r.set, older.set, newer.set);
+  r.done=Object.assign({}, older.done, newer.done);
+  r.pos=Object.assign({}, older.pos, newer.pos);
+  [a.log,b.log].forEach(L=>Object.keys(L||{}).forEach(d=>{ r.log[d]=Math.max(r.log[d]||0, +L[d]||0); }));
+  r.cards=Object.assign({}, a.cards);
+  Object.keys(b.cards||{}).forEach(id=>{ const x=r.cards[id], y=b.cards[id]; if(!x || (y.t||0)>(x.t||0)) r.cards[id]=y; });
+  r.u=Math.max(a.u||0,b.u||0);
+  return r;
+}
+
+/* ---------------- sync (db capability, private per person) ---------------- */
+const SYNC = {ref:null, on:false, busy:false, again:false, timer:0, lastPull:0};
+function syncLabel(){ const d=$('#syncDot'); if(d && !IN_CLAUDE){ d.hidden=true; } if(d){ d.classList.toggle('on',SYNC.on); d.title = SYNC.on ? 'التقدم محفوظ في حسابك' : 'التقدم محفوظ على هذا الجهاز'; } const s=$('#syncText'); if(s) s.textContent = !IN_CLAUDE ? 'تقدّمك محفوظ في هذا المتصفح على هذا الجهاز. لنقله إلى جهاز آخر استعمل النسخة الاحتياطية أسفله.' : SYNC.on ? 'تقدّمك محفوظ في حسابك، ويظهر لك على الهاتف والحاسوب.' : 'تقدّمك محفوظ على هذا الجهاز فقط الآن. سيُحفظ في حسابك تلقائياً عند توفر الاتصال.'; }
+async function initSync(){
+  try{
+    if(!window.claude || typeof window.claude.use!=='function') return;
+    const pair = await Promise.all([window.claude.use('user'), window.claude.use('db')]);
+    const user=pair[0], db=pair[1];
+    if(!user || !db) return;
+    const uid = await user.id();
+    if(!uid) return;
+    SYNC.ref = db.doc('data/users/'+uid+'/progress');
+    await pull();
+  }catch(e){}
+}
+async function pull(){
+  if(!SYNC.ref) return;
+  SYNC.lastPull=Date.now();
+  try{
+    const snap = await SYNC.ref.get();
+    let remote=null;
+    if(snap.exists){ try{ remote=clean(JSON.parse(snap.data().json)); }catch(e){} }
+    SYNC.on=true;
+    if(remote){
+      const before=JSON.stringify(S);
+      S=merge(S,remote); saveLocal();
+      if(JSON.stringify(S)!==before){ render(); }
+      if(JSON.stringify(S)!==JSON.stringify(remote)) scheduleWrite();
+    } else if(Object.keys(S.done).length || Object.keys(S.cards).length){ scheduleWrite(); }
+  }catch(e){ SYNC.on=false; }
+  syncLabel();
+}
+function scheduleWrite(){ if(!SYNC.ref) return; clearTimeout(SYNC.timer); SYNC.timer=setTimeout(flush,1200); }
+async function flush(){
+  if(!SYNC.ref) return;
+  clearTimeout(SYNC.timer); SYNC.timer=0;
+  if(SYNC.busy){ SYNC.again=true; return; }
+  SYNC.busy=true;
+  try{ await SYNC.ref.set({json:JSON.stringify(S), u:S.u}); SYNC.on=true; }
+  catch(e){ if(e && e.code==='unavailable'){ setTimeout(scheduleWrite, 1200+Math.random()*1800); } else if(e && (e.code==='invalid_argument'||e.code==='revoked'||e.code==='not_granted')){ SYNC.ref=null; SYNC.on=false; } }
+  SYNC.busy=false; syncLabel();
+  if(SYNC.again){ SYNC.again=false; flush(); }
+}
+function commit(){ S.u=Date.now(); saveLocal(); scheduleWrite(); }
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'){ if(SYNC.timer) flush(); }
+  else if(SYNC.ref && Date.now()-SYNC.lastPull>30000){ pull(); }
+});
+
+/* ---------------- derived ---------------- */
+function curDay(){ for(let i=1;i<=NDAYS;i++) if(!S.done[i]) return i; return NDAYS; }
+function doneCount(){ return Object.keys(S.done).filter(k=>+k>=1&&+k<=NDAYS).length; }
+function streak(){ let d=today(); if(!S.log[d]) d=addDays(d,-1); let n=0; while(S.log[d]){ n++; d=addDays(d,-1); } return n; }
+function wordsLearned(){ return Object.keys(S.done).reduce((a,k)=>a+((DAYS[k-1]&&DAYS[k-1].vocab.length)||0),0); }
+function lessonOf(n){ return LESSONS.find(g=>g.days.indexOf(n)>=0); }
+function lessonLabel(n){ const g=lessonOf(n); return g && g.l ? 'Lektion '+g.l : 'Wiederholung'; }
+
+/* ---------------- text helpers ---------------- */
+function fmt(s){
+  return String(s).replace(/«([^»]+)»/g,(m,t)=>{
+    const k=CORE.norm(t), p=CORE.playable(k);
+    const inner=t.replace(/،/g,',').replace(/\[(der|den|das|die)\]/g,(x,a)=>'<span class="g g-'+(a==='den'?'der':a)+'">'+a+'</span>');
+    return '<span class="de'+(p?' tap':'')+'" lang="de"'+(p?' data-k="'+esc(k)+'" role="button" tabindex="0"':'')+'>'+inner+'</span>';
+  });
+}
+const deOf = s=>fmt('«'+s+'»');
+const keyOf = s=>CORE.norm(s);
+
+/* ---------------- audio: neural German voice sprites, browser voice as fallback ---------------- */
+const AUDIO = (function(){
+  let ctx=null, src=null, token=0, markEl=null, warned=false;
+  const raw={}, bufs={};
+  const file=(d,slow)=>'audio/d'+pad2(d)+(slow?'s':'')+'.mp3';
+  function prefetch(d,slow){ const id=d+(slow?'s':''); if(!raw[id]) raw[id]=fetch(file(d,slow)).then(r=>{ if(!r.ok) throw new Error(String(r.status)); return r.arrayBuffer(); }).catch(()=>{ delete raw[id]; return null; }); return raw[id]; }
+  function ensure(){
+    if(!ctx){ const C=window.AudioContext||window.webkitAudioContext; if(C){ try{ ctx=new C(); }catch(e){ ctx=null; } } }
+    if(ctx && ctx.state!=='running'){ try{ ctx.resume(); }catch(e){} }
+    return ctx;
+  }
+  function buffer(d,slow){
+    const id=d+(slow?'s':'');
+    if(!bufs[id]) bufs[id]=prefetch(d,slow).then(ab=>{
+      if(!ab||!ctx) return null;
+      return new Promise(res=>{ let p; try{ p=ctx.decodeAudioData(ab.slice(0), b=>res(b), ()=>res(null)); }catch(e){ res(null); } if(p&&p.then) p.then(res,()=>res(null)); });
+    }).then(b=>{ if(!b) delete bufs[id]; return b; });
+    return bufs[id];
+  }
+  function locate(d,k){ const D=M&&M.days; if(!D) return null; if(D[d]&&D[d][k]) return [d,D[d][k]]; for(const x in D){ if(D[x][k]) return [+x,D[x][k]]; } return null; }
+  function mark(el){ if(markEl) markEl.classList.remove('is-playing'); markEl=el||null; if(markEl) markEl.classList.add('is-playing'); }
+  function stop(){
+    token++;
+    if(src){ const n=src; src=null; n.onended=null; try{ n.stop(); }catch(e){} if(n._res) n._res(); }
+    try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
+    mark(null);
+  }
+  function fallback(k,slow,my){
+    if(!warned){ warned=true; toast('ملفات الصوت لم تُحمَّل بعد، يُستعمل صوت المتصفح مؤقتاً.'); }
+    return new Promise(res=>{
+      if(!('speechSynthesis' in window)){ mark(null); res(); return; }
+      try{
+        const u=new SpeechSynthesisUtterance(k); u.lang='de-DE'; u.rate=slow?0.6:0.9;
+        const v=speechSynthesis.getVoices().find(v=>/^de/i.test(v.lang)); if(v) u.voice=v;
+        u.onend=u.onerror=()=>{ if(my===token) mark(null); res(); };
+        speechSynthesis.speak(u);
+      }catch(e){ mark(null); res(); }
+    });
+  }
+  async function play(d,k,opt){
+    opt=opt||{}; const slow=!!opt.slow;
+    stop(); const my=token; mark(opt.el);
+    const c=ensure(); const loc=locate(d,k);
+    if(!loc||!c) return fallback(k,slow,my);
+    if(opt.el) opt.el.classList.add('is-loading');
+    const b=await buffer(loc[0],slow);
+    if(opt.el) opt.el.classList.remove('is-loading');
+    if(my!==token) return;
+    if(!b) return fallback(k,slow,my);
+    const clip=loc[1], st=(slow?clip[2]:clip[0])/1000, du=(slow?clip[3]:clip[1])/1000;
+    return new Promise(res=>{
+      const n=c.createBufferSource(); n.buffer=b; n.connect(c.destination); n._res=res;
+      n.onended=()=>{ if(src===n){ src=null; mark(null); } res(); };
+      src=n;
+      try{ n.start(0, Math.max(0,st-0.03), du+0.1); }catch(e){ src=null; mark(null); res(); }
+    });
+  }
+  return {play, stop, prefetch, current:()=>token};
+})();
+const sleep = ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------------- toast ---------------- */
+let toastT=0;
+function toast(msg){ const t=$('#toast'); if(!t) return; t.querySelector('span').textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{ t.hidden=true; },3200); }
+
+/* ---------------- tabs ---------------- */
+const TABS=[['home','الرئيسية',ICON.home],['course','الدروس',ICON.book],['cards','البطاقات',ICON.cards],['listen','الاستماع',ICON.phones]];
+let TAB='home';
+function renderTabs(){
+  const due=cardStats().dueNow;
+  $('#tabbar').innerHTML=TABS.map(t=>'<button type="button" class="tab" data-act="tab" data-tab="'+t[0]+'" aria-current="'+(TAB===t[0]?'page':'false')+'">'+t[2]+'<span>'+t[1]+'</span>'+(t[0]==='cards'&&due?'<span class="badge">'+due+'</span>':'')+'</button>').join('');
+}
+function setTab(t){ if(TAB==='listen' && t!=='listen') listenStop(); TAB=t; render(); window.scrollTo(0,0); }
+function render(){
+  const el=$('#screen');
+  el.innerHTML = TAB==='home'?homeView():TAB==='course'?courseView():TAB==='cards'?cardsView():listenView();
+  el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter');
+  renderTabs(); fillGrids(el);
+  if(TAB==='cards' && CS && !CS.end) autoPlayCard();
+}
+
+/* ---------------- home ---------------- */
+const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
+const MONTHS_AR=['يناير','فبراير','مارس','أبريل','ماي','يونيو','يوليوز','غشت','شتنبر','أكتوبر','نونبر','دجنبر'];
+const DAYS_AR=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+function homeView(){
+  const n=curDay(), d=DAYS[n-1], allDone=doneCount()>=NDAYS, h=new Date().getHours();
+  const greet = h<11?['Guten Morgen!','صباح الخير']:h<18?['Guten Tag!','نهارك سعيد']:['Guten Abend!','مساء الخير'];
+  const now=new Date(), dateAr=DAYS_AR[now.getDay()]+' '+now.getDate()+' '+MONTHS_AR[now.getMonth()];
+  const pos=S.pos[n]||0, dc=doneCount(), pct=dc/NDAYS, C=2*Math.PI*12;
+  let week='';
+  for(let i=6;i>=0;i--){ const iso=addDays(today(),-i), dt=new Date(iso+'T12:00:00'); const cls=(S.log[iso]?'done ':'')+(i===0?'today':''); week+='<div class="'+cls+'"><span>'+WD[dt.getDay()]+'</span><i>'+(S.log[iso]?ICON.check.replace('class="ic"','class="ic" style="width:16px;height:16px"'):dt.getDate())+'</i></div>'; }
+  const cs=cardStats();
+  return ''+
+  '<section class="greet" data-day="0"><span class="de tap" lang="de" data-k="'+esc(greet[0])+'" role="button" tabindex="0">'+greet[0]+'</span><p>'+greet[1]+' · '+dateAr+'</p></section>'+
+  '<article class="hero" data-day="'+n+'">'+
+    '<div class="hero-top"><span>'+(allDone?'أنهيت كل الأيام · أعد أي يوم':'درس اليوم')+'</span><span dir="ltr">'+lessonLabel(n)+'</span></div>'+
+    '<div class="hero-day">Tag '+n+'</div>'+
+    '<h2>'+d.title+'</h2>'+
+    '<p>'+fmt(d.goal)+'</p>'+
+    '<div class="hero-steps">'+SEGS.map((s,i)=>'<span class="'+(i<pos?'on':'')+'">'+s[0]+'</span>').join('')+'</div>'+
+    '<button type="button" class="btn btn-hero" data-act="open" data-n="'+n+'">'+(pos>0?'أكمل من حيث توقفت':(allDone?'افتح اليوم '+n:'ابدأ ساعة اليوم'))+ICON.next+'</button>'+
+  '</article>'+
+  '<section class="stats">'+
+    '<div class="tile"><div class="num">'+ICON.flame+streak()+'</div><small>أيام متتالية</small></div>'+
+    '<div class="tile"><div class="num"><svg class="ring" viewBox="0 0 30 30" aria-hidden="true"><circle class="bg" cx="15" cy="15" r="12"/><circle class="fg" cx="15" cy="15" r="12" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-pct)).toFixed(1)+'"/></svg>'+dc+'</div><small>من '+NDAYS+' يوماً</small></div>'+
+    '<div class="tile"><div class="num">'+wordsLearned()+'</div><small>كلمة تعلّمتها</small></div>'+
+  '</section>'+
+  '<section class="week" aria-label="آخر 7 أيام">'+week+'</section>'+
+  '<section class="quick">'+
+    '<button type="button" class="qa" data-act="tab" data-tab="cards">'+ICON.cards+'<b>مراجعة البطاقات</b><small>'+(cs.dueNow?cs.dueNow+' بطاقة تنتظرك اليوم':'لا توجد بطاقات مستحقة الآن')+'</small></button>'+
+    '<button type="button" class="qa" data-act="tab" data-tab="listen">'+ICON.phones+'<b>وضع الاستماع</b><small>مفردات وجمل اليوم بصوت ألماني</small></button>'+
+  '</section>'+
+  '<section class="say-card" data-day="'+n+'"><span class="eyebrow">جملة اليوم '+n+'</span><span class="de tap" lang="de" data-k="'+esc(keyOf(d.say[0]))+'" role="button" tabindex="0">'+esc(d.say[0])+'</span><p class="muted">'+d.say[1]+'</p>'+
+    '<div class="row"><button type="button" class="btn btn-soft pbtn" data-k="'+esc(keyOf(d.say[0]))+'">'+ICON.spk+'استمع</button><button type="button" class="btn btn-ghost pbtn" data-k="'+esc(keyOf(d.say[0]))+'" data-slow="1">'+ICON.spk+'ببطء</button></div></section>';
+}
+
+/* ---------------- course ---------------- */
+function courseView(){
+  const dc=doneCount(), cur=curDay();
+  return '<header class="scr-h"><h1>الدروس</h1><p>الدروس 1 إلى 5 من كتابك في 20 يوماً، ساعة لكل يوم. أنجزت '+dc+' من '+NDAYS+'.</p><div class="bar"><i style="width:'+(dc/NDAYS*100)+'%"></i></div></header>'+
+  LESSONS.map(g=>{
+    const dn=g.days.filter(n=>S.done[n]).length;
+    return '<section class="unit"><div class="unit-h"><span class="unit-l">'+(g.l?'Lektion '+g.l:'Wiederholung')+'</span>'+(g.l?'<span class="unit-t">'+g.name+'</span>':'<span class="muted" style="font-size:14px">مراجعة شاملة واختبار</span>')+'<span class="unit-c">'+dn+'/'+g.days.length+'</span></div>'+
+    '<ol class="days-list">'+g.days.map(n=>{
+      const d=DAYS[n-1], dn=S.done[n], isCur=!dn&&n===cur, pos=S.pos[n]||0;
+      const end = dn ? (dn.t?'<span class="pill pill-ok">'+dn.s+'/'+dn.t+'</span>':'<span class="pill pill-ok" style="direction:rtl">منجز</span>') : isCur ? '<span class="pill pill-cur">'+(pos?'متوقف عند '+SEGS[pos][0]:'اليوم')+'</span>' : (pos?'<span class="pill pill-res">بدأته</span>':'');
+      return '<li><button type="button" class="day-row'+(dn?' done':'')+(isCur?' cur':'')+'" data-act="open" data-n="'+n+'"><span class="day-num">'+(dn?ICON.check.replace('class="ic"','class="ic" style="width:18px;height:18px"'):n)+'</span><span class="day-main"><b>'+d.title+'</b><small>'+esc(d.ref)+'</small></span>'+end+'</button></li>';
+    }).join('')+'</ol></section>';
+  }).join('');
+}
+
+/* ---------------- flashcards (Leitner boxes) ---------------- */
+const INTV=[0,1,3,7,14,30];
+function poolDays(){ const s=new Set(Object.keys(S.done).map(Number)); s.add(curDay()); return [...s].filter(n=>n>=1&&n<=NDAYS).sort((a,b)=>a-b); }
+function poolIds(){ const ids=[]; poolDays().forEach(n=>DAYS[n-1].vocab.forEach((v,i)=>ids.push('d'+n+'v'+i))); return ids; }
+function cardOf(id){ const m=/^d(\d+)v(\d+)$/.exec(id); const n=+m[1], i=+m[2]; return {id, n, v:DAYS[n-1].vocab[i]}; }
+function cardStats(){
+  const t=today(), ids=poolIds(); let due=0, fresh=0; const boxes=[0,0,0,0,0,0];
+  ids.forEach(id=>{ const c=S.cards[id]; if(!c){ fresh++; boxes[0]++; } else { boxes[Math.min(5,c.b||0)]++; if(c.due<=t) due++; } });
+  return {due, fresh, total:ids.length, boxes, dueNow: due+Math.min(fresh,10)};
+}
+let CS=null;
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function startCards(free){
+  const t=today(), ids=poolIds();
+  let q;
+  if(free){ q=shuffle(ids.slice()).slice(0,15); }
+  else {
+    const due=shuffle(ids.filter(id=>S.cards[id] && S.cards[id].due<=t)).slice(0,30);
+    const fresh=ids.filter(id=>!S.cards[id]).slice(0,10);
+    q=due.concat(fresh);
+  }
+  if(!q.length) return;
+  CS={q, i:0, flip:false, st:{ok:0,hard:0,no:0}, again:{}, end:false};
+  render();
+}
+function cardsView(){
+  if(CS && CS.end){
+    const st=CS.st;
+    return '<header class="scr-h"><h1>انتهت المراجعة</h1><p>راجعت '+(st.ok+st.hard+st.no)+' بطاقة.</p></header>'+
+      '<div class="finish-stats" style="max-width:none"><div><b style="color:var(--ok)">'+st.ok+'</b><span>عرفتها</span></div><div><b>'+st.hard+'</b><span>صعبة</span></div><div><b style="color:var(--bad)">'+st.no+'</b><span>لم أعرفها</span></div></div>'+
+      '<button type="button" class="btn btn-primary btn-block" data-act="cs-close">تم</button>';
+  }
+  if(CS){
+    const c=cardOf(CS.q[CS.i]), dir=S.set.dir, k=keyOf(c.v[0]);
+    const de='<span class="de" lang="de">'+deOf(c.v[0]).replace(/^<span class="de tap"[^>]*>|<\/span>$/g,'')+'</span>';
+    const front = dir==='de' ? '<div class="front">'+de+'</div>' : '<div class="front"><div class="ar">'+c.v[2]+'</div></div>';
+    const back = dir==='de' ? '<div class="back"><div class="ar">'+c.v[2]+'</div><div class="pr">'+c.v[1]+'</div></div>' : '<div class="back">'+de+'<div class="pr">'+c.v[1]+'</div></div>';
+    const cc=S.cards[c.id]||{b:0}, nb=Math.min(5,(cc.b||0)+1);
+    const when=d=>d===0?'اليوم':d===1?'غداً':'بعد '+d+' أيام';
+    return '<div class="cs-top"><button type="button" class="chip-btn" data-act="cs-stop">إنهاء</button><div class="bar"><i style="width:'+(CS.i/CS.q.length*100)+'%"></i></div><span>'+(CS.i+1)+' / '+CS.q.length+'</span></div>'+
+      '<div class="flash" data-act="cs-flip" data-day="'+c.n+'">'+front+(CS.flip?back:'<span class="hint">اضغط لترى '+(dir==='de'?'المعنى':'الكلمة الألمانية')+'</span>')+
+      '<div class="row" style="justify-content:center"><button type="button" class="pbtn" data-k="'+esc(k)+'" aria-label="استمع">'+ICON.spk+'</button><button type="button" class="pbtn" data-k="'+esc(k)+'" data-slow="1" aria-label="استمع ببطء" style="width:auto;padding:0 12px;border-radius:20px;font-size:13px;font-weight:600">ببطء</button></div>'+
+      '<span class="from">Tag '+c.n+' · '+lessonLabel(c.n)+'</span></div>'+
+      (CS.flip ? '<div class="grades"><button type="button" class="grade-btn no" data-act="cs-grade" data-r="no">لم أعرفها<small>تعود الآن</small></button><button type="button" class="grade-btn hard" data-act="cs-grade" data-r="hard">صعبة<small>غداً</small></button><button type="button" class="grade-btn ok" data-act="cs-grade" data-r="ok">عرفتها<small>'+when(INTV[nb])+'</small></button></div>'
+               : '<button type="button" class="btn btn-primary btn-block" data-act="cs-flip">اقلب البطاقة</button>');
+  }
+  const st=cardStats(), mx=Math.max(1,...st.boxes);
+  const labels=['جديدة','1','2','3','4','5'];
+  return '<header class="scr-h"><h1>البطاقات</h1><p>مراجعة ذكية: الكلمة التي تعرفها تعود بعد أيام، والتي تنساها تعود اليوم. الكلمات من الأيام التي أنجزتها ومن يومك الحالي.</p></header>'+
+    '<div class="seg" role="group" aria-label="اتجاه البطاقة"><button type="button" class="'+(S.set.dir==='de'?'on':'')+'" data-act="cs-dir" data-dir="de">ألماني ← عربي</button><button type="button" class="'+(S.set.dir==='ar'?'on':'')+'" data-act="cs-dir" data-dir="ar">عربي ← ألماني</button></div>'+
+    '<div class="stats"><div class="tile"><div class="num">'+st.due+'</div><small>للمراجعة اليوم</small></div><div class="tile"><div class="num">'+st.fresh+'</div><small>كلمة جديدة</small></div><div class="tile"><div class="num">'+(st.boxes[3]+st.boxes[4]+st.boxes[5])+'</div><small>كلمة ثابتة</small></div></div>'+
+    '<div class="boxes"><b style="font-size:15px">مستوى الحفظ</b><div class="boxes-chart">'+st.boxes.map((v,i)=>'<div><b>'+v+'</b><i style="height:'+(v/mx*80)+'px"></i></div>').join('')+'</div><div class="boxes-legend">'+labels.map(l=>'<span>'+l+'</span>').join('')+'</div><p class="hint">كل مرة تعرف الكلمة تنتقل إلى الصندوق التالي. الصندوق 5 يعني أنها صارت في ذاكرتك الطويلة.</p></div>'+
+    (st.dueNow ? '<button type="button" class="btn btn-primary btn-block" data-act="cs-start">ابدأ المراجعة ('+st.dueNow+')</button>'
+               : '<div class="empty"><b>أنجزت مراجعة اليوم</b><p class="hint">لا توجد بطاقات مستحقة الآن. يمكنك مراجعة حرة لـ 15 بطاقة عشوائية.</p><button type="button" class="btn btn-soft" data-act="cs-free">مراجعة حرة</button></div>');
+}
+function gradeCard(r){
+  const id=CS.q[CS.i], c=Object.assign({b:0}, S.cards[id]), t=today();
+  if(r==='ok'){ c.b=Math.min(5,(c.b||0)+1); c.due=addDays(t,INTV[c.b]); }
+  else if(r==='hard'){ c.b=Math.max(1,c.b||0); c.due=addDays(t,1); }
+  else { c.b=0; c.due=t; if(!CS.again[id]){ CS.again[id]=1; CS.q.push(id); } }
+  c.t=Date.now(); S.cards[id]=c; CS.st[r]++; commit();
+  CS.i++; CS.flip=false;
+  if(CS.i>=CS.q.length){ CS.end=true; AUDIO.stop(); }
+  render();
+}
+function autoPlayCard(){
+  if(!CS||CS.end||!S.set.auto) return;
+  const c=cardOf(CS.q[CS.i]);
+  if(S.set.dir==='de' ? !CS.flip : CS.flip){ const el=$('.flash .pbtn'); AUDIO.play(c.n, keyOf(c.v[0]), {el, slow:S.set.slow}); }
+}
+
+/* ---------------- listening mode ---------------- */
+const LS={day:curDay(), mode:'vocab', i:0, playing:false, run:0, rep:true, gap:3};
+function listenItems(){
+  const d=DAYS[LS.day-1];
+  if(LS.mode==='vocab') return d.vocab.map(v=>({k:keyOf(v[0]), de:v[0], pr:v[1], ar:v[2]}));
+  const seen=new Set(), out=[];
+  const add=(k,ar)=>{ if(!k||seen.has(k)) return; seen.add(k); out.push({k, de:k, ar:ar||''}); };
+  add(keyOf(d.say[0]), d.say[1]);
+  d.ex.forEach(e=>{ const c=CORE.complete(e); if(c) add(keyOf(c)); CORE.spans(e.a).filter(k=>CORE.playable(k) && /[.?!]$/.test(k) && k.split(' ').length>=3).forEach(k=>add(k)); });
+  return out;
+}
+function listenView(){
+  const items=listenItems(), it=items[Math.min(LS.i,items.length-1)];
+  let days=''; for(let n=1;n<=NDAYS;n++) days+='<button type="button" class="'+(n===LS.day?'on':'')+'" data-act="ls-day" data-n="'+n+'" aria-label="اليوم '+n+'">'+n+'</button>';
+  return '<header class="scr-h"><h1>الاستماع</h1><p>اسمع كل كلمة ثم ردّدها بصوت عالٍ في المهلة التي تليها. يناسب الطريق وأوقات الانتظار.</p></header>'+
+    '<div class="ls-days" id="lsDays">'+days+'</div>'+
+    '<div class="row" style="justify-content:space-between"><div class="seg"><button type="button" class="'+(LS.mode==='vocab'?'on':'')+'" data-act="ls-mode" data-m="vocab">المفردات</button><button type="button" class="'+(LS.mode==='sent'?'on':'')+'" data-act="ls-mode" data-m="sent">الجمل</button></div><span class="muted" style="font-size:13px">Tag '+LS.day+' · '+esc(DAYS[LS.day-1].title)+'</span></div>'+
+    '<div class="ls-now" id="lsNow" data-day="'+LS.day+'">'+nowHTML(it,items.length)+'</div>'+
+    '<div class="ls-ctrl"><button type="button" class="ls-skip" data-act="ls-prev" aria-label="السابق">'+ICON.skipB+'</button><button type="button" class="ls-play" data-act="ls-toggle" id="lsPlay" aria-label="'+(LS.playing?'إيقاف':'تشغيل')+'">'+(LS.playing?ICON.pause:ICON.play)+'</button><button type="button" class="ls-skip" data-act="ls-next" aria-label="التالي">'+ICON.skipF+'</button></div>'+
+    '<div class="ls-opts"><button type="button" class="chip-btn '+(LS.rep?'on':'')+'" data-act="ls-rep">'+ICON.repeat+'أعد كل كلمة ببطء</button><button type="button" class="chip-btn" data-act="ls-gap">مهلة الترديد: '+LS.gap+' ث</button></div>'+
+    '<ol class="ls-list" id="lsList" data-day="'+LS.day+'">'+items.map((x,i)=>'<li><button type="button" class="'+(i===LS.i?'cur':'')+'" data-act="ls-jump" data-i="'+i+'"><span class="n">'+(i+1)+'</span><span class="t">'+deOf(x.de).replace(' tap"','"').replace(/ data-k="[^"]*" role="button" tabindex="0"/,'')+(x.ar?'<small>'+x.ar+'</small>':'')+'</span></button></li>').join('')+'</ol>';
+}
+function nowHTML(it,len){
+  if(!it) return '<span class="hint">لا توجد عناصر</span>';
+  return '<span class="cnt">'+(LS.i+1)+' / '+len+'</span>'+deOf(it.de).replace(' tap"','"')+(it.pr?'<span class="pr">'+it.pr+'</span>':'')+(it.ar?'<span class="ar">'+it.ar+'</span>':'');
+}
+function listenSync(scroll){
+  const items=listenItems(); const now=$('#lsNow'); if(!now) return;
+  now.innerHTML=nowHTML(items[LS.i],items.length);
+  $$('#lsList button').forEach((b,i)=>b.classList.toggle('cur',i===LS.i));
+  const p=$('#lsPlay'); if(p){ p.innerHTML=LS.playing?ICON.pause:ICON.play; p.setAttribute('aria-label',LS.playing?'إيقاف':'تشغيل'); }
+  if(scroll){ const c=$('#lsList .cur'); if(c && c.scrollIntoView) c.scrollIntoView({block:'nearest', behavior:reduceMotion()?'auto':'smooth'}); }
+}
+let wake=null;
+async function listenLoop(){
+  const my=++LS.run; LS.playing=true; listenSync(false);
+  try{ if(navigator.wakeLock && !wake) navigator.wakeLock.request('screen').then(w=>{ wake=w; }).catch(()=>{}); }catch(e){}
+  const alive=()=>LS.playing && my===LS.run;
+  let items=listenItems();
+  while(alive() && LS.i<items.length){
+    listenSync(true);
+    const k=items[LS.i].k;
+    await AUDIO.play(LS.day, k, {el:$('#lsNow .de')}); if(!alive()) break;
+    await sleep(LS.gap*1000); if(!alive()) break;
+    if(LS.rep){ await AUDIO.play(LS.day, k, {slow:true, el:$('#lsNow .de')}); if(!alive()) break; await sleep(LS.gap*1000); if(!alive()) break; }
+    LS.i++;
+  }
+  if(my===LS.run){ LS.playing=false; if(LS.i>=items.length) LS.i=0; listenSync(false); releaseWake(); }
+}
+function releaseWake(){ try{ if(wake){ wake.release(); wake=null; } }catch(e){} }
+function listenStop(){ LS.playing=false; LS.run++; AUDIO.stop(); releaseWake(); listenSync(false); }
+
+/* ---------------- lesson player ---------------- */
+let L=null, plTimer=0;
+function openLesson(n, step){
+  listenStop(); AUDIO.stop();
+  L={n, step: step!=null?step:Math.min(S.pos[n]||0,4), ex:{}, open:{}, reps:0, hide:false, elapsed:0, last:Date.now(), finished:false, peek:{}, shown:{}};
+  AUDIO.prefetch(n,false);
+  const pl=$('#player'); pl.hidden=false; document.body.style.overflow='hidden';
+  renderPlayer(true);
+  clearInterval(plTimer); plTimer=setInterval(tickTimer,1000);
+}
+function closeLesson(){
+  if(!L) return;
+  AUDIO.stop(); vocabStop();
+  if(!L.finished){ S.pos[L.n]=L.step; commit(); }
+  L=null; clearInterval(plTimer);
+  $('#player').hidden=true; $('#player').innerHTML=''; document.body.style.overflow='';
+  render();
+}
+function tickTimer(){
+  if(!L) return;
+  const now=Date.now(); if(document.visibilityState==='visible' && !L.finished) L.elapsed+= (now-L.last)/1000; L.last=now;
+  const t=$('#plTimer b'); if(t){ const s=Math.floor(L.elapsed); t.textContent=pad2(Math.floor(s/60))+':'+pad2(s%60); }
+}
+function renderPlayer(full){
+  const n=L.n, d=DAYS[n-1], pl=$('#player');
+  const s=Math.floor(L.elapsed);
+  if(full){
+    pl.innerHTML='<div class="pl-head"><div class="pl-head-in"><button type="button" class="icon-btn" data-act="pl-close" aria-label="إغلاق الدرس">'+ICON.close+'</button><div class="pl-title"><small>Tag '+n+' · '+esc(d.ref)+'</small><b>'+d.title+'</b></div><span class="pl-timer" id="plTimer" title="وقت الدراسة">'+ICON.timer+'<b>'+pad2(Math.floor(s/60))+':'+pad2(s%60)+'</b></span></div><div class="pl-steps" id="plSteps"></div></div>'+
+      '<div class="pl-body" id="plBody"><div class="pl-body-in" id="plIn" data-day="'+n+'"></div></div><div class="pl-foot"><div class="pl-foot-in" id="plFoot"></div></div>';
+  }
+  $('#plSteps').innerHTML = L.finished ? SEGS.map(x=>'<div class="pl-step past"><i></i><span>'+x[0]+'</span></div>').join('') :
+    SEGS.map((x,i)=>'<button type="button" class="pl-step'+(i===L.step?' cur':'')+(i<L.step?' past':'')+'" data-act="pl-step" data-i="'+i+'"><i></i><span>'+x[0]+'</span></button>').join('');
+  const body = L.finished ? finishView() : [stepReview,stepVocab,stepRule,stepEx,stepSay][L.step]();
+  const pin=$('#plIn'); pin.innerHTML=body; pin.classList.remove('enter'); void pin.offsetWidth; pin.classList.add('enter');
+  fillGrids(pin);
+  $('#plFoot').innerHTML = L.finished
+    ? '<button type="button" class="btn btn-ghost" data-act="pl-cards">راجع كلمات اليوم</button><button type="button" class="btn btn-primary" data-act="pl-close">العودة للرئيسية</button>'
+    : '<button type="button" class="btn btn-ghost" data-act="pl-prev"'+(L.step===0?' disabled':'')+'>'+ICON.prev+'السابق</button>'+
+      (L.step<4 ? '<button type="button" class="btn btn-primary" data-act="pl-next">التالي'+ICON.next+'</button>' : '<button type="button" class="btn btn-ok" data-act="pl-finish">'+ICON.check+'إنهاء اليوم</button>');
+}
+function rerenderBody(){ const b=$('#plBody'), y=b?b.scrollTop:0; renderPlayer(false); if(b) b.scrollTop=y; $('#plIn').classList.remove('enter'); }
+function goStep(i){ vocabStop(); AUDIO.stop(); L.step=Math.max(0,Math.min(4,i)); S.pos[L.n]=L.step; commit(); renderPlayer(false); $('#plBody').scrollTop=0; }
+const stepHead=(i,extra)=>'<div class="step-h"><h3>'+SEGS[i][0]+'</h3>'+(extra||'<span class="min">'+SEGS[i][1]+' دقيقة</span>')+'</div>';
+function recallPick(n){ const v=DAYS[n-1].vocab, out=[], step=v.length/5; for(let j=0;j<5;j++) out.push(v[Math.floor(j*step+step/2)]); return out; }
+function stepReview(){
+  const n=L.n, d=DAYS[n-1];
+  let h=stepHead(0)+'<div class="note-card">'+fmt(d.review)+'</div>';
+  if(n>1){
+    const p=DAYS[n-2];
+    h+='<div class="block"><h4>جملة الأمس</h4><div class="say-card"><span class="de tap" lang="de" data-k="'+esc(keyOf(p.say[0]))+'" role="button" tabindex="0">'+esc(p.say[0])+'</span><p class="muted">'+p.say[1]+'</p><div class="row"><button type="button" class="btn btn-soft pbtn" data-k="'+esc(keyOf(p.say[0]))+'">'+ICON.spk+'استمع</button><button type="button" class="btn btn-ghost pbtn" data-k="'+esc(keyOf(p.say[0]))+'" data-slow="1">'+ICON.spk+'ببطء</button></div></div></div>'+
+       '<div class="block" data-day="'+(n-1)+'"><h4>هل تتذكر كلمات الأمس؟</h4><p class="hint">اقرأ المعنى وقل الكلمة بالألمانية بصوت عالٍ، ثم اضغط لتتأكد وتسمعها.</p><ul class="recall">'+
+       recallPick(n-1).map((v,j)=>'<li><button type="button" class="'+(L.shown[j]?'shown':'')+'" data-act="recall" data-j="'+j+'" data-rk="'+esc(keyOf(v[0]))+'"><span class="q">'+v[2]+'</span><span class="a">'+esc(keyOf(v[0]))+'</span></button></li>').join('')+'</ul></div>';
+  }
+  return h;
+}
+function stepVocab(){
+  const d=DAYS[L.n-1];
+  return stepHead(1)+'<p class="hint">اسمع كل كلمة وردّدها 3 مرات. ثم أخفِ الألمانية واختبر نفسك: اقرأ المعنى، قل الكلمة، واضغط السطر لتتأكد.</p>'+
+    '<div class="tools"><button type="button" class="chip-btn'+(VS.on?' on':'')+'" data-act="vocab-all">'+(VS.on?ICON.pause+'إيقاف':ICON.play+'استمع للكل')+'</button><button type="button" class="chip-btn'+(L.hide?' on':'')+'" data-act="vocab-hide">'+ICON.eye+'إخفاء الألمانية</button></div>'+
+    '<ul class="vlist'+(L.hide?' hide-de':'')+'" id="vlist">'+d.vocab.map((v,i)=>'<li class="vrow'+(L.peek[i]?' peek':'')+'" data-act="vrow" data-i="'+i+'"><button type="button" class="pbtn" data-k="'+esc(keyOf(v[0]))+'" aria-label="استمع">'+ICON.spk+'</button><div class="vde">'+deOf(v[0]).replace(' tap"','"').replace(/ data-k="[^"]*" role="button" tabindex="0"/,'')+'<small>'+v[1]+'</small></div><div class="var">'+v[2]+'</div></li>').join('')+'</ul>';
+}
+function stepRule(){ return stepHead(2)+'<p class="hint">اضغط على أي عبارة ألمانية منقّطة لتسمع نطقها.</p><div class="rule">'+fmt(DAYS[L.n-1].rule)+'</div>'; }
+function exScore(){ const d=DAYS[L.n-1]; let ok=0; d.ex.forEach((e,i)=>{ if(L.ex[i]==='ok') ok++; }); return [ok,d.ex.length]; }
+function stepEx(){
+  const d=DAYS[L.n-1], sc=exScore();
+  return stepHead(3,'<span class="score">'+sc[0]+' / '+sc[1]+'</span>')+'<p class="hint">اكتب جوابك في دفترك أولاً، ثم افتح الحل وقيّم نفسك بصدق. النتيجة تُحفظ مع اليوم.</p>'+
+    '<ol class="exlist">'+d.ex.map((e,i)=>{
+      const r=L.ex[i], c=CORE.complete(e);
+      return '<li class="exc'+(r?' '+r:'')+'"><div class="exq"><span class="exn">'+(i+1)+'</span><div>'+fmt(e.q)+'</div></div>'+
+        (L.open[i] ? '<div class="exa"><span class="exa-l">الحل</span><div>'+fmt(e.a)+'</div>'+
+            (c?'<div class="exfull"><button type="button" class="pbtn" data-k="'+esc(keyOf(c))+'" aria-label="استمع للجملة كاملة">'+ICON.spk+'</button><span class="de" lang="de">'+esc(c)+'</span></div>':'')+
+            '<div class="grade"><button type="button" class="g-ok'+(r==='ok'?' sel':'')+'" data-act="ex-grade" data-i="'+i+'" data-r="ok">أصبت</button><button type="button" class="g-no'+(r==='no'?' sel':'')+'" data-act="ex-grade" data-i="'+i+'" data-r="no">أخطأت</button></div></div>'
+          : '<button type="button" class="btn-reveal" data-act="ex-open" data-i="'+i+'">أظهر الحل</button>')+
+      '</li>';
+    }).join('')+'</ol>';
+}
+function stepSay(){
+  const d=DAYS[L.n-1], k=keyOf(d.say[0]), C=2*Math.PI*42, f=Math.min(L.reps,10)/10;
+  return stepHead(4)+
+    '<div class="say-big"><span class="de tap" lang="de" data-k="'+esc(k)+'" role="button" tabindex="0">'+esc(d.say[0])+'</span><p class="ar">'+d.say[1]+'</p><div class="row"><button type="button" class="btn btn-soft pbtn" data-k="'+esc(k)+'">'+ICON.spk+'استمع</button><button type="button" class="btn btn-ghost pbtn" data-k="'+esc(k)+'" data-slow="1">'+ICON.spk+'ببطء</button></div></div>'+
+    '<div class="reps"><button type="button" class="rep-ring'+(L.reps>=10?' full':'')+'" data-act="rep" aria-label="قلتها مرة"><svg viewBox="0 0 96 96" aria-hidden="true"><circle class="bg" cx="48" cy="48" r="42"/><circle class="fg" cx="48" cy="48" r="42" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-f)).toFixed(1)+'"/></svg><b>'+L.reps+'</b><small>من 10</small></button>'+
+    '<p>قل الجملة بصوت عالٍ ثم اضغط الدائرة. كرّرها 10 مرات، ثم اكتبها 3 مرات في دفترك. غداً تبدأ بها المراجعة.</p></div>';
+}
+function finishView(){
+  const n=L.n, dn=S.done[n]||{s:0,t:0,m:0};
+  return '<div class="finish"><div class="finish-badge">'+ICON.check+'</div><h3>أحسنت! أنهيت اليوم '+n+'</h3><span class="de tap" lang="de" data-k="Sehr gut! Weiter so!" data-day="0" role="button" tabindex="0">Sehr gut! Weiter so!</span>'+
+    '<div class="finish-stats"><div><b>'+dn.s+'/'+dn.t+'</b><span>تمارين صحيحة</span></div><div><b>'+dn.m+'</b><span>دقيقة دراسة</span></div><div><b>'+streak()+'</b><span>أيام متتالية</span></div></div>'+
+    '<p class="muted" style="max-width:420px">'+(n<NDAYS?'غداً: اليوم '+(n+1)+' · '+DAYS[n].title+'. أضفتُ كلمات اليوم إلى بطاقات المراجعة.':'أنهيت الدروس 1 إلى 5. أرسل بقية صفحات الكتاب لأضيف الدروس 6 و7 و8.')+'</p></div>';
+}
+function finishLesson(){
+  const n=L.n, sc=exScore(), m=Math.max(1,Math.round(L.elapsed/60)), t=today();
+  const prev=S.done[n];
+  S.done[n]={d:t, s:sc[0], t:sc[1], m: prev? Math.max(prev.m||0,m) : m};
+  S.log[t]=(S.log[t]||0)+m; S.pos[n]=0; commit();
+  L.finished=true; vocabStop(); AUDIO.stop();
+  renderPlayer(false); $('#plBody').scrollTop=0;
+  setTimeout(()=>{ if(L && L.finished) AUDIO.play(0,'Sehr gut! Weiter so!',{el:$('.finish .de')}); }, 450);
+}
+
+/* vocab sequence inside lesson */
+const VS={on:false, run:0};
+async function vocabAll(){
+  const my=++VS.run; VS.on=true; rerenderBody();
+  const d=DAYS[L.n-1], n=L.n;
+  for(let i=0;i<d.vocab.length;i++){
+    if(!VS.on||my!==VS.run||!L||L.n!==n) break;
+    const row=$('#vlist .vrow[data-i="'+i+'"]'); $$('#vlist .vrow.seq').forEach(r=>r.classList.remove('seq'));
+    if(row){ row.classList.add('seq'); if(row.scrollIntoView) row.scrollIntoView({block:'nearest', behavior:reduceMotion()?'auto':'smooth'}); }
+    await AUDIO.play(n, keyOf(d.vocab[i][0]), {el: row?row.querySelector('.pbtn'):null, slow:S.set.slow});
+    if(!VS.on||my!==VS.run) break;
+    await sleep(1600);
+  }
+  if(my===VS.run){ VS.on=false; $$('#vlist .vrow.seq').forEach(r=>r.classList.remove('seq')); if(L && !L.finished && L.step===1) rerenderBody(); }
+}
+function vocabStop(){ if(VS.on){ VS.on=false; VS.run++; } }
+
+/* ---------------- grids (alphabet, numbers, months) ---------------- */
+function fillGrids(root){
+  const abc=$('#abc',root); if(abc) abc.innerHTML=ABC.map(a=>'<button type="button" class="gcell" data-k="'+esc(a[0])+'"><span class="de">'+a[0]+'</span><small>'+a[1]+'</small></button>').join('');
+  const nums=$('#nums',root); if(nums) nums.innerHTML=NUMS.map(x=>'<button type="button" class="gcell" data-k="'+esc(x[1])+'"><span class="de">'+x[1]+'</span><small style="font-variant-numeric:tabular-nums">'+x[0]+'</small></button>').join('');
+  const mo=$('#months',root); if(mo) mo.innerHTML=MONTHS.map(x=>'<button type="button" class="gcell" data-k="'+esc(x[0])+'"><span class="de">'+x[0]+'</span><small>'+x[1]+'</small></button>').join('');
+}
+
+/* ---------------- install, offline audio, backup ---------------- */
+let installEvt=null;
+const standalone = ()=> (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true;
+function showInstall(){ const b=$('#installBtn'); if(b) b.hidden=!installEvt; }
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEvt=e; showInstall(); });
+window.addEventListener('appinstalled',()=>{ installEvt=null; showInstall(); toast('ثُبّت التطبيق. ستجده في شاشتك الرئيسية.'); });
+const AUDIO_FILES = (M && M.days ? Object.keys(M.days) : []).reduce((a,d)=>a.concat(['d'+pad2(d)+'.mp3','d'+pad2(d)+'s.mp3']),[]);
+const AUDIO_CACHE='dafk-audio-v1';
+async function offlineCheck(){
+  const t=$('#offText'), b=$('#dlBtn'); if(!t||!b||!('caches' in window)) return;
+  try{ const c=await caches.open(AUDIO_CACHE); let n=0; for(const f of AUDIO_FILES){ if(await c.match(new URL('audio/'+f,location.href).href)) n++; }
+    if(n>=AUDIO_FILES.length){ t.textContent='كل الأصوات محفوظة على جهازك. التطبيق يعمل بدون إنترنت.'; b.hidden=true; }
+    else if(n>0){ t.textContent='محفوظ '+n+' من '+AUDIO_FILES.length+' ملف صوتي. نزّل الباقي ليعمل كل شيء بدون إنترنت.'; }
+  }catch(e){}
+}
+async function downloadAll(b){
+  if(!('caches' in window)) return;
+  b.disabled=true;
+  try{
+    const c=await caches.open(AUDIO_CACHE); let i=0;
+    for(const f of AUDIO_FILES){ i++; b.textContent='جارٍ التنزيل '+i+' / '+AUDIO_FILES.length; const u=new URL('audio/'+f,location.href).href; if(!(await c.match(u))) await c.add(u); }
+    toast('نُزّلت كل الأصوات. التطبيق يعمل الآن بدون إنترنت.');
+  }catch(e){ b.textContent='تعذّر التنزيل. تحقّق من الاتصال ثم أعد المحاولة.'; b.disabled=false; return; }
+  b.disabled=false; offlineCheck();
+}
+function backupCode(){ return 'DAFK1:'+btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
+function restoreCode(code){
+  const m=/DAFK1:([A-Za-z0-9+/=\s]+)/.exec(code||''); if(!m) return false;
+  try{ const o=clean(JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/\s+/g,'')))))); S=merge(S,o); S.u=Date.now(); saveLocal(); scheduleWrite(); return true; }catch(e){ return false; }
+}
+
+/* ---------------- settings sheet ---------------- */
+let armT=0;
+function openSettings(){
+  const sh=$('#sheet');
+  sh.innerHTML='<div class="sheet-panel" role="dialog" aria-modal="true" aria-label="الإعدادات"><span class="sheet-grip"></span><div class="row" style="justify-content:space-between"><h2>الإعدادات</h2><button type="button" class="icon-btn" data-act="sheet-close" aria-label="إغلاق">'+ICON.close+'</button></div>'+
+    '<label class="sw" for="setSlow"><span>النطق البطيء دائماً<br><small class="muted">لكل أزرار الاستماع في الدروس</small></span><input type="checkbox" id="setSlow"'+(S.set.slow?' checked':'')+'></label>'+
+    '<label class="sw" for="setAuto"><span>تشغيل النطق تلقائياً في البطاقات</span><input type="checkbox" id="setAuto"'+(S.set.auto?' checked':'')+'></label>'+
+    '<div class="sync-box">'+ICON.cloud+'<span id="syncText"></span></div>'+
+    '<h3>دليل النطق والألوان</h3><ul class="guide">'+
+      '<li><b>ڭ</b> = G · <b>ڤ</b> = W · <b>پ</b> = P · حرف <span class="de">v</span> يُنطق ف غالباً</li>'+
+      '<li><span class="de">ch</span> بعد i وe = ش خفيفة (<span class="de">ich</span>)، وبعد a وo وu = خ (<span class="de">Buch</span>)</li>'+
+      '<li><span class="de">ü</span> = u الفرنسية (tu) · <span class="de">ö</span> = eu الفرنسية (deux) · <span class="de">u</span> = ou · <span class="de">e</span> = é</li>'+
+      '<li><span class="de">ei</span> = آي · <span class="de">ie</span> = إي طويلة · <span class="de">eu</span> = أوي · <span class="de">z</span> = تس · <span class="de">ß</span> = س</li></ul>'+
+    '<div class="legend"><span><span class="g g-der">der</span> مذكر</span><span><span class="g g-das">das</span> محايد</span><span><span class="g g-die">die</span> مؤنث</span><span>die بدون لون = جمع</span></div>'+
+    '<h3>الصوت</h3><p class="hint">كل الكلمات والجمل مسجلة بصوت ألماني طبيعي (متكلم ألماني اصطناعي عالي الجودة)، بسرعتين: عادية وبطيئة. الصوت يعمل بعد أول ضغطة على أي زر استماع.</p>'+
+    (!IN_CLAUDE ? '<h3>التثبيت على الهاتف</h3>'+(standalone()?'<p class="hint">التطبيق مثبّت ويعمل من شاشتك الرئيسية.</p>':'<ol class="steps-ol"><li>في Chrome على Android: اضغط ⋮ أعلى الشاشة ثم «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</li><li>في Safari على iPhone: اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</li><li>على الحاسوب في Chrome: اضغط أيقونة التثبيت في شريط العنوان.</li></ol>') : '')+
+    ('caches' in window && !IN_CLAUDE ? '<h3>العمل بدون إنترنت</h3><p class="hint" id="offText">الأصوات تُحفظ تلقائياً كلما استمعت إليها. لتعمل كل الدروس بدون إنترنت نزّلها مرة واحدة (حوالي 14 ميغا).</p><button type="button" class="btn btn-soft" data-act="dl-audio" id="dlBtn">نزّل كل الأصوات</button>' : '')+
+    '<h3>نسخة احتياطية للتقدم</h3><p class="hint">لنقل تقدّمك إلى جهاز آخر أو متصفح آخر: انسخ الرمز هنا، ثم الصقه في الإعدادات هناك واضغط «استرجع».</p>'+
+    '<button type="button" class="btn btn-ghost" data-act="bk-copy">انسخ رمز التقدم</button>'+
+    '<textarea class="bk-in" id="bkIn" rows="3" placeholder="الصق رمز التقدم هنا" aria-label="رمز التقدم"></textarea>'+
+    '<button type="button" class="btn btn-ghost" data-act="bk-load">استرجع التقدم من الرمز</button>'+
+    '<h3>إعادة الضبط</h3><button type="button" class="btn btn-danger" data-act="reset" id="resetBtn">مسح كل التقدم والبدء من اليوم 1</button>'+
+  '</div>';
+  sh.hidden=false; syncLabel(); offlineCheck();
+}
+function closeSheet(){ const sh=$('#sheet'); sh.hidden=true; sh.innerHTML=''; }
+
+/* ---------------- events ---------------- */
+function dayCtx(el){ const h=el.closest('[data-day]'); if(h) return +h.dataset.day; if(L) return L.n; return curDay(); }
+document.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.id==='sheet'){ closeSheet(); return; }
+  const a=t.closest('[data-act]'), k=t.closest('[data-k]');
+  // audio buttons win over row-level actions
+  if(k && (!a || a.contains(k) && a!==k)){
+    const el = k;
+    const slow = k.dataset.slow==='1' || S.set.slow;
+    AUDIO.play(+(k.dataset.day||dayCtx(k)), k.dataset.k, {el, slow});
+    if(a && a.dataset.act==='vrow' && L && L.hide){ const i=+a.dataset.i; L.peek[i]=1; a.classList.add('peek'); }
+    return;
+  }
+  if(!a) return;
+  const act=a.dataset.act;
+  switch(act){
+    case 'tab': setTab(a.dataset.tab); break;
+    case 'settings': openSettings(); break;
+    case 'sheet-close': closeSheet(); break;
+    case 'open': openLesson(+a.dataset.n); break;
+    case 'pl-close': closeLesson(); break;
+    case 'pl-step': goStep(+a.dataset.i); break;
+    case 'pl-prev': goStep(L.step-1); break;
+    case 'pl-next': goStep(L.step+1); break;
+    case 'pl-finish': finishLesson(); break;
+    case 'pl-cards': { const n=L.n; closeLesson(); TAB='cards'; startCards(false); if(!CS) render(); break; }
+    case 'recall': { const j=+a.dataset.j; L.shown[j]=1; a.classList.add('shown'); AUDIO.play(L.n-1, a.dataset.rk, {el:a.querySelector('.a')}); break; }
+    case 'vocab-all': if(VS.on){ vocabStop(); AUDIO.stop(); rerenderBody(); } else vocabAll(); break;
+    case 'vocab-hide': L.hide=!L.hide; L.peek={}; rerenderBody(); break;
+    case 'vrow': { const i=+a.dataset.i; if(L.hide){ L.peek[i]=1; a.classList.add('peek'); } const v=DAYS[L.n-1].vocab[i]; AUDIO.play(L.n, keyOf(v[0]), {el:a.querySelector('.pbtn'), slow:S.set.slow}); break; }
+    case 'ex-open': L.open[+a.dataset.i]=1; rerenderBody(); break;
+    case 'ex-grade': { const i=+a.dataset.i; L.ex[i]=a.dataset.r; rerenderBody(); break; }
+    case 'rep': L.reps=Math.min(10,L.reps+1); rerenderBody(); if(L.reps===10) toast('ممتاز! الآن اكتبها 3 مرات في دفترك.'); break;
+    case 'cs-start': startCards(false); break;
+    case 'cs-free': startCards(true); break;
+    case 'cs-dir': S.set.dir=a.dataset.dir; commit(); render(); break;
+    case 'cs-flip': if(CS && !CS.flip){ CS.flip=true; render(); } break;
+    case 'cs-grade': gradeCard(a.dataset.r); break;
+    case 'cs-stop': CS.end=true; AUDIO.stop(); render(); break;
+    case 'cs-close': CS=null; render(); break;
+    case 'ls-day': listenStop(); LS.day=+a.dataset.n; LS.i=0; AUDIO.prefetch(LS.day,false); render(); { const b=$('#lsDays .on'); if(b&&b.scrollIntoView) b.scrollIntoView({inline:'center',block:'nearest'}); } break;
+    case 'ls-mode': listenStop(); LS.mode=a.dataset.m; LS.i=0; render(); break;
+    case 'ls-toggle': if(LS.playing) listenStop(); else listenLoop(); break;
+    case 'ls-next': { const was=LS.playing; listenStop(); LS.i=Math.min(listenItems().length-1,LS.i+1); listenSync(true); if(was) listenLoop(); else AUDIO.play(LS.day, listenItems()[LS.i].k, {el:$('#lsNow .de')}); break; }
+    case 'ls-prev': { const was=LS.playing; listenStop(); LS.i=Math.max(0,LS.i-1); listenSync(true); if(was) listenLoop(); else AUDIO.play(LS.day, listenItems()[LS.i].k, {el:$('#lsNow .de')}); break; }
+    case 'ls-jump': { const was=LS.playing; listenStop(); LS.i=+a.dataset.i; listenSync(false); if(was) listenLoop(); else AUDIO.play(LS.day, listenItems()[LS.i].k, {el:$('#lsNow .de')}); break; }
+    case 'ls-rep': LS.rep=!LS.rep; a.classList.toggle('on',LS.rep); break;
+    case 'ls-gap': LS.gap = LS.gap===3?5:LS.gap===5?8:3; a.textContent='مهلة الترديد: '+LS.gap+' ث'; break;
+    case 'install': if(installEvt){ installEvt.prompt(); const ev=installEvt; ev.userChoice.then(()=>{ installEvt=null; showInstall(); }).catch(()=>{}); } break;
+    case 'dl-audio': downloadAll(a); break;
+    case 'bk-copy': { const code=backupCode(), ta=$('#bkIn');
+      const show=()=>{ if(ta){ ta.value=code; ta.focus(); ta.select(); } toast('حدّد الرمز وانسخه يدوياً.'); };
+      try{ navigator.clipboard.writeText(code).then(()=>toast('نُسخ رمز التقدم. الصقه في الجهاز الآخر.'), show); }catch(e){ show(); } break; }
+    case 'bk-load': { const ta=$('#bkIn'); if(restoreCode(ta&&ta.value)){ CS=null; closeSheet(); render(); toast('استُرجع التقدم.'); } else toast('الرمز غير صحيح. انسخه كاملاً وأعد المحاولة.'); break; }
+    case 'reset': {
+      if(!a.classList.contains('arm')){ a.classList.add('arm'); a.textContent='اضغط مرة أخرى للتأكيد'; clearTimeout(armT); armT=setTimeout(()=>{ a.classList.remove('arm'); a.textContent='مسح كل التقدم والبدء من اليوم 1'; },4000); break; }
+      const keep=S.set; S=blank(); S.set=keep; S.u=Date.now(); saveLocal(); try{ localStorage.removeItem('dafk-done'); }catch(e){} if(SYNC.ref) flush();
+      CS=null; closeSheet(); TAB='home'; render(); toast('مُسح التقدم. تبدأ من اليوم 1.'); break;
+    }
+  }
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='setSlow'){ S.set.slow=e.target.checked; commit(); }
+  if(e.target.id==='setAuto'){ S.set.auto=e.target.checked; commit(); }
+});
+document.addEventListener('keydown',e=>{
+  const k=e.target.closest && e.target.closest('.de.tap[data-k]');
+  if(k && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); k.click(); return; }
+  if(e.key==='Escape'){ if(!$('#sheet').hidden) closeSheet(); else if(L) closeLesson(); return; }
+  if(TAB==='cards' && CS && !CS.end && !L && $('#sheet').hidden && !/INPUT|TEXTAREA/.test(e.target.tagName)){
+    if(e.key===' '){ e.preventDefault(); if(!CS.flip){ CS.flip=true; render(); } }
+    else if(CS.flip && e.key==='1') gradeCard('no'); else if(CS.flip && e.key==='2') gradeCard('hard'); else if(CS.flip && e.key==='3') gradeCard('ok');
+  }
+});
+
+/* ---------------- boot ---------------- */
+$('#setBtn').innerHTML=ICON.sliders;
+const h=location.hash.replace('#','');
+const m=/^day-(\d{1,2})$/.exec(h);
+if(['course','cards','listen'].indexOf(h)>=0) TAB=h;
+render(); syncLabel();
+if(m && +m[1]>=1 && +m[1]<=NDAYS) openLesson(+m[1]);
+AUDIO.prefetch(curDay(),false);
+initSync();
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost') && !IN_CLAUDE){ try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){} }
+})();
+
+</script>
+
+</body>
+</html>
