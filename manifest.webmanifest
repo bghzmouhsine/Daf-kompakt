@@ -1,19 +1,135 @@
 {
-  "name": "DaF kompakt مبسّط",
-  "short_name": "DaF kompakt",
-  "description": "الدروس 1 إلى 5 من DaF kompakt A1 مبسّطة بالعربية، مع النطق الألماني وبطاقات المراجعة ووضع الاستماع.",
+  "id": "./",
+  "name": "Deutschstunde — مدرّسك الألماني A1–A2",
+  "short_name": "Deutschstunde",
+  "description": "مدرّس ألماني شخصي للناطقين بالعربية: 18 درسًا (A1 حسب كتاب DaF kompakt neu A1 ثم A2)، صوت طبيعي مسجّل، تمارين وحوارات تفاعلية، تقييم النطق، مراجعة ذكية، مدرّس ذكي، خطة يومية وتذكير.",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "./",
+  "start_url": "./?source=pwa",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait",
-  "background_color": "#f2f3ed",
-  "theme_color": "#f2f3ed",
-  "categories": ["education"],
+  "background_color": "#F2F4F7",
+  "theme_color": "#14202B",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
   "icons": [
-    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "درس اليوم",
+      "short_name": "درس اليوم",
+      "url": "./?go=today",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "المراجعة الذكية",
+      "short_name": "المراجعة",
+      "url": "./?go=review",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "المدرّس الذكي والحوارات",
+      "short_name": "المدرّس",
+      "url": "./?go=tutor",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "تقدّمي",
+      "short_name": "تقدّمي",
+      "url": "./?go=stats",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/1-home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "الصفحة الرئيسية وخطة اليوم"
+    },
+    {
+      "src": "screenshots/2-unit.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "درس بخطوات واضحة"
+    },
+    {
+      "src": "screenshots/3-dialog.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "حوار تفاعلي مع تصحيح"
+    },
+    {
+      "src": "screenshots/4-session.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "تمارين مع شرح الأخطاء"
+    },
+    {
+      "src": "screenshots/5-stats.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "إحصاءات التقدّم والمستوى"
+    },
+    {
+      "src": "screenshots/6-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "على الحاسوب"
+    }
   ]
 }

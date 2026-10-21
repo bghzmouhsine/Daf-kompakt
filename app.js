@@ -1,8 +1,72 @@
 (function(){
 'use strict';
 document.documentElement.setAttribute('dir','rtl');document.documentElement.setAttribute('lang','ar');
+/* ================= AUDIO KEYS (shared by the app and tools/audio_build.js) =================
+   A German text is cleaned, split into sentence chunks, and each chunk is identified by a
+   53-bit hash of its exact text. The recorded audio index maps voice + hash -> pack slice. */
+var AudioKey = (function () {
+  function clean(t) { // t must already have placeholders filled
+    return String(t)
+      .replace(/\*\*/g, "")
+      .replace(/\{[mfnp]\|([^}]+)\}/g, "$1")
+      .replace(/[‹›„“”"«»]/g, "")
+      .replace(/(\d)\s*[–—-]\s*(\d)/g, "$1 bis $2")
+      .replace(/\b(Mo|Di|Mi|Do|Fr|Sa|So)\s*[–—-]\s*(Mo|Di|Mi|Do|Fr|Sa|So)\b/g, "$1 bis $2")
+      .replace(/([.!?])\s*[–—]\s*/g, "$1 ")
+      .replace(/\s*[–—]\s*/g, ", ")
+      .replace(/…/g, ", ")
+      .replace(/\s\/\s/g, ", ")
+      .replace(/[↗↘⚠✓✗]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  var ABBR = /(?:^|[\s(])(?:Dr|Nr|Str|Hr|Fr|Tel|ca|bzw|usw|vgl|Mio|Mrd|St|Prof|evtl|inkl|Jh|Abs|bzgl|Std|Min|Mo|Di|Mi|Do|Sa|So)\.$/;
+  function norm(c) {
+    return c.replace(/^[\s,;:]+/, "").replace(/[\s,]+$/, "").replace(/\s+/g, " ").trim();
+  }
+  /* split into sentence chunks; never split after a digit ("3. Mai"), a single letter ("z. B.") or an abbreviation */
+  function split(t) {
+    t = clean(t);
+    var out = [], start = 0, re = /[.!?;]+(?=\s|$)/g, m;
+    while ((m = re.exec(t))) {
+      var end = m.index + m[0].length;
+      var before = t.slice(start, m.index + 1);
+      var prevCh = t[m.index - 1] || "";
+      var lastTok = (t.slice(start, m.index).match(/(\S+)$/) || ["", ""])[1];
+      var isDot = m[0] === ".";
+      if (isDot && (/\d/.test(prevCh) || lastTok.length === 1 || ABBR.test(before))) continue;
+      var c = norm(t.slice(start, end));
+      if (c) out.push(c);
+      start = end;
+    }
+    var rest = norm(t.slice(start));
+    if (rest) out.push(rest);
+    return out.filter(function (c) { return /[A-Za-zÄÖÜäöüß0-9]/.test(c); });
+  }
+  /* cyrb53 — 53-bit string hash, returned as base36 */
+  function hash(str) {
+    var h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (var i = 0, ch; i < str.length; i++) {
+      ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+  }
+  /* which recorded voice speaks for a dialogue role (m = Thorsten, f = Kerstin) */
+  var FEMALE = /^(Frau|Leyla|Mia|Anna|Clara|Bea|Annika|Lena|Sophie|Passantin|Laura|Reporterin|Verkäuferin|Kellnerin|Oma|Mutter|Lehrerin|Christiane|Ärztin|Sekretärin|Nachbarin|Kollegin|Freundin|Julia|Sarah|Lisa|Emma|Marie|Hanna|Lea|Nina|Paula|Petra|Sabine|Eva|Katrin|Maria|Elif|Ayşe|Yasmina|Fatima|Sara|Ines|Carla|Sofia|Sophia|Mira|Jana)\b/;
+  var FEMALE_ROLE = /(Kursteilnehmerin|Mitarbeiterin|Verkäuferin|Reporterin|Radioreporterin|Freundin|Besitzerin|Passantin|Kollegin|Gastgeberin|Lehrerin|Ärztin|Vermieterin|Nachbarin|Kellnerin|\bFrau\b)/;
+  function voiceOfName(n) { return n && FEMALE.test(String(n).trim()) ? "f" : "m"; }
+  function voiceOfRole(r) { return FEMALE_ROLE.test(r || "") && !/\b(ein|der) (Kellner|Kommilitone|Vermieter|Mitbewohner)\b|^(Niels|Max|Herr|Leon|Tobias|Felix)/.test(r || "") ? "f" : "m"; }
+  return { clean: clean, split: split, hash: hash, norm: norm, voiceOfName: voiceOfName, voiceOfRole: voiceOfRole };
+})();
+if (typeof module !== "undefined" && module.exports) module.exports = AudioKey;
+
 /* ================= CORE: utils, state, storage, audio, speech, AI ================= */
 const C = window.COURSE;
+const APP_VERSION = "2.0";
 const IS_FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 const HAS_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const IS_PWA_CONTEXT = !HAS_CLAUDE && /^https?:$/.test(location.protocol);
@@ -213,6 +277,7 @@ const ART_CLASS = { der: "g-m", die: "g-f", das: "g-n" };
 /* ---------- course index ---------- */
 const UNITS = []; const UNIT = {}; const LESSON = {}; const ITEMS = {}; const WORDS = []; const WORD = {};
 function buildIndex() {
+  C.lessons.sort((a, b) => a.id - b.id);
   for (const L of C.lessons) {
     LESSON[L.id] = L;
     L.units.forEach((u, ui) => {
@@ -229,6 +294,7 @@ function buildIndex() {
   }
   C.exam.parts.forEach((p) => (p.items || []).forEach((x, i) => { x.id = "X" + p.id + ":" + i; ITEMS[x.id] = x; }));
 }
+function picOf(w) { return (w && w.t === "n" && C.pics && C.pics[w.w]) || null; }
 function wordLabel(w) { return (w.art && w.t !== "c" ? w.art + " " : "") + w.w; }
 
 /* ---------- STATE ---------- */
@@ -237,7 +303,7 @@ function defaultState() {
   return {
     v: 1, createdAt: Date.now(), updatedAt: 0,
     profile: { name: "محسن", first: "Mouhsine", last: "", land: "Marokko", city: "Errachidia", onboarded: false },
-    settings: { studyTime: "19:00", goalMin: 60, days: [0, 1, 2, 3, 4, 5, 6], rate: 0.95, voice: "", aiCheck: true, remind: true, notify: false },
+    settings: { studyTime: "19:00", goalMin: 60, days: [0, 1, 2, 3, 4, 5, 6], rate: 0.95, voice: "", neural: true, aiCheck: true, remind: true, notify: false },
     progress: { units: {}, lessons: {}, exam: {}, last: null },
     srs: {}, mist: {}, tags: {}, log: {}, ach: {}, dlg: {}, sounds: {}
   };
@@ -272,8 +338,12 @@ const Store = {
       if (snap.exists) {
         const remote = snap.data();
         const data = remote && remote.json ? JSON.parse(remote.json) : null;
-        if (data && (data.updatedAt || 0) > (S.updatedAt || 0)) { window.S = mergeDefaults(data); this.saveLocal(); onRemote && onRemote(); }
-        else if ((S.updatedAt || 0) > ((data && data.updatedAt) || 0)) this.pushCloud();
+        if (data && data.v) {
+          const before = JSON.stringify(S);
+          const merged = mergeDefaults(mergeStates(S, data));
+          if (JSON.stringify(merged) !== before) { window.S = merged; this.saveLocal(); onRemote && onRemote(); }
+          if ((S.updatedAt || 0) !== (data.updatedAt || 0) || JSON.stringify(merged) !== JSON.stringify(mergeDefaults(data))) this.pushCloud();
+        }
       } else if (S.updatedAt) this.pushCloud();
       UI && UI.setSync && UI.setSync("cloud");
     } catch (e) { console.warn("cloud init", e); }
@@ -287,9 +357,9 @@ const Store = {
     this.writing = false;
     if (this.pending) { this.pending = false; this.pushCloud(); }
   },
-  touch() { S.updatedAt = Date.now(); this.saveLocal(); this.cloudLater(); IDBKV.syncReminder(); },
+  touch() { S.updatedAt = Date.now(); this.saveLocal(); this.cloudLater(); IDBKV.syncReminder(); if (Gist.on()) Gist.later(); },
   cloudLater: debounce(function () { Store.pushCloud(); }, 4000),
-  flush() { this.saveLocal(); if (this.docRef) this.pushCloud(); }
+  flush() { this.saveLocal(); if (this.docRef) this.pushCloud(); if (Gist.on() && Date.now() - Gist.last > 5000) Gist.pushSafe(); }
 };
 const save = debounce(() => Store.touch(), 800);
 
@@ -329,19 +399,25 @@ function unitDone(uid) { const p = S.progress.units[uid]; return !!(p && p.q && 
 function markStep(uid, k, data) {
   const p = unitP(uid); const was = !!p[k];
   p[k] = Object.assign({}, typeof p[k] === "object" ? p[k] : {}, data || {}, { ts: Date.now() });
-  if (k === "q" && data && data.pass && !p.done) { p.done = Date.now(); const L = todayLog(); if (!L.u.includes(uid)) L.u.push(uid); }
+  const firstPass = k === "q" && data && data.pass && !p.done;
+  if (firstPass) { p.done = Date.now(); const L = todayLog(); if (!L.u.includes(uid)) L.u.push(uid); }
   S.progress.last = { unit: uid, step: k };
+  if (!was) Game.hook("step"); if (firstPass) Game.hook("unitPass");
   save(); checkAchievements();
   return !was;
 }
 function lessonDone(lid) { return LESSON[lid].units.every((u) => unitDone(u.id)); }
-function nextUnit() { return UNITS.find((u) => !unitDone(u.id)) || null; }
+function nextUnit() { const from = (S.placement && S.placement.from) || 1; return UNITS.find((u) => !unitDone(u.id) && +u.lesson >= from) || UNITS.find((u) => !unitDone(u.id)) || null; }
 function levelLabel() {
-  const n = C.lessons.filter((L) => lessonDone(L.id)).length;
-  if (n >= 8) return "A1 مكتمل";
-  if (n >= 4) return "A1.2";
+  const a1 = C.lessons.filter((L) => (L.level || "A1") === "A1"), a2 = C.lessons.filter((L) => L.level === "A2");
+  const d1 = a1.filter((L) => lessonDone(L.id)).length, d2 = a2.filter((L) => lessonDone(L.id)).length;
+  if (a2.length && d2 >= a2.length) return "A2 مكتمل";
+  if (a2.length && d2 >= Math.ceil(a2.length / 2)) return "A2.2";
+  if (d1 >= a1.length) return a2.length ? "A2.1" : "A1 مكتمل";
+  if (d1 >= Math.ceil(a1.length / 2)) return "A1.2";
   return "A1.1";
 }
+function curLevel() { const u = nextUnit(); return (u && LESSON[u.lesson].level) || (u ? "A1" : "A2"); }
 
 function recordAnswer(item, ok, meta) {
   if (!item) return;
@@ -361,6 +437,7 @@ function recordAnswer(item, ok, meta) {
     else if (m) { m.s = (m.s || 0) + 1; if (m.s >= 2) delete S.mist[id]; else m.due = today + 3; }
   }
   if (meta && meta.wid) srsTouch(meta.wid, ok);
+  Game.hook("answer", { ok, tag });
   save();
 }
 function mastery(tag) { const t = S.tags[tag]; if (!t || t[0] < 4) return 0.5; return t[2]; }
@@ -379,13 +456,16 @@ function srsRate(wid, rating) { // rating: 0 again, 1 hard, 2 good
   if (rating === 0) { r[0] = 0; r[1] = today; r[3]++; }
   else if (rating === 1) { r[0] = Math.max(1, r[0]); r[1] = today + 1; }
   else { r[0] = Math.min(7, r[0] + 1); r[1] = today + INTERVALS[r[0]]; }
-  r[2]++; r[4] = today; S.srs[wid] = r; save();
+  r[2]++; r[4] = today; S.srs[wid] = r; if (!srsRate.quiet) Game.hook("card"); save();
 }
 function srsTouch(wid, ok) {
   const r = S.srs[wid]; const today = dayNum();
-  if (!r) { srsRate(wid, ok ? 2 : 0); return; }
-  if (!ok) srsRate(wid, 0);
-  else if (r[1] <= today) srsRate(wid, 2);
+  srsRate.quiet = true;
+  try {
+    if (!r) srsRate(wid, ok ? 2 : 0);
+    else if (!ok) srsRate(wid, 0);
+    else if (r[1] <= today) srsRate(wid, 2);
+  } finally { srsRate.quiet = false; }
 }
 function wordState(wid) { const r = S.srs[wid]; if (!r) return "new"; if (r[0] >= 3) return "known"; return "learning"; }
 function dueWords() { const t = dayNum(); return WORDS.filter((w) => S.srs[w.id] && S.srs[w.id][1] <= t).sort((a, b) => S.srs[a.id][1] - S.srs[b.id][1]); }
@@ -394,13 +474,7 @@ function seenCount() { return Object.keys(S.srs).length; }
 function dueMistakes() { const t = dayNum(); return Object.keys(S.mist).filter((id) => ITEMS[id] && S.mist[id].due <= t); }
 
 /* ---------- streak & time ---------- */
-function streak() {
-  let n = 0; const d = new Date();
-  const active = (k) => { const L = S.log[k]; return L && (L.s >= 300 || L.x >= 5); };
-  if (!active(dayKey(d))) d.setDate(d.getDate() - 1);
-  while (active(dayKey(d))) { n++; d.setDate(d.getDate() - 1); }
-  return n;
-}
+function streak() { return Game.streak(); }
 function totalSec() { return Object.values(S.log).reduce((a, L) => a + (L.s || 0), 0); }
 
 /* ---------- achievements ---------- */
@@ -417,16 +491,138 @@ const ACH = [
   { id: "h25", ar: "25 ساعة", d: "25 ساعة دراسة", test: () => totalSec() >= 25 * 3600 },
   { id: "perfect", ar: "علامة كاملة", d: "100% في اختبار", test: () => Object.values(S.progress.units).some((p) => p.q && p.q.best === 100) || Object.values(S.progress.lessons).some((p) => p.test && p.test.best === 100) },
   { id: "dlg", ar: "متحدّث", d: "أكملت 10 حوارات", test: () => Object.values(S.dlg).reduce((a, d) => a + (d.n || 0), 0) >= 10 },
-  { id: "a1", ar: "A1 مكتمل", d: "أنهيت الكتاب كاملًا", test: () => C.lessons.every((L) => lessonDone(L.id)) }
+  { id: "a1", ar: "A1 مكتمل", d: "أنهيت كتاب A1 كاملًا", test: () => C.lessons.filter((L) => (L.level || "A1") === "A1").every((L) => lessonDone(L.id)) },
+  { id: "a2", ar: "A2 مكتمل", d: "أنهيت كل دروس A2", test: () => C.lessons.some((L) => L.level === "A2") && C.lessons.filter((L) => L.level === "A2").every((L) => lessonDone(L.id)) },
+  { id: "xp5k", ar: "5000 XP", d: "جمعت 5000 نقطة خبرة", test: () => Game.total() >= 5000 },
+  { id: "mock", ar: "ناجح في التجريبي", d: "نجحت في امتحان تجريبي كامل", test: () => (S.mock || []).some((m) => m.total >= 60) },
+  { id: "quests", ar: "كل المهام", d: "أكملت مهام اليوم الثلاث", test: () => Object.values(S.log).some((L) => (L.q || []).length >= 3) }
 ];
 function checkAchievements() {
-  for (const a of ACH) if (!S.ach[a.id] && a.test()) { S.ach[a.id] = Date.now(); UI && UI.toast && UI.toast("وسام جديد: " + a.ar, "star"); }
+  const fresh = [];
+  for (const a of ACH) { try { if (!S.ach[a.id] && a.test()) { S.ach[a.id] = Date.now(); fresh.push(a); } } catch (e) { } }
+  if (!fresh.length || !(UI && UI.toast)) return;
+  if (fresh.length <= 2) fresh.forEach((a) => UI.toast("وسام جديد: " + a.ar, "star"));
+  else UI.toast("حصلت على " + fresh.length + " أوسمة جديدة! شاهدها في «تقدّمي»", "star");
 }
 
-/* ---------- AUDIO: text-to-speech ---------- */
+/* ---------- AUDIO: recorded neural voices (Piper: Thorsten / Kerstin) ---------- */
+const Rec = {
+  base: "audio/", index: null, state: "idle", // idle | loading | ready | none
+  packs: new Map(), loadingPacks: new Map(), lru: [], el: null, cur: null, cacheName: "ds-audio-v1",
+  enabled() { return S.settings.neural !== false; },
+  init() {
+    if (this.state !== "idle") return this.loading;
+    this.state = "loading";
+    this.loading = fetch(this.base + "index.json", { cache: "no-cache" })
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then((j) => { this.index = j; this.state = "ready"; UI && UI.refreshAudio && UI.refreshAudio(); this.prune(); })
+      .catch(() => { this.state = "none"; UI && UI.refreshAudio && UI.refreshAudio(); });
+    return this.loading;
+  },
+  async prune() { // drop cached packs of older audio versions
+    try {
+      const keep = new Set(this.index.packs.map((p) => p.file));
+      const c = await caches.open(this.cacheName);
+      for (const req of await c.keys()) { const f = req.url.split("/").pop(); if (!keep.has(f)) c.delete(req); }
+    } catch (e) { }
+  },
+  entry(chunk, voice) {
+    if (!this.index) return null;
+    const h = AudioKey.hash(chunk);
+    return (this.index[voice] && this.index[voice][h]) || (voice !== "m" && this.index.m[h]) || null;
+  },
+  coverage(text, voice) { // fraction of chunks that have a recording
+    if (!this.index) return 0;
+    const c = AudioKey.split(fillPH(text)); if (!c.length) return 0;
+    return c.filter((x) => this.entry(x, voice || "m")).length / c.length;
+  },
+  packUrl(pi) { return this.base + this.index.packs[pi].file; },
+  async fetchPack(pi) {
+    const url = this.packUrl(pi);
+    let res = null, cache = null;
+    try { cache = await caches.open(this.cacheName); res = await cache.match(url); } catch (e) { cache = null; }
+    if (!res) {
+      res = await fetch(url);
+      if (!res.ok) throw new Error("pack " + res.status);
+      if (cache) { try { await cache.put(url, res.clone()); } catch (e) { } }
+    }
+    return await res.arrayBuffer();
+  },
+  pack(pi) {
+    if (this.packs.has(pi)) { this.touchLru(pi); return Promise.resolve(this.packs.get(pi)); }
+    if (this.loadingPacks.has(pi)) return this.loadingPacks.get(pi);
+    const p = this.fetchPack(pi).then((buf) => { this.packs.set(pi, buf); this.loadingPacks.delete(pi); this.touchLru(pi); return buf; })
+      .catch((e) => { this.loadingPacks.delete(pi); throw e; });
+    this.loadingPacks.set(pi, p);
+    return p;
+  },
+  touchLru(pi) {
+    this.lru = this.lru.filter((x) => x !== pi); this.lru.push(pi);
+    while (this.lru.length > 10) { const old = this.lru.shift(); this.packs.delete(old); }
+  },
+  packIdOf(unitOrLesson) { // "1A" | lesson id 3 | "x"
+    if (!this.index) return -1;
+    let id = String(unitOrLesson);
+    if (/^\d+$/.test(id) && LESSON[id]) id = LESSON[id].units[0].id;
+    return this.index.packs.findIndex((p) => p.id === id);
+  },
+  async prefetch(ids) {
+    if (!this.enabled()) return;
+    await this.init();
+    if (!this.index) return;
+    for (const id of uniq([].concat(ids).filter(Boolean))) { const pi = this.packIdOf(id); if (pi >= 0) this.pack(pi).catch(() => { }); }
+  },
+  async play(chunk, voice, rate, qid) {
+    const e = this.entry(chunk, voice);
+    if (!e) return false;
+    let buf;
+    try { buf = await Promise.race([this.pack(e[0]), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 7000))]); }
+    catch (err) { return false; }
+    if (qid !== TTS.queue) return true;
+    const url = URL.createObjectURL(new Blob([new Uint8Array(buf, e[1], e[2])], { type: "audio/mpeg" }));
+    const a = this.el || (this.el = new Audio());
+    a.preload = "auto";
+    try { a.preservesPitch = true; a.mozPreservesPitch = true; a.webkitPreservesPitch = true; } catch (x) { }
+    return new Promise((resolve) => {
+      let done = false;
+      const fin = (ok) => { if (done) return; done = true; clearTimeout(guard); a.onended = a.onerror = null; this.cur = null; setTimeout(() => URL.revokeObjectURL(url), 1000); resolve(ok); };
+      const guard = setTimeout(() => fin(true), (e[2] / 4000) * 1000 / rate + 4000);
+      this.cur = fin;
+      a.onended = () => fin(true);
+      a.onerror = () => fin(false);
+      a.src = url;
+      a.playbackRate = rate;
+      const p = a.play();
+      if (p && p.then) p.then(() => { a.playbackRate = rate; }).catch(() => fin(false));
+    });
+  },
+  stop() { if (this.el) { try { this.el.pause(); } catch (e) { } } if (this.cur) this.cur(true); },
+  async downloadAll(onProgress) {
+    await this.init();
+    if (!this.index) throw new Error("no audio");
+    const total = this.index.packs.reduce((a, p) => a + p.size, 0); let got = 0;
+    for (let i = 0; i < this.index.packs.length; i++) {
+      await this.pack(i);
+      got += this.index.packs[i].size; onProgress && onProgress(got / total, got, total);
+    }
+    return total;
+  },
+  async cachedBytes() {
+    if (!this.index) return 0;
+    try {
+      const cache = await caches.open(this.cacheName); let n = 0;
+      for (const p of this.index.packs) if (await cache.match(this.base + p.file)) n += p.size;
+      return n;
+    } catch (e) { return 0; }
+  },
+  totalBytes() { return this.index ? this.index.packs.reduce((a, p) => a + p.size, 0) : 0; }
+};
+
+/* ---------- AUDIO: speaking (recorded voice first, device voice as fallback) ---------- */
 const TTS = {
   ok: "speechSynthesis" in window, voices: [], voice: null, speaking: false, queue: 0,
   init() {
+    Rec.init();
     if (!this.ok) return;
     const load = () => {
       try { this.voices = speechSynthesis.getVoices().filter((v) => /^de(-|_|$)/i.test(v.lang)); } catch (e) { this.voices = []; }
@@ -444,46 +640,55 @@ const TTS = {
       || this.voices.find((v) => /de-DE/i.test(v.lang))
       || this.voices[0] || null;
   },
-  clean(t) {
-    return fillPH(String(t)).replace(/\*\*/g, "").replace(/[‹›„“”"«»]/g, "").replace(/\s*[–—]\s*/g, ", ").replace(/…/g, ", ").replace(/\s\/\s/g, ", ").replace(/\{[mfnp]\|([^}]+)\}/g, "$1").replace(/[↗↘⚠]/g, "");
-  },
-  speak(text, o = {}) {
-    if (!this.ok) { UI.toast("الصوت غير متاح في هذا المتصفح", "warn"); return Promise.resolve(); }
-    Activity.ping();
-    const t = this.clean(text); if (!t.trim()) return Promise.resolve();
-    if (!o.keep) { try { speechSynthesis.cancel(); } catch (e) { } }
-    const parts = t.match(/[^.!?;]+[.!?;]*/g) || [t];
-    const id = ++this.queue;
+  clean(t) { return AudioKey.clean(fillPH(String(t))); },
+  rate(o) { return clamp((o.rate || S.settings.rate || 0.95) * (o.slow ? 0.72 : 1), 0.4, 1.5); },
+  synth(txt, o, id) { // one chunk with the device voice
     return new Promise((resolve) => {
-      let i = 0;
-      const next = () => {
-        if (id !== this.queue && !o.keep) return resolve();
-        if (i >= parts.length) { this.speaking = false; o.onend && o.onend(); return resolve(); }
-        const txt = parts[i++].trim();
-        const u = new SpeechSynthesisUtterance(txt);
-        u.lang = (this.voice && this.voice.lang) || "de-DE";
-        if (this.voice) u.voice = this.voice;
-        u.rate = clamp((o.rate || S.settings.rate || 0.95) * (o.slow ? 0.72 : 1), 0.4, 1.5);
-        u.pitch = o.pitch || 1;
-        let fired = false;
-        const fin = () => { if (fired) return; fired = true; clearTimeout(guard); next(); };
-        const guard = setTimeout(fin, 1800 + txt.length * 120 / u.rate);
-        u.onend = fin; u.onerror = fin;
-        this.speaking = true;
-        try { speechSynthesis.resume(); speechSynthesis.speak(u); } catch (e) { fin(); }
-      };
-      next();
+      if (!this.ok) return resolve(false);
+      const u = new SpeechSynthesisUtterance(txt);
+      u.lang = (this.voice && this.voice.lang) || "de-DE";
+      if (this.voice) u.voice = this.voice;
+      u.rate = this.rate(o);
+      u.pitch = o.pitch || (o.voice === "f" ? 1.18 : 1);
+      let fired = false;
+      const fin = () => { if (fired) return; fired = true; clearTimeout(guard); resolve(true); };
+      const guard = setTimeout(fin, 1800 + txt.length * 120 / u.rate);
+      u.onend = fin; u.onerror = fin;
+      try { speechSynthesis.resume(); speechSynthesis.speak(u); } catch (e) { fin(); }
     });
   },
-  stop() { this.queue++; try { speechSynthesis.cancel(); } catch (e) { } this.speaking = false; },
-  async sequence(lines) { // [{text, pitch}]
+  speak(text, o = {}) {
+    Activity.ping();
+    const chunks = AudioKey.split(fillPH(String(text || "")));
+    if (!chunks.length) return Promise.resolve();
+    if (!o.keep) this.halt();
+    const id = o.keep ? this.queue : ++this.queue;
+    const useRec = Rec.enabled() && Rec.state !== "none";
+    if (!useRec && !this.ok) { UI.toast("الصوت غير متاح في هذا المتصفح", "warn"); return Promise.resolve(); }
+    this.speaking = true;
+    return (async () => {
+      if (useRec && Rec.state !== "ready") { try { await Promise.race([Rec.init(), new Promise((r) => setTimeout(r, 2500))]); } catch (e) { } }
+      const recRate = clamp((S.settings.rate || 0.95) / 0.95 * (o.slow ? 0.75 : 1), 0.5, 1.6);
+      for (let i = 0; i < chunks.length; i++) {
+        if (id !== this.queue) break;
+        let ok = false;
+        if (Rec.enabled() && Rec.index) ok = await Rec.play(chunks[i], o.voice || "m", recRate, id);
+        if (!ok && id === this.queue) await this.synth(chunks[i], o, id);
+        if (i < chunks.length - 1 && id === this.queue) await new Promise((r) => setTimeout(r, o.slow ? 260 : 160));
+      }
+      if (id === this.queue) { this.speaking = false; o.onend && o.onend(); }
+    })();
+  },
+  halt() { Rec.stop(); try { speechSynthesis.cancel(); } catch (e) { } },
+  stop() { this.queue++; this.halt(); this.speaking = false; },
+  async sequence(lines) { // [{text, voice, pitch}]
     this.stop(); const id = this.queue;
-    for (const l of lines) { if (id !== this.queue) break; await this.speak(l.text, { pitch: l.pitch, keep: true }); await new Promise((r) => setTimeout(r, 350)); }
+    for (const l of lines) { if (id !== this.queue) break; await this.speak(l.text, { voice: l.voice, pitch: l.pitch, keep: true }); if (id !== this.queue) break; await new Promise((r) => setTimeout(r, 380)); }
   }
 };
 function playBtn(text, o = {}) {
-  const b = el("button", { class: "icon-btn play" + (o.small ? " sm" : ""), type: "button", "aria-label": "استمع", title: "استمع" }, icon(o.slow ? "turtle" : "volume"));
-  b.addEventListener("click", (e) => { e.stopPropagation(); b.classList.add("on"); TTS.speak(text, { slow: o.slow }).then(() => b.classList.remove("on")); });
+  const b = el("button", { class: "icon-btn play" + (o.small ? " sm" : ""), type: "button", "aria-label": o.slow ? "استمع ببطء" : "استمع", title: o.slow ? "استمع ببطء" : "استمع" }, icon(o.slow ? "turtle" : "volume"));
+  b.addEventListener("click", (e) => { e.stopPropagation(); b.classList.add("on"); TTS.speak(text, { slow: o.slow, voice: o.voice }).then(() => b.classList.remove("on")); });
   return b;
 }
 
@@ -515,9 +720,16 @@ const SR = {
 /* ---------- AI tutor (Claude via the artifact runtime) ---------- */
 const AI = {
   fn: null, state: "unknown", // unknown | ready | off | denied
+  src: "none", // claude | own | none
   async init() {
-    if (!HAS_CLAUDE) { this.state = "off"; return; }
-    try { this.fn = await window.claude.use("sample"); this.state = this.fn ? "ready" : "off"; } catch (e) { this.state = "off"; }
+    if (!HAS_CLAUDE) {
+      const cfg = Keys.ai();
+      if (cfg && cfg.key && Providers[cfg.provider]) { this.fn = makeProviderFn(cfg); this.state = "ready"; this.src = "own"; }
+      else { this.fn = null; this.state = "off"; this.src = "none"; }
+      UI && UI.refreshAI && UI.refreshAI();
+      return;
+    }
+    try { this.fn = await window.claude.use("sample"); this.state = this.fn ? "ready" : "off"; this.src = "claude"; } catch (e) { this.state = "off"; }
     UI && UI.refreshAI && UI.refreshAI();
   },
   available() { return this.state === "ready" && !!this.fn; },
@@ -528,13 +740,16 @@ const AI = {
     if (c === "cancelled") return "";
     if (c === "invalid_json") return "لم أفهم رد المدرس. حاول مرة أخرى.";
     if (c === "sampling_disabled") { this.state = "off"; return "المدرس الذكي غير متاح لحسابك حاليًا."; }
+    if (c === "bad_key") return "مفتاح الذكاء الاصطناعي غير صالح أو انتهت صلاحيته. افتح الإعدادات ← المدرّس الذكي.";
+    if (c === "network") return "لا يوجد اتصال بالإنترنت أو الخدمة لا تستجيب. حاول لاحقًا.";
+    if (c === "bad_request") return "رفضت خدمة الذكاء الاصطناعي الطلب. جرّب نموذجًا آخر من الإعدادات.";
     return "تعذّر الاتصال بالمدرس الذكي الآن. حاول لاحقًا.";
   },
   learnerContext() {
     const done = C.lessons.filter((L) => L.units.some((u) => stepDone(u.id, "g"))).map((L) => L.id);
     const cur = (nextUnit() || UNITS[UNITS.length - 1]);
     const weak = Object.keys(S.tags).filter((t) => S.tags[t][0] >= 4 && S.tags[t][2] < 0.6).map((t) => C.tags[t] ? C.tags[t].ar : t).slice(0, 4);
-    return `Learner: Arabic speaker (Morocco), also speaks French. Level: A1 beginner using the textbook "DaF kompakt neu A1". Currently at Lektion ${cur.lesson} (${LESSON[cur.lesson].de}), unit ${cur.id} "${cur.de}". Lessons started: ${done.join(", ") || "1"}. Weak topics: ${weak.join("، ") || "none yet"}. Learner's name: ${S.profile.first || "Karim"}.`;
+    return `Learner: Arabic speaker (Morocco), also speaks French. Level: ${LESSON[cur.lesson].level === "A2" ? "A2 (elementary), has finished the A1 textbook \"DaF kompakt neu A1\"" : "A1 beginner using the textbook \"DaF kompakt neu A1\""}. Currently at Lektion ${cur.lesson} (${LESSON[cur.lesson].de}), unit ${cur.id} "${cur.de}". Lessons started: ${done.join(", ") || "1"}. Weak topics: ${weak.join("، ") || "none yet"}. Learner's name: ${S.profile.first || "Karim"}.`;
   },
   async checkReply(ctx) {
     const prompt = `You are a warm, precise German teacher for an Arabic-speaking A1 learner.
@@ -545,16 +760,16 @@ The learner's task (Arabic): ${ctx.task}
 A model answer: "${ctx.model}"
 The learner wrote: "${ctx.input}"
 
-Judge whether the learner's reply is acceptable German that fulfils the task (A1 level; ignore missing final punctuation and small capitalisation slips in the first word). Be encouraging but honest: grammar mistakes (verb ending, article, word order, case) make it not ok.
+Judge whether the learner's reply is acceptable German that fulfils the task (${curLevel()} level; ignore missing final punctuation and small capitalisation slips in the first word). Be encouraging but honest: grammar mistakes (verb ending, article, word order, case) make it not ok.
 Reply with ONLY a JSON object:
-{"ok": true|false, "corrected": "the learner's sentence corrected minimally (same idea)", "natural": "a natural alternative a native speaker would say (A1 level)", "explain_ar": "1-2 short sentences in Arabic explaining the main mistake or praising", "tags": ["one or two of: praesens, sein, haben, wortstellung, artikel, akkusativ, dativ, possessiv, modal, trennbar, perfekt, imperativ, negation, plural, wortschatz"]}`;
+{"ok": true|false, "corrected": "the learner's sentence corrected minimally (same idea)", "natural": "a natural alternative a native speaker would say (${curLevel()} level)", "explain_ar": "1-2 short sentences in Arabic explaining the main mistake or praising", "tags": ["one or two of: praesens, sein, haben, wortstellung, artikel, akkusativ, dativ, possessiv, modal, trennbar, perfekt, imperativ, negation, plural, wortschatz"]}`;
     return await this.fn.json(prompt, { modelTier: "quick", cache: false });
   },
   async chat(scenario, turns) {
-    const rules = `You are role-playing to help an Arabic-speaking learner practise German at A1 level.
+    const rules = `You are role-playing to help an Arabic-speaking learner practise German at ${curLevel()} level.
 ${this.learnerContext()}
 Your role: ${scenario.role}. Conversation goal: ${scenario.goal}.
-Rules: Speak ONLY simple German (A1, short sentences, max 2 sentences, vocabulary and grammar of DaF kompakt A1 up to the learner's current lesson). Stay in role and keep the conversation going with a question. Then correct the learner's LAST message.
+Rules: Speak ONLY simple German (${curLevel()}, short sentences, max 2 sentences, vocabulary and grammar up to the learner's current lesson). Stay in role and keep the conversation going with a question. Then correct the learner's LAST message.
 Reply with ONLY a JSON object:
 {"reply": "your next line in German", "reply_ar": "Arabic translation of your line", "ok": true|false (was the learner's last message correct German?), "corrected": "corrected version of the learner's last message (or the same if correct)", "explain_ar": "short Arabic explanation of the mistake, or a short praise", "tip_ar": "optional short Arabic tip or a useful phrase, may be empty"}
 The conversation so far follows. The learner's messages are marked LEARNER, yours TUTOR.`;
@@ -562,7 +777,7 @@ The conversation so far follows. The learner's messages are marked LEARNER, your
     return await this.fn.json([{ role: "user", content: rules + "\n\n" + transcript + "\n\nNow answer as TUTOR in the JSON format." }], { modelTier: "quick", cache: false });
   },
   async correctWriting(task, text) {
-    const prompt = `You are a German teacher correcting a short text by an Arabic-speaking A1 learner.
+    const prompt = `You are a German teacher correcting a short text by an Arabic-speaking ${curLevel()} learner.
 ${this.learnerContext()}
 Task given to the learner (Arabic): ${task.ar}
 German task: ${task.de}
@@ -574,7 +789,7 @@ Reply with ONLY a JSON object:
     return await this.fn.json(prompt, { modelTier: "default", cache: false });
   },
   async ask(question, onText, signal) {
-    const prompt = `You are a patient German teacher. Answer in clear Modern Standard Arabic for a Moroccan learner at A1 level (textbook DaF kompakt neu A1). Use short German examples with Arabic translation. Be concise (max ~180 words). Use simple formatting: short paragraphs, examples on their own lines.
+    const prompt = `You are a patient German teacher. Answer in clear Modern Standard Arabic for a Moroccan learner at ${curLevel()} level (A1 textbook DaF kompakt neu A1, then A2). Use short German examples with Arabic translation. Be concise (max ~180 words). Use simple formatting: short paragraphs, examples on their own lines.
 ${this.learnerContext()}
 Question: ${question}`;
     return await this.fn(prompt, { onText, signal, cache: false });
@@ -598,6 +813,539 @@ const Activity = {
   }
 };
 
+/* ================= SERVICES: own API keys (AI tutor), smart merge, GitHub Gist sync,
+   microphone recorder, advanced pronunciation assessment (Gemini / Azure) ================= */
+
+/* ---------- keys: stored only on this device, never synced ---------- */
+const Keys = {
+  K: "deutschstunde.keys",
+  get() { try { return JSON.parse(localStorage.getItem(this.K) || "{}") || {}; } catch (e) { return {}; } },
+  set(patch) { const k = Object.assign(this.get(), patch); try { localStorage.setItem(this.K, JSON.stringify(k)); } catch (e) { } return k; },
+  ai() { return this.get().ai || null; },
+  azure() { return this.get().azure || null; },
+  gist() { return this.get().gist || null; }
+};
+
+/* ---------- HTTP helpers ---------- */
+function httpErr(status, body) {
+  const e = new Error("HTTP " + status + " " + String(body || "").slice(0, 300));
+  e.status = status;
+  e.code = status === 401 || status === 403 ? "bad_key" : status === 429 ? "rate_limited" : status === 404 ? "not_found" : status === 400 ? "bad_request" : "http";
+  return e;
+}
+async function readSSE(res, onData, signal) {
+  const rd = res.body.getReader(); const dec = new TextDecoder(); let buf = "";
+  while (true) {
+    if (signal && signal.aborted) { try { rd.cancel(); } catch (e) { } const er = new Error("cancelled"); er.code = "cancelled"; throw er; }
+    const { done, value } = await rd.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, i).replace(/\r$/, ""); buf = buf.slice(i + 1);
+      if (line.startsWith("data:")) { const d = line.slice(5).trim(); if (d && d !== "[DONE]") { try { onData(JSON.parse(d)); } catch (e) { } } }
+    }
+  }
+}
+function parseJSONLoose(t) {
+  t = String(t || "").trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
+  try { return JSON.parse(t); } catch (e) { }
+  const a = t.indexOf("{"), b = t.lastIndexOf("}");
+  if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch (e) { } }
+  const er = new Error("invalid json"); er.code = "invalid_json"; throw er;
+}
+const toMessages = (p) => (Array.isArray(p) ? p : [{ role: "user", content: String(p) }]);
+
+/* ---------- AI providers (same interface as the Claude artifact "sample" capability) ---------- */
+const Providers = {
+  gemini: {
+    label: "Google Gemini (مجاني)", keyHint: "AIza…", models: ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3-flash-preview", "gemini-3.1-flash-lite", "gemini-2.5-flash"],
+    async pickModel(cfg) {
+      try {
+        const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key=" + encodeURIComponent(cfg.key));
+        if (r.status === 400 || r.status === 401 || r.status === 403) throw httpErr(r.status, await r.text());
+        const j = await r.json();
+        const ok = (j.models || []).filter((m) => (m.supportedGenerationMethods || []).includes("generateContent")).map((m) => m.name.replace(/^models\//, ""))
+          .filter((n) => /^gemini-[\d.]+-flash(-lite)?$|^gemini-flash-latest$|^gemini-[\d.]+-flash-preview$/.test(n));
+        const score = (n) => { const v = parseFloat((n.match(/gemini-([\d.]+)/) || [0, 0])[1]) || 0; return (n === "gemini-flash-latest" ? 50 : v * 10) - (/lite/.test(n) ? 3 : 0) - (/preview/.test(n) ? 1 : 0); };
+        ok.sort((a, b) => score(b) - score(a));
+        if (ok.length) return ok[0];
+      } catch (e) { if (e.code === "bad_key") throw e; }
+      return this.models[0];
+    },
+    body(msgs, json, sys) {
+      const contents = msgs.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: Array.isArray(m.parts) ? m.parts : [{ text: String(m.content) }] }));
+      const b = { contents, generationConfig: { temperature: json ? 0.3 : 0.6, maxOutputTokens: 2048 } };
+      if (json) b.generationConfig.responseMimeType = "application/json";
+      if (sys) b.systemInstruction = { parts: [{ text: sys }] };
+      return b;
+    },
+    async call(cfg, msgs, o) {
+      const model = cfg.model || this.models[0];
+      const url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":" + (o.onText ? "streamGenerateContent?alt=sse&" : "generateContent?") + "key=" + encodeURIComponent(cfg.key);
+      const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(this.body(msgs, o.json, o.system)), signal: o.signal });
+      if (!res.ok) throw httpErr(res.status, await res.text());
+      const textOf = (j) => ((((j.candidates || [])[0] || {}).content || {}).parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join("");
+      if (o.onText) { let acc = ""; await readSSE(res, (j) => { acc += textOf(j); o.onText({ text: acc }); }, o.signal); return acc; }
+      return textOf(await res.json());
+    }
+  },
+  anthropic: {
+    label: "Claude (Anthropic API)", keyHint: "sk-ant-…", models: ["claude-haiku-5-5", "claude-sonnet-5-5"],
+    async pickModel() { return "claude-haiku-5-5"; },
+    async call(cfg, msgs, o) {
+      const body = { model: (o.tier === "default" && cfg.model2) || cfg.model || "claude-haiku-5-5", max_tokens: 2048, messages: msgs.map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.content })) };
+      if (o.system) body.system = o.system;
+      if (o.onText) body.stream = true;
+      const res = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", signal: o.signal, headers: { "content-type": "application/json", "x-api-key": cfg.key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" }, body: JSON.stringify(body) });
+      if (!res.ok) throw httpErr(res.status, await res.text());
+      if (o.onText) { let acc = ""; await readSSE(res, (j) => { if (j.type === "content_block_delta" && j.delta && j.delta.type === "text_delta") { acc += j.delta.text; o.onText({ text: acc }); } }, o.signal); return acc; }
+      const j = await res.json();
+      return (j.content || []).filter((c) => c.type === "text").map((c) => c.text).join("");
+    }
+  },
+  openai: {
+    label: "متوافق مع OpenAI (OpenRouter، Groq، OpenAI…)", keyHint: "sk-…", models: [],
+    async pickModel(cfg) { return cfg.model || "gpt-4o-mini"; },
+    async call(cfg, msgs, o) {
+      const base = (cfg.base || "https://api.openai.com/v1").replace(/\/+$/, "");
+      const messages = (o.system ? [{ role: "system", content: o.system }] : []).concat(msgs.map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.content })));
+      const body = { model: cfg.model || "gpt-4o-mini", messages, temperature: o.json ? 0.3 : 0.6 };
+      if (o.onText) body.stream = true;
+      const res = await fetch(base + "/chat/completions", { method: "POST", signal: o.signal, headers: { "Content-Type": "application/json", Authorization: "Bearer " + cfg.key }, body: JSON.stringify(body) });
+      if (!res.ok) throw httpErr(res.status, await res.text());
+      if (o.onText) { let acc = ""; await readSSE(res, (j) => { const d = j.choices && j.choices[0] && j.choices[0].delta; if (d && d.content) { acc += d.content; o.onText({ text: acc }); } }, o.signal); return acc; }
+      const j = await res.json();
+      return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
+    }
+  }
+};
+function makeProviderFn(cfg) {
+  const P = Providers[cfg.provider];
+  const run = async (prompt, o = {}) => {
+    try { return await P.call(cfg, toMessages(prompt), o); }
+    catch (e) {
+      if (e.name === "AbortError") { e.code = "cancelled"; throw e; }
+      if (e.code === "not_found" && cfg.provider === "gemini" && !o._retry) { // model retired -> pick again
+        cfg.model = await P.pickModel(Object.assign({}, cfg, { model: null })); Keys.set({ ai: cfg });
+        return run(prompt, Object.assign({}, o, { _retry: true }));
+      }
+      if (!e.code) e.code = "network";
+      throw e;
+    }
+  };
+  const fn = (prompt, o = {}) => run(prompt, { onText: o.onText, signal: o.signal });
+  fn.json = async (prompt, o = {}) => parseJSONLoose(await run(prompt, { json: true, tier: o.modelTier, signal: o.signal }));
+  fn.raw = run;
+  fn.provider = cfg.provider;
+  return fn;
+}
+const OwnAI = {
+  async connect(cfg) { // validates the key with a tiny request
+    const P = Providers[cfg.provider];
+    if (!P) throw new Error("provider");
+    cfg = Object.assign({}, cfg);
+    if (!cfg.model) cfg.model = await P.pickModel(cfg);
+    const fn = makeProviderFn(cfg);
+    const t = await fn.raw("Antworte nur mit dem Wort: OK", {});
+    if (!/ok/i.test(t || "")) throw new Error("unexpected reply");
+    Keys.set({ ai: cfg });
+    return cfg;
+  },
+  disconnect() { Keys.set({ ai: null }); }
+};
+
+/* ---------- smart merge of two progress states (two devices) ---------- */
+function mergeStates(a, b) {
+  if (!a) return b; if (!b) return a;
+  const newer = (a.updatedAt || 0) >= (b.updatedAt || 0) ? a : b, older = newer === a ? b : a;
+  const out = JSON.parse(JSON.stringify(newer));
+  const o = older;
+  // daily log: maximum of each counter, union of finished units
+  for (const k in o.log || {}) {
+    const x = o.log[k], y = out.log[k];
+    if (!y) { out.log[k] = x; continue; }
+    for (const f of ["s", "x", "k", "w", "xp"]) if (typeof x[f] === "number") y[f] = Math.max(y[f] || 0, x[f]);
+    y.u = uniq((y.u || []).concat(x.u || []));
+  }
+  // SRS: keep the record reviewed most recently (then the one with more reviews)
+  for (const k in o.srs || {}) { const x = o.srs[k], y = out.srs[k]; if (!y || x[4] > y[4] || (x[4] === y[4] && x[2] > y[2])) out.srs[k] = x; }
+  // mistakes: union, keep the most recent record
+  for (const k in o.mist || {}) { const x = o.mist[k], y = out.mist[k]; if (!y || (x.d || 0) > (y.d || 0)) out.mist[k] = x; }
+  // achievements: earliest date
+  for (const k in o.ach || {}) out.ach[k] = Math.min(out.ach[k] || Infinity, o.ach[k]);
+  // unit progress: per step keep the latest, best quiz score
+  out.progress = out.progress || {}; out.progress.units = out.progress.units || {};
+  for (const u in (o.progress && o.progress.units) || {}) {
+    const x = o.progress.units[u], y = out.progress.units[u] || (out.progress.units[u] = {});
+    for (const s in x) {
+      if (s === "done") { y.done = Math.min(y.done || Infinity, x.done); continue; }
+      if (!y[s] || ((x[s] && x[s].ts) || 0) > ((y[s] && y[s].ts) || 0)) { const best = Math.max((y[s] && y[s].best) || 0, (x[s] && x[s].best) || 0); y[s] = Object.assign({}, x[s]); if (best) y[s].best = best; if (x[s] && x[s].pass || (out.progress.units[u][s] && out.progress.units[u][s].pass)) y[s].pass = true; }
+    }
+  }
+  for (const L in (o.progress && o.progress.lessons) || {}) {
+    const x = o.progress.lessons[L], y = out.progress.lessons[L] || (out.progress.lessons[L] = {});
+    for (const s in x) { if (typeof x[s] === "number") y[s] = Math.max(y[s] || 0, x[s]); else if (x[s] && typeof x[s] === "object") { if (!y[s]) y[s] = x[s]; else if (x[s].best != null) y[s].best = Math.max(y[s].best || 0, x[s].best); } }
+  }
+  for (const k in o.dlg || {}) { const x = o.dlg[k], y = out.dlg[k]; if (!y) out.dlg[k] = x; else { y.best = Math.max(y.best || 0, x.best || 0); y.n = Math.max(y.n || 0, x.n || 0); } }
+  for (const k in o.sounds || {}) out.sounds[k] = Math.max(out.sounds[k] || 0, o.sounds[k]);
+  if (o.game || out.game) {
+    out.game = out.game || {}; const g = o.game || {};
+    out.game.freezes = Math.max(out.game.freezes || 0, g.freezes || 0);
+    out.game.frozen = uniq((out.game.frozen || []).concat(g.frozen || []));
+    out.game.weeks = Object.assign({}, g.weeks || {}, out.game.weeks || {});
+  }
+  if (o.placement && !out.placement) out.placement = o.placement;
+  if (o.mock) { out.mock = out.mock || []; const seen = new Set(out.mock.map((m) => m.ts)); o.mock.forEach((m) => { if (!seen.has(m.ts)) out.mock.push(m); }); out.mock.sort((x, y) => x.ts - y.ts); }
+  out.updatedAt = Math.max(a.updatedAt || 0, b.updatedAt || 0);
+  return out;
+}
+
+/* ---------- GitHub Gist sync (installed app) ---------- */
+const Gist = {
+  FILE: "deutschstunde-progress.json", busy: false, last: 0, status: "off",
+  cfg() { return Keys.gist(); },
+  on() { const c = this.cfg(); return !!(c && c.token && c.id); },
+  hdr(token) { return { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; },
+  async connect(token) {
+    token = token.trim();
+    const me = await fetch("https://api.github.com/user", { headers: this.hdr(token) });
+    if (!me.ok) throw httpErr(me.status, await me.text());
+    let id = null;
+    for (let page = 1; page <= 5 && !id; page++) {
+      const r = await fetch("https://api.github.com/gists?per_page=100&page=" + page, { headers: this.hdr(token) });
+      if (!r.ok) throw httpErr(r.status, await r.text());
+      const list = await r.json(); if (!list.length) break;
+      const g = list.find((x) => x.files && x.files[this.FILE]); if (g) id = g.id;
+    }
+    if (!id) {
+      const r = await fetch("https://api.github.com/gists", { method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, this.hdr(token)), body: JSON.stringify({ description: "Deutschstunde — مزامنة التقدّم (خاص)", public: false, files: { [this.FILE]: { content: JSON.stringify(S) } } }) });
+      if (!r.ok) throw httpErr(r.status, await r.text());
+      id = (await r.json()).id;
+    }
+    Keys.set({ gist: { token, id, login: (await me.json()).login } });
+    await this.sync(true);
+    return id;
+  },
+  disconnect() { Keys.set({ gist: null }); this.status = "off"; },
+  async pull() {
+    const c = this.cfg();
+    const r = await fetch("https://api.github.com/gists/" + c.id, { headers: this.hdr(c.token), cache: "no-store" });
+    if (!r.ok) throw httpErr(r.status, await r.text());
+    const g = await r.json(); const f = g.files && g.files[this.FILE];
+    if (!f) return null;
+    let txt = f.content;
+    if (f.truncated && f.raw_url) txt = await (await fetch(f.raw_url, { headers: this.hdr(c.token) })).text();
+    try { return JSON.parse(txt); } catch (e) { return null; }
+  },
+  async push() {
+    const c = this.cfg();
+    const r = await fetch("https://api.github.com/gists/" + c.id, { method: "PATCH", headers: Object.assign({ "Content-Type": "application/json" }, this.hdr(c.token)), body: JSON.stringify({ files: { [this.FILE]: { content: JSON.stringify(S) } } }) });
+    if (!r.ok) throw httpErr(r.status, await r.text());
+    this.last = Date.now();
+  },
+  async sync(force) { // pull, merge, push
+    if (!this.on() || this.busy) return;
+    this.busy = true;
+    try {
+      const remote = await this.pull();
+      if (remote && remote.v) {
+        const before = JSON.stringify(S);
+        const merged = mergeDefaults(mergeStates(S, remote));
+        if (JSON.stringify(merged) !== before) { window.S = merged; Store.saveLocal(); UI && UI.refresh && UI.refresh(); }
+        if ((remote.updatedAt || 0) !== (S.updatedAt || 0) || force) await this.push();
+      } else await this.push();
+      this.status = "ok"; UI && UI.setSync && UI.setSync("cloud");
+    } catch (e) { console.warn("gist sync", e); this.status = e.code === "bad_key" ? "bad" : "err"; UI && UI.setSync && UI.setSync("local"); }
+    this.busy = false;
+  },
+  later: debounce(function () { Gist.pushSafe(); }, 20000),
+  async pushSafe() { if (!this.on() || this.busy) return; this.busy = true; try { await this.push(); this.status = "ok"; UI && UI.setSync && UI.setSync("cloud"); } catch (e) { this.status = "err"; } this.busy = false; }
+};
+
+/* ---------- microphone recorder: 16 kHz mono WAV with simple voice-activity stop ---------- */
+const MicRec = {
+  supported() { return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && (window.AudioContext || window.webkitAudioContext)); },
+  async record(o = {}) { // resolves {wav: Blob, dur}
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AC();
+    const src = ctx.createMediaStreamSource(stream);
+    const proc = ctx.createScriptProcessor(4096, 1, 1);
+    const chunks = []; let speech = false, silentMs = 0, total = 0, peak = 0;
+    const maxMs = o.maxMs || 9000, sr = ctx.sampleRate;
+    return await new Promise((resolve, reject) => {
+      let stopped = false;
+      const stop = () => {
+        if (stopped) return; stopped = true;
+        try { proc.disconnect(); src.disconnect(); } catch (e) { }
+        stream.getTracks().forEach((t) => t.stop());
+        ctx.close && ctx.close();
+        const len = chunks.reduce((a, c) => a + c.length, 0);
+        const all = new Float32Array(len); let off = 0; for (const c of chunks) { all.set(c, off); off += c.length; }
+        resolve({ wav: encodeWav(downsample(all, sr, 16000), 16000), dur: len / sr, peak, speech });
+      };
+      o.onStop && o.onStop(stop);
+      proc.onaudioprocess = (ev) => {
+        const d = ev.inputBuffer.getChannelData(0); chunks.push(new Float32Array(d));
+        let s = 0; for (let i = 0; i < d.length; i++) s += d[i] * d[i];
+        const rms = Math.sqrt(s / d.length); peak = Math.max(peak, rms);
+        const ms = d.length / sr * 1000; total += ms;
+        if (rms > 0.02) { speech = true; silentMs = 0; } else if (speech) silentMs += ms;
+        o.onLevel && o.onLevel(Math.min(1, rms * 8));
+        if ((speech && silentMs > 1300) || total > maxMs || (!speech && total > 5000)) stop();
+      };
+      src.connect(proc); proc.connect(ctx.destination);
+    });
+  }
+};
+function downsample(buf, from, to) {
+  if (from === to) return buf;
+  const ratio = from / to, n = Math.floor(buf.length / ratio), out = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const a = Math.floor(i * ratio), b = Math.min(buf.length, Math.floor((i + 1) * ratio)); let s = 0; for (let j = a; j < b; j++) s += buf[j]; out[i] = s / Math.max(1, b - a); }
+  return out;
+}
+function encodeWav(samples, rate) {
+  const b = new ArrayBuffer(44 + samples.length * 2), v = new DataView(b);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, "RIFF"); v.setUint32(4, 36 + samples.length * 2, true); w(8, "WAVE"); w(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, samples.length * 2, true);
+  for (let i = 0; i < samples.length; i++) { const s = Math.max(-1, Math.min(1, samples[i])); v.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true); }
+  return new Blob([b], { type: "audio/wav" });
+}
+const blobToB64 = (blob) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.readAsDataURL(blob); });
+
+/* ---------- advanced pronunciation assessment ---------- */
+const ProEval = {
+  mode() {
+    const az = Keys.azure(); if (az && az.key && az.region) return "azure";
+    const ai = Keys.ai(); if (ai && ai.provider === "gemini" && ai.key && !HAS_CLAUDE) return "gemini";
+    return null;
+  },
+  available() { return !!this.mode() && MicRec.supported() && !HAS_CLAUDE; },
+  label() { return { azure: "Microsoft Azure", gemini: "Gemini" }[this.mode()] || ""; },
+  async assess(wav, text) { return this.mode() === "azure" ? this.azure(wav, text) : this.gemini(wav, text); },
+  async azure(wav, text) {
+    const az = Keys.azure();
+    const cfg = { ReferenceText: text, GradingSystem: "HundredMark", Granularity: "Phoneme", Dimension: "Comprehensive", EnableMiscue: true };
+    const hdr = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+    const r = await fetch("https://" + az.region + ".stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=de-DE&format=detailed", { method: "POST", headers: { "Ocp-Apim-Subscription-Key": az.key, "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000", "Pronunciation-Assessment": hdr, Accept: "application/json" }, body: wav });
+    if (!r.ok) throw httpErr(r.status, await r.text());
+    const j = await r.json();
+    const nb = (j.NBest || [])[0];
+    if (!nb) return { score: 0, heard: "", words: [], tips: ["لم يُسمع كلام واضح. اقترب من الميكروفون وتكلّم بصوت أعلى."] };
+    const pa = nb.PronunciationAssessment || nb;
+    const words = (nb.Words || []).map((w) => { const p = w.PronunciationAssessment || w; return { w: w.Word, score: Math.round(p.AccuracyScore || 0), err: p.ErrorType || "None", ph: (w.Phonemes || []).filter((x) => ((x.PronunciationAssessment || x).AccuracyScore || 100) < 60).map((x) => x.Phoneme) }; });
+    const tips = [];
+    words.filter((w) => w.err === "Omission").forEach((w) => tips.push("نسيت كلمة ‹" + w.w + "›."));
+    words.filter((w) => w.err === "Mispronunciation" || w.score < 60).slice(0, 3).forEach((w) => tips.push("‹" + w.w + "»: النطق يحتاج تحسينًا" + (w.ph.length ? " (الأصوات: " + w.ph.join(" ") + ")" : "") + "."));
+    return { score: Math.round(pa.PronScore || pa.AccuracyScore || 0), acc: Math.round(pa.AccuracyScore || 0), flu: Math.round(pa.FluencyScore || 0), comp: Math.round(pa.CompletenessScore || 0), heard: nb.Display || j.DisplayText || "", words, tips, src: "azure" };
+  },
+  async gemini(wav, text) {
+    const cfg = Keys.ai();
+    const data = await blobToB64(wav);
+    const prompt = `You are an expert German pronunciation coach for an Arabic-speaking (Moroccan) A1 learner.
+The learner tried to say this German sentence: "${text}"
+Listen to the audio carefully and evaluate the pronunciation (sounds, word stress, vowel length, umlauts, ch/r/z/w sounds, completeness, fluency). Be honest but encouraging; a strong foreign accent that is still clearly intelligible deserves about 70-80.
+Reply with ONLY JSON:
+{"heard": "what you actually heard, in German", "score": 0-100, "acc": 0-100, "flu": 0-100, "comp": 0-100,
+ "words": [{"w": "each word of the target sentence", "score": 0-100, "err": "None|Mispronunciation|Omission"}],
+ "tips": ["1-3 short concrete tips in Arabic about the main problems, mention the German word in ‹ ›"]}`;
+    const fn = makeProviderFn(cfg);
+    const r = await fn.raw([{ role: "user", parts: [{ text: prompt }, { inline_data: { mime_type: "audio/wav", data } }] }], { json: true });
+    const j = parseJSONLoose(r);
+    j.src = "gemini";
+    j.words = Array.isArray(j.words) ? j.words : [];
+    j.tips = Array.isArray(j.tips) ? j.tips : [];
+    return j;
+  }
+};
+
+/* ================= GAME: XP, levels, streak freezes, daily quests, weekly goal & report ================= */
+const XPV = { ok: 10, wrong: 2, step: 20, unit: 50, lesson: 100, card: 3, pron: 5, quest: 30, dialog: 10 };
+const RANKS = [
+  [1, "Neuling", "مبتدئ"], [5, "Entdecker", "مستكشف"], [10, "Lerner", "متعلّم"], [15, "Sprecher", "متحدّث"],
+  [20, "Kenner", "عارف"], [30, "Profi", "محترف"], [40, "Meister", "أستاذ"], [60, "Legende", "أسطورة"]
+];
+const Game = {
+  g() { return S.game || (S.game = { freezes: 0, frozen: [], weeks: {}, award: 0, report: "" }); },
+  xp(n, silent) {
+    if (!n) return;
+    const L = todayLog(); L.xp = (L.xp || 0) + n;
+    const before = this.level(this.total() - n).n, after = this.level().n;
+    if (!silent && UI && UI.xpFloat) UI.xpFloat(n);
+    if (after > before && UI && UI.toast) setTimeout(() => UI.toast("مستوى جديد! أنت الآن في المستوى " + after + " · " + this.rank(after)[1], "star"), 400);
+  },
+  total() { let t = 0; for (const k in S.log) t += S.log[k].xp || 0; return t; },
+  need(n) { return 25 * (n - 1) * (n + 2); }, // XP needed to reach level n
+  level(xp) {
+    if (xp == null) xp = this.total();
+    let n = 1; while (this.need(n + 1) <= xp) n++;
+    const a = this.need(n), b = this.need(n + 1);
+    return { n, xp, from: a, to: b, frac: (xp - a) / (b - a), left: b - xp };
+  },
+  rank(n) { let r = RANKS[0]; for (const x of RANKS) if (n >= x[0]) r = x; return r; },
+  /* --- streak with rest days and freezes --- */
+  planned(d) { return (S.settings.days || [0, 1, 2, 3, 4, 5, 6]).includes(d.getDay()); },
+  active(k) { const L = S.log[k]; return !!(L && (L.s >= 300 || L.x >= 5)); },
+  frozen(k) { return this.g().frozen.includes(k); },
+  streak() {
+    let n = 0; const d = new Date();
+    if (!this.active(dayKey(d))) d.setDate(d.getDate() - 1);
+    for (let i = 0; i < 800; i++) {
+      const k = dayKey(d);
+      if (this.active(k)) n++;
+      else if (!this.planned(d) || this.frozen(k)) { /* rest day or frozen: streak continues */ }
+      else break;
+      d.setDate(d.getDate() - 1);
+    }
+    return n;
+  },
+  applyFreezes() { // on start: protect the streak if a planned day was missed
+    const g = this.g(); if (!g.freezes) return;
+    const y = new Date(); y.setDate(y.getDate() - 1);
+    const yk = dayKey(y);
+    if (this.active(yk) || this.frozen(yk) || !this.planned(y)) return;
+    const before = new Date(y); before.setDate(before.getDate() - 1);
+    let alive = false;
+    for (let i = 0; i < 7; i++) { const k = dayKey(before); if (this.active(k)) { alive = true; break; } if (this.planned(before) && !this.frozen(k)) break; before.setDate(before.getDate() - 1); }
+    if (!alive) return;
+    g.frozen.push(yk); g.freezes--; save();
+    setTimeout(() => UI.toast("❄ استُعمل تجميد السلسلة ليوم أمس — سلسلتك محفوظة!", "star"), 1200);
+  },
+  awardFreezes() {
+    const g = this.g(), st = this.streak();
+    if (st >= 7 && Math.floor(st / 7) > (g.award || 0)) {
+      g.award = Math.floor(st / 7);
+      if (g.freezes < 2) { g.freezes++; UI.toast("❄ ربحت تجميدًا للسلسلة (" + g.freezes + "/2) — يحميها إن فاتك يوم دراسة.", "star"); }
+    }
+    if (st < 7 && (g.award || 0) > 0 && st === 0) g.award = 0;
+  },
+  /* --- daily quests --- */
+  QUESTS: [
+    { id: "min", ar: (g) => "ادرس " + g + " دقيقة", need: (g) => g * 60, val: (L) => L.s || 0, fmt: (v, n) => Math.floor(v / 60) + "/" + Math.round(n / 60) + " د" },
+    { id: "ans", ar: () => "أجب عن 30 سؤالًا", need: () => 30, val: (L) => L.x || 0 },
+    { id: "acc", ar: () => "20 إجابة صحيحة", need: () => 20, val: (L) => L.k || 0 },
+    { id: "card", ar: () => "راجع 15 بطاقة كلمات", need: () => 15, val: (L) => L.c || 0 },
+    { id: "dlg", ar: () => "أكمل حوارًا", need: () => 1, val: (L) => L.d || 0 },
+    { id: "pron", ar: () => "تدرّب على نطق 6 جمل", need: () => 6, val: (L) => L.p || 0 },
+    { id: "step", ar: () => "أكمل خطوتين جديدتين في الدرس", need: () => 2, val: (L) => L.st || 0 }
+  ],
+  quests(k) {
+    k = k || dayKey(); const n = dayNum(new Date(k + "T12:00:00"));
+    const rest = this.QUESTS.slice(1);
+    const a = rest[n % rest.length], b = rest[(n * 3 + 2) % rest.length];
+    const picks = [this.QUESTS[0], a, b === a ? rest[(n + 1) % rest.length] : b];
+    const L = S.log[k] || {}, goal = S.settings.goalMin || 60;
+    return picks.map((q) => { const need = q.need(goal), v = Math.min(need, q.val(L)); return { id: q.id, ar: q.ar(goal), need, v, done: v >= need, label: q.fmt ? q.fmt(v, need) : v + "/" + need }; });
+  },
+  checkQuests() {
+    const L = todayLog(); L.q = L.q || [];
+    for (const q of this.quests()) if (q.done && !L.q.includes(q.id)) {
+      L.q.push(q.id); this.xp(XPV.quest, true);
+      UI.toast("مهمة اليوم مكتملة: " + q.ar + " (+" + XPV.quest + " XP)", "star");
+      if (L.q.length === 3) setTimeout(() => UI.toast("أنجزت كل مهام اليوم! Großartig!", "star"), 1600);
+    }
+  },
+  count(field, n = 1) { const L = todayLog(); L[field] = (L[field] || 0) + n; },
+  /* --- weeks --- */
+  weekStart(d = new Date()) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const dow = (x.getDay() + 6) % 7; x.setDate(x.getDate() - dow); return x; },
+  weekStats(start) {
+    const out = { sec: 0, days: 0, xp: 0, x: 0, k: 0, w: 0, c: 0, d: 0, units: [], sk: {}, planned: 0, quests: 0 };
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start); d.setDate(d.getDate() + i); const L = S.log[dayKey(d)];
+      if (this.planned(d)) out.planned++;
+      if (!L) continue;
+      out.sec += L.s || 0; out.xp += L.xp || 0; out.x += L.x || 0; out.k += L.k || 0; out.w += L.w || 0; out.c += L.c || 0; out.d += L.d || 0; out.quests += (L.q || []).length;
+      if (this.active(dayKey(d))) out.days++;
+      (L.u || []).forEach((u) => out.units.push(u));
+      for (const s in L.sk || {}) { const a = out.sk[s] || (out.sk[s] = [0, 0]); a[0] += L.sk[s][0]; a[1] += L.sk[s][1]; }
+    }
+    out.goalSec = (S.settings.goalMin || 60) * 60 * out.planned;
+    return out;
+  },
+  maybeWeeklyReport() {
+    const g = this.g();
+    const thisWeek = dayKey(this.weekStart());
+    if (g.report === thisWeek) return;
+    const last = this.weekStart(); last.setDate(last.getDate() - 7);
+    const st = this.weekStats(last);
+    g.report = thisWeek; save();
+    if (st.sec < 120 && st.x < 5) return;
+    g.weeks[dayKey(last)] = { sec: Math.round(st.sec), xp: st.xp, days: st.days, x: st.x, k: st.k };
+    setTimeout(() => showWeeklyReport(last), 900);
+  },
+  hook(kind, data) { // called from core when the learner does something
+    try {
+      if (kind === "answer") { this.xp(data.ok ? XPV.ok : XPV.wrong, !data.ok); const L = todayLog(); const sk = (C.tags[data.tag] && C.tags[data.tag].skill) || "grammatik"; L.sk = L.sk || {}; const a = L.sk[sk] || (L.sk[sk] = [0, 0]); a[0]++; if (data.ok) a[1]++; }
+      else if (kind === "step") { this.count("st"); this.xp(XPV.step); }
+      else if (kind === "unitPass") this.xp(XPV.unit);
+      else if (kind === "lessonPass") this.xp(XPV.lesson);
+      else if (kind === "card") { this.count("c"); this.xp(XPV.card, true); }
+      else if (kind === "pron") { this.count("p"); this.xp(XPV.pron, true); }
+      else if (kind === "dialog") { this.count("d"); this.xp(XPV.dialog + Math.round((data.pct || 0) / 100 * 30)); }
+      this.checkQuests();
+      this.awardFreezes();
+    } catch (e) { console.warn("game", e); }
+  }
+};
+
+/* ---------- UI pieces ---------- */
+function levelCard() {
+  const lv = Game.level(), rk = Game.rank(lv.n), g = Game.g();
+  const qs = Game.quests();
+  return el("section", { class: "card lvcard" },
+    el("div", { class: "lv-top" },
+      el("div", { class: "lv-badge", "aria-hidden": "true" }, el("b", null, String(lv.n))),
+      el("div", { class: "lv-t" }, el("b", null, "المستوى " + lv.n + " · ", el("span", { dir: "ltr", lang: "de" }, rk[1]), " (" + rk[2] + ")"),
+        el("div", { class: "bar thin" }, el("i", { style: { width: Math.round(lv.frac * 100) + "%" } })),
+        el("small", { class: "muted" }, lv.xp.toLocaleString("ar-MA") + " XP · بقي " + lv.left + " للمستوى " + (lv.n + 1))),
+      el("div", { class: "lv-fz", title: "تجميد السلسلة: يحميها إن فاتك يوم دراسة. تربح واحدًا كل 7 أيام متتالية (حتى 2)." }, el("span", null, "❄"), el("b", null, String(g.freezes || 0)))),
+    el("div", { class: "quests" }, el("small", { class: "muted q-h" }, "مهام اليوم"), qs.map((q) => el("div", { class: "quest" + (q.done ? " done" : "") },
+      el("span", { class: "q-ic" }, q.done ? icon("check") : icon("flag")), el("span", { class: "q-t" }, q.ar),
+      el("span", { class: "q-bar" }, el("i", { style: { width: Math.round(q.v / q.need * 100) + "%" } })), el("small", { class: "q-v" }, q.done ? "+" + XPV.quest + " XP" : q.label)))));
+}
+function weekGoalCard() {
+  const st = Game.weekStats(Game.weekStart());
+  const f = st.goalSec ? st.sec / st.goalSec : 0;
+  return el("div", { class: "wk-goal" }, ring(Math.min(1, f), 76, 8, Math.round(f * 100) + "%"),
+    el("div", null, el("b", null, "هدف الأسبوع"), el("p", { class: "muted sm" }, fmtMin(st.sec) + " من " + fmtMin(st.goalSec) + " · " + st.days + " من " + st.planned + " أيام دراسة · " + st.xp + " XP")));
+}
+function weeklyReportNode(start) {
+  const st = Game.weekStats(start);
+  const prev = new Date(start); prev.setDate(prev.getDate() - 7);
+  const pv = Game.weekStats(prev);
+  const end = new Date(start); end.setDate(end.getDate() + 6);
+  const acc = st.x ? Math.round(st.k / st.x * 100) : 0;
+  const sks = Object.keys(st.sk).filter((s) => st.sk[s][0] >= 5).map((s) => ({ s, p: st.sk[s][1] / st.sk[s][0] })).sort((a, b) => b.p - a.p);
+  const best = sks[0], worst = sks.length > 1 ? sks[sks.length - 1] : null;
+  const delta = (a, b, f) => { if (!b) return null; const d = a - b; return el("small", { class: d >= 0 ? "t-ok" : "t-no" }, (d >= 0 ? "▲ " : "▼ ") + f(Math.abs(d))); };
+  const rec = [];
+  if (st.days < st.planned) rec.push("درست " + st.days + " من " + st.planned + " أيام. الهدف هذا الأسبوع: لا تفوّت أي يوم — حتى 20 دقيقة أفضل من لا شيء.");
+  if (worst && worst.p < 0.7) rec.push("ركّز على " + C.skills[worst.s] + " (" + Math.round(worst.p * 100) + "%): افتح المراجعة ← نقاط الضعف.");
+  if (dueWords().length > 30) rec.push("لديك " + dueWords().length + " كلمة مستحقة للمراجعة — ابدأ كل جلسة بالمراجعة الذكية.");
+  if (!rec.length) rec.push("أسبوع ممتاز! حافظ على نفس الإيقاع وانتقل إلى الوحدة التالية.");
+  return el("div", { class: "wreport" },
+    el("p", { class: "muted" }, start.getDate() + " " + AR_MONTHS[start.getMonth()] + " – " + end.getDate() + " " + AR_MONTHS[end.getMonth()]),
+    el("div", { class: "tiles" },
+      el("div", { class: "tile" }, icon("clock"), el("b", null, fmtMin(st.sec)), el("small", null, "وقت الدراسة"), delta(st.sec, pv.sec, (x) => fmtMin(x))),
+      el("div", { class: "tile" }, icon("flame"), el("b", null, st.days + "/" + st.planned), el("small", null, "أيام الدراسة")),
+      el("div", { class: "tile" }, icon("star"), el("b", null, String(st.xp)), el("small", null, "XP"), delta(st.xp, pv.xp, (x) => x + " XP")),
+      el("div", { class: "tile" }, icon("check"), el("b", null, st.x ? acc + "%" : "—"), el("small", null, st.x + " إجابة"))),
+    el("ul", { class: "glist" },
+      el("li", null, "كلمات جديدة: ", el("b", null, String(st.w)), " · بطاقات مراجعة: ", el("b", null, String(st.c)), " · حوارات: ", el("b", null, String(st.d))),
+      st.units.length ? el("li", null, "وحدات أكملتها: ", el("b", { dir: "ltr" }, uniq(st.units).join("، "))) : null,
+      best ? el("li", null, "أقوى مهارة: ", el("b", { class: "t-ok" }, C.skills[best.s] + " " + Math.round(best.p * 100) + "%")) : null,
+      worst ? el("li", null, "تحتاج تقوية: ", el("b", { class: "t-no" }, C.skills[worst.s] + " " + Math.round(worst.p * 100) + "%")) : null),
+    el("h4", null, "خطة الأسبوع القادم"), el("ul", { class: "glist" }, rec.map((r) => el("li", null, r))));
+}
+function showWeeklyReport(start) {
+  const wrap = el("div", { class: "session" });
+  wrap.append(ovHeader("تقرير الأسبوع", "Wochenbericht"), el("div", { class: "s-body" }, weeklyReportNode(start)),
+    el("div", { class: "s-foot sticky" }, btn("ابدأ أسبوعًا جديدًا", { kind: "primary", cls: "wide", icon: "play", on: () => Overlay.close() })));
+  Overlay.open(wrap);
+}
+
 /* ================= UI: icons, shell, router, shared components ================= */
 const ICONS = {
   home: "M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -605,6 +1353,7 @@ const ICONS = {
   review: "M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7",
   chat: "M4 5h16v11H9l-5 4z",
   chart: "M5 20V11M11 20V5M17 20v-6M3 20h18",
+  copy: "M8 8h11v11H8zM5 16V5h11",
   gear: "M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z",
   volume: "M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13",
   turtle: "M4 15a8 8 0 1 1 16 0M12 15l-4-4M3 19h18",
@@ -702,7 +1451,7 @@ function emptyState(ic, title, text, action) {
 function cardLink(o) {
   const b = el("button", { class: "clink" + (o.cls ? " " + o.cls : ""), type: "button" },
     o.icon ? el("span", { class: "clink-ic" }, icon(o.icon)) : null,
-    el("span", { class: "clink-t" }, el("b", null, o.title), o.sub ? el("small", { class: "muted" }, o.sub) : null),
+    el("span", { class: "clink-t" }, el("b", null, typeof o.title === "string" ? el("bdi", { dir: "auto" }, o.title) : o.title), o.sub ? el("small", { class: "muted" }, o.sub) : null),
     o.badge != null ? el("span", { class: "badge" + (o.badgeCls ? " " + o.badgeCls : "") }, o.badge) : null,
     icon("next", "chev"));
   b.addEventListener("click", o.on);
@@ -801,6 +1550,13 @@ var UI = {
   },
   setSync(mode) { const d = $("#syncDot"); if (!d) return; d.className = "sync " + mode; d.title = mode === "cloud" ? "يُحفظ تقدّمك تلقائيًا في حسابك (متزامن بين أجهزتك)" : "يُحفظ تقدّمك تلقائيًا على هذا الجهاز"; },
   refreshAI() { if (this.cur && (this.cur.name === "tutor" || this.cur.name === "home")) this.refresh(); },
+  refreshAudio() { if (this.cur && this.cur.name === "settings") this.refresh(); },
+  xpFloat(n) {
+    if (this._xpT && Date.now() - this._xpT < 350) { this._xpN = (this._xpN || 0) + n; if (this._xpEl) this._xpEl.textContent = "+" + this._xpN + " XP"; return; }
+    this._xpT = Date.now(); this._xpN = n;
+    const f = el("div", { class: "xpf", "aria-hidden": "true" }, "+" + n + " XP"); this._xpEl = f;
+    document.body.appendChild(f); setTimeout(() => f.remove(), 1300);
+  },
   toast(msg, ic = "check") {
     const t = el("div", { class: "toast" }, icon(ic), el("span", null, msg));
     $("#toasts").appendChild(t);
@@ -845,7 +1601,7 @@ const Overlay = {
 function ovHeader(title, sub, o = {}) {
   return el("div", { class: "ov-h" },
     el("button", { class: "icon-btn", type: "button", "aria-label": "إغلاق", onclick: () => { if (o.onX) o.onX(); else Overlay.close(); } }, icon("x")),
-    el("div", { class: "ov-t" }, el("b", null, title instanceof Node ? title : String(title)), sub ? el("small", { class: "muted" }, sub) : null),
+    el("div", { class: "ov-t" }, el("b", null, title instanceof Node ? title : el("bdi", { dir: "auto" }, String(title))), sub ? el("small", { class: "muted" }, typeof sub === "string" ? el("bdi", { dir: "auto" }, sub) : sub) : null),
     o.right || el("span", { class: "sp" }));
 }
 
@@ -977,7 +1733,7 @@ R.gap = (x, ctx) => {
         if (!r.ok) { allOk = false; if (x.wrong) { const k = Object.keys(x.wrong).find((kk) => canon(kk) === canon(inp.value)); if (k) wr = x.wrong[k]; } }
         if (r.note) notes.push(r.note);
       });
-      return { ok: allOk, user: inputs.map((z) => z.value || "—").join(" / "), correct: x.a.map((a) => [].concat(a)[0]).join(" / "), why: wr || x.why, note: notes[0], full: x.s.split("___").reduce((acc, p, i) => acc + (i ? [].concat(x.a[i - 1])[0] : "") + p, "") };
+      return { ok: allOk, user: inputs.map((z) => z.value || "—").join(" / "), correct: x.a.map((a) => [].concat(a)[0]).join(" / "), why: wr || x.why, note: notes[0], full: x.s.split("___").reduce((acc, p, i) => acc + (i ? [].concat(x.a[i - 1])[0] : "") + p, "").replace(/\s*\([^)]*\)/g, "").trim() };
     }
   };
 };
@@ -1132,7 +1888,7 @@ R.vart = (x, ctx) => {
   setTimeout(() => TTS.speak(w.w), 250);
   return {
     auto: true,
-    node: el("div", { class: "it" }, el("p", { class: "q" }, "ما أداة هذا الاسم؟"), el("div", { class: "row center" }, el("div", { class: "bigword" }, deSpan(w.w)), playBtn(w.w)), el("p", { class: "muted center" }, w.ar), el("div", { class: "artrow" }, bs)),
+    node: el("div", { class: "it" }, el("p", { class: "q" }, "ما أداة هذا الاسم؟"), el("div", { class: "row center" }, el("div", { class: "bigword" }, deSpan(w.w)), playBtn(w.w)), el("p", { class: "muted center" }, picOf(w) ? el("span", { class: "pic" }, picOf(w) + " ") : null, w.ar), el("div", { class: "artrow" }, bs)),
     key(e) { const k = { "1": 0, "2": 1, "3": 2 }[e.key]; if (k != null) bs[k].click(); },
     check() {
       const ok = chosen === w.art;
@@ -1172,23 +1928,46 @@ function renderLabel(label) {
   return deSpan(label);
 }
 
+/* which recorded-audio pack an item lives in */
+function audioPackOf(x) {
+  if (!x) return null;
+  if (x.unit) return x.unit;
+  if (x.w && x.w.unit) return x.w.unit;
+  const id = String(x.id || "");
+  if (/^P\d+:/.test(id)) return id.slice(1).split(":")[0];
+  if (/^(X|snd:)/.test(id)) return "x";
+  return null;
+}
 /* ---------- session runner ---------- */
 const Session = {
   start(o) {
     const items = (o.items || []).filter(Boolean);
     if (!items.length) { UI.toast("لا توجد عناصر للتدريب هنا بعد", "info"); return; }
+    Rec.prefetch(items.map(audioPackOf));
     const st = { i: 0, score: 0, results: [], t0: Date.now() };
     const wrap = el("div", { class: "session" });
     const prog = bar(0, "thin");
     const counter = el("small", { class: "muted" });
-    const head = ovHeader(o.title || "تمرين", o.sub, { right: counter, onX: async () => { if (st.i > 0 && st.i < items.length && !(await UI.confirm("إنهاء التمرين؟", "سيُحفظ ما أنجزته حتى الآن.", "إنهاء"))) return; finish(true); } });
+    const timerEl = o.timeLimit ? el("span", { class: "chip timer", dir: "ltr" }) : null;
+    let tId = null;
+    const head = ovHeader(o.title || "تمرين", o.sub, { right: timerEl ? el("span", { class: "row" }, timerEl, counter) : counter, onX: async () => { if (st.i > 0 && st.i < items.length && !(await UI.confirm("إنهاء التمرين؟", "سيُحفظ ما أنجزته حتى الآن.", "إنهاء"))) return; finish(true); } });
     const body = el("div", { class: "s-body" });
     const fb = el("div", { class: "fb", hidden: true, "aria-live": "polite" });
     const checkB = btn("تحقّق", { kind: "primary", cls: "wide", disabled: true });
     const skipB = btn("لا أعرف", { kind: "ghost" });
     const foot = el("div", { class: "s-foot" }, skipB, checkB);
     wrap.append(head, prog, body, fb, foot);
-    Overlay.open(wrap, () => { document.removeEventListener("keydown", onKey); });
+    Overlay.open(wrap, () => { document.removeEventListener("keydown", onKey); clearInterval(tId); });
+    if (o.timeLimit) {
+      const end = Date.now() + o.timeLimit * 1000;
+      const tick = () => {
+        const left = Math.max(0, Math.round((end - Date.now()) / 1000));
+        timerEl.textContent = "⏱ " + Math.floor(left / 60) + ":" + pad2(left % 60);
+        timerEl.classList.toggle("low", left <= 60);
+        if (left <= 0) { clearInterval(tId); UI.toast("انتهى الوقت!", "warn"); finish(false, true); }
+      };
+      tick(); tId = setInterval(tick, 1000);
+    }
     let cur = null, ctx = null, phase = "answer";
     const show = () => {
       phase = "answer"; fb.hidden = true; clear(fb);
@@ -1211,9 +1990,13 @@ const Session = {
       const x = items[st.i];
       const frac = res.frac != null ? res.frac : res.ok ? 1 : 0;
       st.score += frac; st.results.push({ x, res });
+      if (!res.ok && res.user && S.accepted && x.id && (S.accepted[x.id] || []).some((a) => canon(a) === canon(res.user))) { res.ok = true; res.frac = 1; res.note = "قُبلت هذه الإجابة لأنك أبلغت سابقًا أنها صحيحة."; st.score += 1 - frac; }
       if (!res.recorded) recordAnswer(x, res.ok, { wid: x.wid });
       if (res.aiTags && !res.ok) res.aiTags.forEach((t) => { if (C.tags[t]) recordAnswer({ tag: t }, false); });
+      if (o.exam) { phase = "feedback"; TTS.stop(); next(); return; }
       showFb(res, x);
+      const say = res.full || (["order", "tr"].includes(x.t) && isLatin(res.correct) ? res.correct : null);
+      if (say && S.settings.autoSay !== false) setTimeout(() => TTS.speak(say), 250);
       phase = "feedback";
       checkB.hidden = false; checkB.disabled = false; checkB.lastChild.textContent = st.i + 1 < items.length ? "التالي" : "النتيجة";
       checkB.focus({ preventScroll: true });
@@ -1222,13 +2005,14 @@ const Session = {
       clear(fb); fb.hidden = false; fb.className = "fb " + (res.ok ? "ok" : "no");
       fb.appendChild(el("div", { class: "fb-h" }, icon(res.ok ? "check" : "x"), el("b", null, res.ok ? pick(["أحسنت!", "ممتاز!", "صحيح!", "رائع!", "Sehr gut!"]) : pick(["ليس تمامًا", "انتبه", "خطأ صغير", "حاول أن تتذكّر"]))));
       if (!res.ok && res.user && x.t !== "read" && x.t !== "match") fb.appendChild(el("div", { class: "fb-r" }, el("span", { class: "muted" }, "إجابتك: "), isLatin(res.user) ? deSpan(res.user) : el("span", null, res.user)));
-      if (res.correct && (!res.ok || res.note || x.t === "vart")) fb.appendChild(el("div", { class: "fb-r" }, el("span", { class: "muted" }, res.ok ? "الصحيح: " : "الإجابة الصحيحة: "), isLatin(res.correct) ? renderLabel(res.correct) : el("span", { html: fmt(res.correct) })));
+      if (res.correct && (!res.ok || res.note || x.t === "vart")) fb.appendChild(el("div", { class: "fb-r" }, el("span", { class: "muted" }, res.ok ? "الصحيح: " : "الإجابة الصحيحة: "), isLatin(res.correct) ? renderLabel(res.correct) : el("span", { html: fmt(res.correct) }), isLatin(res.correct) && !res.full && !/ · | \/ /.test(res.correct) ? playBtn(res.correct, { small: true }) : null));
       if (res.full && !res.ok) fb.appendChild(el("div", { class: "fb-r" }, el("span", { class: "muted" }, "الجملة: "), deSpan(res.full), playBtn(res.full, { small: true })));
       if (res.diff && !res.ok) { const d = el("div", { class: "diff", dir: "ltr", lang: "de" }); res.diff.forEach((p) => d.appendChild(el("span", { class: p.ok ? "dw ok" : "dw no" }, p.w + " "))); fb.appendChild(d); }
       if (res.note) fb.appendChild(el("p", { class: "fb-note" }, icon("info"), el("span", null, res.note)));
       if (res.why) fb.appendChild(el("p", { class: "fb-why", html: fmt(res.why) }));
       if (res.natural && res.ai) fb.appendChild(el("p", { class: "fb-why" }, el("span", { class: "muted" }, "صياغة طبيعية: "), deSpan(res.natural)));
       if (res.transcript) fb.appendChild(el("div", { class: "fb-r" }, el("span", { class: "muted" }, "النص المسموع: "), deSpan(res.transcript), playBtn(res.transcript, { small: true })));
+      fb.appendChild(el("button", { class: "linkbtn rep", type: "button", onclick: () => reportIssue({ where: "session:" + (o.title || ""), id: x.id, item: x, text: x.s ? fillPH(x.s) : x.say || x.q || (x.w && wordLabel(x.w)) || "", user: typeof res.user === "string" ? res.user : null, correct: typeof res.correct === "string" ? res.correct : null, kind: res.ok ? "content" : "answer" }) }, icon("flag"), " أبلغ عن خطأ في هذا السؤال"));
       if (!res.ok && AI.available()) {
         const out = el("div", { class: "ai-out", hidden: true });
         const ab = btn("لماذا؟ اسأل المدرّس الذكي", { kind: "ghost", icon: "sparkle", cls: "sm" });
@@ -1241,11 +2025,14 @@ const Session = {
       }
     };
     const next = () => { st.i++; if (st.i >= items.length) finish(false); else show(); };
-    const finish = (aborted) => {
-      document.removeEventListener("keydown", onKey);
-      const n = st.results.length; const pct = n ? Math.round(st.score / n * 100) : 0;
-      if (!n) { Overlay.close(); return; }
-      if (o.onFinish) o.onFinish({ pct, n, total: items.length, results: st.results, aborted });
+    let finished = false;
+    const finish = (aborted, timeout) => {
+      if (finished) return; finished = true;
+      document.removeEventListener("keydown", onKey); clearInterval(tId); TTS.stop();
+      const n = st.results.length; const pct = o.exam ? Math.round(st.score / items.length * 100) : n ? Math.round(st.score / n * 100) : 0;
+      if (!n && !o.exam) { Overlay.close(); return; }
+      if (o.onFinish) o.onFinish({ pct, n, total: items.length, results: st.results, aborted, timeout, score: st.score });
+      if (o.silentFinish) return;
       clear(wrap);
       const wrong = st.results.filter((r) => !r.res.ok);
       const msg = pct >= 90 ? "ممتاز! أنت تتقن هذا." : pct >= 70 ? "جيد جدًا! واصل هكذا." : pct >= 50 ? "بداية جيدة — راجع الأخطاء أدناه." : "لا بأس، التعلّم يحتاج تكرارًا. راجع الشرح ثم أعد المحاولة.";
@@ -1253,12 +2040,12 @@ const Session = {
         el("div", { class: "result" },
           ring(pct / 100, 120, 10, pct + "%"),
           el("h2", null, msg),
-          el("p", { class: "muted" }, Math.round(st.score) + " من " + n + " إجابة صحيحة · " + fmtMin((Date.now() - st.t0) / 1000)),
+          el("p", { class: "muted" }, Math.round(st.score) + " من " + (o.exam ? items.length : n) + " إجابة صحيحة · " + fmtMin((Date.now() - st.t0) / 1000)),
           o.passMark ? el("p", { class: pct >= o.passMark ? "pass" : "fail" }, pct >= o.passMark ? "نجحت في الاختبار ✓" : "تحتاج " + o.passMark + "% للنجاح — حاول مرة أخرى بعد المراجعة.") : null),
         wrong.length ? el("div", { class: "mistakes" }, el("h3", null, "أخطاؤك وتصحيحها"), wrong.map((r) => mistakeRow(r))) : null,
         el("div", { class: "s-foot sticky" },
           wrong.length ? btn("أعد الأخطاء (" + wrong.length + ")", { kind: "ghost", icon: "review", on: () => { Overlay.close(); setTimeout(() => Session.start({ title: "تصحيح الأخطاء", items: wrong.map((r) => r.x.gen ? getItem(r.x.id) : r.x), onFinish: o.onRetryFinish }), 50); } }) : null,
-          btn("إنهاء", { kind: "primary", cls: "wide", on: () => Overlay.close() })));
+          o.next ? btn(o.next.label, { kind: "primary", cls: "wide", icon: "next", on: () => { Overlay.close(); setTimeout(o.next.on, 60); } }) : btn("إنهاء", { kind: "primary", cls: "wide", on: () => Overlay.close() })));
       wrap.scrollTop = 0;
       UI.tick();
     };
@@ -1317,6 +2104,7 @@ const Flash = {
         el("div", { class: "fc-word" }, w.t === "n" && w.art ? el("span", { class: ART_CLASS[w.art] || "" }, w.art + " ") : null, deSpan(w.w)),
         el("div", { class: "row center" }, playBtn(wordLabel(w)), playBtn(wordLabel(w), { slow: true })),
         el("div", { class: "fc-back", hidden: true },
+          picOf(w) ? el("div", { class: "fc-pic", "aria-hidden": "true" }, picOf(w)) : null,
           el("div", { class: "fc-ar" }, w.ar),
           w.pl && w.pl !== w.w ? el("div", { class: "fc-pl" }, "الجمع: ", deSpan("die " + w.pl)) : w.p === "Sg." ? el("div", { class: "fc-pl muted" }, "بدون جمع") : w.t !== "n" && w.p ? el("div", { class: "fc-pl" }, deSpan(w.p)) : null,
           w.ex ? el("div", { class: "fc-ex" }, el("div", { class: "row" }, deSpan(w.ex), playBtn(w.ex, { small: true })), el("small", { class: "muted" }, w.exAr)) : null));
@@ -1365,17 +2153,17 @@ const Dialog = {
     wrap.append(ovHeader(D.title ? deSpan(D.title) : "حوار", MODES[mode] + " · " + D.ar, { right: el("span", { class: "chip" }, MODES[mode]) }),
       el("div", { class: "scene" }, icon("info"), el("span", null, D.scene)), log, panel);
     Overlay.open(wrap);
-    const pitch = (s) => (s === "B" ? 1.18 : 0.98);
+    const vo = (s) => AudioKey.voiceOfName(D.who && D.who[s]);
     const addPartner = (ln) => {
       const tr = el("div", { class: "b-tr", hidden: true }, ln.ar || "");
       const b = el("div", { class: "bub them" },
         el("small", { class: "who" }, (D.who && D.who[ln.s]) || "Partner"),
         el("div", { class: "b-de" }, deSpan(ln.de)),
         tr,
-        el("div", { class: "b-tools" }, playBtn(ln.de, { small: true }), el("button", { class: "icon-btn sm", type: "button", "aria-label": "الترجمة", title: "الترجمة", onclick: () => (tr.hidden = !tr.hidden) }, icon("globe"))));
-      log.appendChild(b); st.transcript.push({ text: ln.de, pitch: pitch(ln.s) });
+        el("div", { class: "b-tools" }, playBtn(ln.de, { small: true, voice: vo(ln.s) }), el("button", { class: "icon-btn sm", type: "button", "aria-label": "الترجمة", title: "الترجمة", onclick: () => (tr.hidden = !tr.hidden) }, icon("globe"))));
+      log.appendChild(b); st.transcript.push({ text: ln.de, voice: vo(ln.s) });
       b.scrollIntoView({ block: "end", behavior: "smooth" });
-      return TTS.speak(ln.de, { pitch: pitch(ln.s) });
+      return TTS.speak(ln.de, { voice: vo(ln.s) });
     };
     const addMine = (text, ok) => {
       const b = el("div", { class: "bub me " + (ok ? "ok" : "no") }, el("small", { class: "who" }, "أنت"), el("div", { class: "b-de" }, deSpan(text)), el("span", { class: "b-st" }, icon(ok ? "check" : "x")));
@@ -1466,13 +2254,14 @@ const Dialog = {
         }
       };
       input();
-      st.transcript.push({ text: model, pitch: 1.05 });
+      st.transcript.push({ text: model, voice: "m" });
       panel.scrollIntoView({ block: "end" });
     };
     const end = () => {
       const pct = userTurns ? Math.round(st.good / userTurns * 100) : 100;
       const d = S.dlg[u.id] || { n: 0, best: 0 };
       d.n = (d.n || 0) + 1; d.best = Math.max(d.best || 0, pct); d.mode = mode; d.lastScore = pct; d.ts = Date.now(); S.dlg[u.id] = d;
+      Game.hook("dialog", { pct });
       markStep(u.id, "d", { score: Math.max(pct, (unitP(u.id).d && unitP(u.id).d.score) || 0), mode });
       clear(panel);
       const nextMode = MODE_ORDER[Math.min(2, MODE_ORDER.indexOf(mode) + 1)];
@@ -1490,7 +2279,7 @@ const Dialog = {
     step();
   }
 };
-function dialogScript(D) { return D.lines.map((l) => ({ text: l.s === "U" ? fillPH(l.m) : l.de, pitch: l.s === "U" ? 1.05 : l.s === "B" ? 1.18 : 0.98 })); }
+function dialogScript(D) { return D.lines.map((l) => ({ text: l.s === "U" ? fillPH(l.m) : l.de, voice: l.s === "U" ? "m" : AudioKey.voiceOfName(D.who && D.who[l.s]) })); }
 
 /* ---------- pronunciation practice ---------- */
 const Pron = {
@@ -1516,8 +2305,43 @@ const Pron = {
   row(text, id, onPractice) {
     const res = el("div", { class: "pr-res", hidden: true });
     const mic = el("button", { class: "icon-btn mic", type: "button", "aria-label": "سجّل نطقك", title: "سجّل نطقك" }, icon("mic"));
-    const rec = (ok, score) => { recordAnswer({ id: null, tag: "sprechen" }, ok); onPractice && onPractice(); };
-    mic.onclick = () => {
+    const rec = (ok, score) => { recordAnswer({ id: null, tag: "sprechen" }, ok); Game.hook("pron"); onPractice && onPractice(); };
+    let stopRec = null;
+    const pro = async () => {
+      if (stopRec) { stopRec(); return; }
+      TTS.stop();
+      const lvl = el("i");
+      res.hidden = false; clear(res).append(el("p", { class: "muted thinking" }, icon("mic"), el("span", null, "تكلّم الآن… (اضغط الميكروفون مرة أخرى عند الانتهاء)")), el("div", { class: "lvmeter" }, lvl));
+      mic.classList.add("rec");
+      let r;
+      try { r = await MicRec.record({ onStop: (f) => (stopRec = f), onLevel: (v) => (lvl.style.width = Math.round(v * 100) + "%") }); }
+      catch (e) { stopRec = null; mic.classList.remove("rec"); if (e && e.name === "NotAllowedError") showSelf("لم يُسمح بالميكروفون. اسمح به من إعدادات الموقع في Chrome، أو قيّم نفسك:"); else basic(); return; }
+      stopRec = null; mic.classList.remove("rec");
+      if (!r.speech) { clear(res).appendChild(el("p", { class: "muted" }, "لم أسمع صوتك. اقترب من الميكروفون واضغط مرة أخرى.")); return; }
+      const mine = URL.createObjectURL(r.wav);
+      clear(res).appendChild(el("p", { class: "muted thinking" }, icon("sparkle"), el("span", null, "جارٍ تحليل نطقك (" + ProEval.label() + ")…")));
+      let a;
+      try { a = await ProEval.assess(r.wav, fillPH(text)); }
+      catch (e) {
+        clear(res).append(el("p", { class: "muted sm" }, e.code === "bad_key" ? "المفتاح غير صالح — راجع الإعدادات." : e.code === "rate_limited" ? "تجاوزت حد الاستعمال مؤقتًا. انتظر دقيقة." : "تعذّر التحليل الآن (الإنترنت؟)."), el("div", { class: "row" }, btn("استمع لتسجيلك", { kind: "ghost", cls: "sm", icon: "play", on: () => new Audio(mine).play() })));
+        showSelfAppend(); return;
+      }
+      const pct = clamp(Math.round(+a.score || 0), 0, 100);
+      const d = el("div", { class: "diff", dir: "ltr", lang: "de" });
+      (a.words && a.words.length ? a.words : fillPH(text).split(/\s+/).map((w) => ({ w, score: pct }))).forEach((w) => {
+        const sc = +w.score || 0, cls = w.err === "Omission" ? "dw no om" : sc >= 80 ? "dw ok" : sc >= 60 ? "dw mid" : "dw no";
+        d.appendChild(el("span", { class: cls, title: sc + "%" }, w.w + " "));
+      });
+      const sub = (lab, v) => (v != null && !isNaN(+v) ? el("span", { class: "chip" }, lab + " " + Math.round(+v) + "%") : null);
+      res.append(el("div", { class: "row wrap" }, el("b", { class: "big-score " + (pct >= 85 ? "t-ok" : pct >= 65 ? "t-mid" : "t-no") }, pct + "%"), el("span", null, pct >= 85 ? "نطق ممتاز!" : pct >= 65 ? "جيد — حسّن الكلمات الملوّنة." : "تدرّب ببطء ثم أعد المحاولة."),
+        sub("الدقة", a.acc), sub("الطلاقة", a.flu), sub("الاكتمال", a.comp)),
+        a.heard ? el("p", { class: "muted sm" }, "سمعتُ: ", deSpan(a.heard)) : null, d,
+        a.tips && a.tips.length ? el("ul", { class: "tips" }, a.tips.slice(0, 3).map((t) => el("li", { html: fmt(String(t)) }))) : tipsFor((a.words || []).filter((w) => (+w.score || 0) < 70).map((w) => w.w)),
+        el("div", { class: "row wrap" }, btn("تسجيلك", { kind: "ghost", cls: "sm", icon: "play", on: () => { TTS.stop(); new Audio(mine).play(); } }), btn("النموذج", { kind: "ghost", cls: "sm", icon: "volume", on: () => TTS.speak(text) }), btn("ببطء", { kind: "ghost", cls: "sm", icon: "turtle", on: () => TTS.speak(text, { slow: true }) })));
+      rec(pct >= 75, pct);
+    };
+    mic.onclick = () => { if (ProEval.available()) pro(); else basic(); };
+    const basic = () => {
       if (!SR.available()) { showSelf("التعرّف على الصوت غير متاح هنا. استمع، كرّر بصوت عالٍ، ثم قيّم نفسك:"); return; }
       res.hidden = false; clear(res).appendChild(el("p", { class: "muted thinking" }, icon("mic"), el("span", null, "تكلّم الآن…")));
       mic.classList.add("rec");
@@ -1540,6 +2364,7 @@ const Pron = {
       });
       setTimeout(() => { if (settled) return; settled = true; try { recog && recog.abort(); } catch (e) { } mic.classList.remove("rec"); showSelf("لم يصل أي صوت من الميكروفون. تحقّق من الإذن أو قيّم نفسك:"); }, 10000);
     };
+    const showSelfAppend = () => res.appendChild(el("div", { class: "row" }, btn("نطقتها جيدًا", { kind: "good", cls: "sm", on: () => { rec(true); clear(res).appendChild(el("p", { class: "t-ok" }, "رائع! واصل.")); } }), btn("أحتاج تدريبًا", { kind: "ghost", cls: "sm", on: () => { rec(false); TTS.speak(text, { slow: true }); } })));
     const showSelf = (msg) => {
       res.hidden = false; clear(res).append(el("p", { class: "muted sm" }, msg),
         el("div", { class: "row" }, btn("نطقتها جيدًا", { kind: "good", cls: "sm", on: () => { rec(true); clear(res).appendChild(el("p", { class: "t-ok" }, "رائع! واصل.")); } }), btn("أحتاج تدريبًا", { kind: "ghost", cls: "sm", on: () => { rec(false); TTS.speak(text, { slow: true }); clear(res).appendChild(el("p", { class: "muted" }, "استمع ببطء وكرّر مقطعًا مقطعًا.")); } })));
@@ -1565,7 +2390,7 @@ function tipsFor(words) {
 /* ---------- AI tutor chat ---------- */
 const Tutor = {
   chat(sc) {
-    if (!AI.available()) { UI.toast("المدرّس الذكي غير متاح في هذه النسخة", "warn"); return; }
+    if (!AI.available()) { UI.toast(HAS_CLAUDE ? "المدرّس الذكي غير متاح الآن" : "فعّل المدرّس الذكي من الإعدادات (مفتاح Gemini مجاني)", "warn"); return; }
     const turns = [{ role: "assistant", content: sc.start }];
     const wrap = el("div", { class: "session dlg chat" });
     const logEl = el("div", { class: "dlg-log" });
@@ -1577,11 +2402,12 @@ const Tutor = {
     wrap.append(ovHeader(sc.title, sc.ar + " · محادثة حرة", { right: el("span", { class: "chip ai" }, icon("sparkle"), "AI") }),
       el("div", { class: "scene" }, icon("info"), el("span", null, "المدرّس يلعب دور: " + sc.ar + ". تكلّم معه بالألمانية؛ سيرد بمستواك ويصحّح أخطاءك بالعربية.")), logEl, panel);
     Overlay.open(wrap);
+    const tv = AudioKey.voiceOfRole(sc.role);
     const tutorBubble = (de, ar) => {
       const tr = el("div", { class: "b-tr", hidden: true }, ar || "");
       const b = el("div", { class: "bub them" }, el("small", { class: "who" }, "المدرّس"), el("div", { class: "b-de" }, deSpan(de)), tr,
-        el("div", { class: "b-tools" }, playBtn(de, { small: true }), ar ? el("button", { class: "icon-btn sm", type: "button", "aria-label": "الترجمة", onclick: () => (tr.hidden = !tr.hidden) }, icon("globe")) : null));
-      logEl.appendChild(b); b.scrollIntoView({ block: "end", behavior: "smooth" }); TTS.speak(de);
+        el("div", { class: "b-tools" }, playBtn(de, { small: true, voice: tv }), ar ? el("button", { class: "icon-btn sm", type: "button", "aria-label": "الترجمة", onclick: () => (tr.hidden = !tr.hidden) }, icon("globe")) : null));
+      logEl.appendChild(b); b.scrollIntoView({ block: "end", behavior: "smooth" }); TTS.speak(de, { voice: tv });
     };
     tutorBubble(sc.start, "");
     send.onclick = async () => {
@@ -1613,7 +2439,7 @@ const Tutor = {
     setTimeout(() => inp.focus({ preventScroll: true }), 200);
   },
   ask(prefill) {
-    if (!AI.available()) { UI.toast("المدرّس الذكي غير متاح في هذه النسخة", "warn"); return; }
+    if (!AI.available()) { UI.toast(HAS_CLAUDE ? "المدرّس الذكي غير متاح الآن" : "فعّل المدرّس الذكي من الإعدادات (مفتاح Gemini مجاني)", "warn"); return; }
     const q = el("textarea", { class: "inp", rows: 3, placeholder: "اكتب سؤالك بالعربية… مثال: متى أستعمل nicht ومتى kein؟", id: "askQ" });
     if (prefill) q.value = prefill;
     const out = el("div", { class: "ai-out big" });
@@ -1676,7 +2502,7 @@ const Writing = {
         el("details", { class: "box" }, el("summary", null, "قائمة التحقق — راجع نصك بنفسك"), checks),
         out, model,
         el("div", { class: "row wrap end" }, btn("اعرض النص النموذجي", { kind: "ghost", icon: "eye", on: () => (model.hidden = !model.hidden) }), aiB, doneB),
-        !AI.available() ? el("p", { class: "muted sm" }, "التصحيح الذكي متاح عندما تفتح التطبيق داخل Claude. هنا يمكنك المقارنة مع النص النموذجي وقائمة التحقق.") : null));
+        !AI.available() ? el("p", { class: "muted sm" }, HAS_CLAUDE ? "التصحيح الذكي غير متاح الآن. قارن نصك مع النص النموذجي وقائمة التحقق." : "للتصحيح الذكي لنصّك اربط مفتاح Gemini المجاني من الإعدادات ← المدرّس الذكي. الآن قارن مع النص النموذجي وقائمة التحقق.") : null));
     Overlay.open(wrap);
   }
 };
@@ -1765,6 +2591,7 @@ VIEWS.home = () => {
     tile("review", dueMistakes().length, "أخطاء للتصحيح"),
     tile("check", L.x ? Math.round(L.k / L.x * 100) + "%" : "—", "دقّة اليوم")));
 
+  root.appendChild(levelCard());
   if (u) root.appendChild(fahrplan(u));
 
   const last = S.progress.last && UNIT[S.progress.last.unit];
@@ -1775,7 +2602,7 @@ VIEWS.home = () => {
   g.appendChild(cardLink({ icon: "ear", title: "الأصوات الألمانية الصعبة", sub: "ü ö ch r p w … للمتحدثين بالعربية", on: () => UI.go("sounds") }));
   root.appendChild(g);
 
-  root.appendChild(el("section", { class: "card" }, sectionTitle("هذا الأسبوع", "دقائق الدراسة يوميًا", el("button", { class: "linkbtn", type: "button", onclick: () => UI.go("stats", null, { root: true }) }, "كل الإحصاءات")), weekChart(7)));
+  root.appendChild(el("section", { class: "card" }, sectionTitle("هذا الأسبوع", "دقائق الدراسة يوميًا", el("button", { class: "linkbtn", type: "button", onclick: () => UI.go("stats", null, { root: true }) }, "كل الإحصاءات")), weekGoalCard(), weekChart(7)));
 
   const tipU = u || UNITS[UNITS.length - 1];
   const ph = tipU.phrases[rnd(tipU.phrases.length)];
@@ -1820,6 +2647,7 @@ function onboardingCard() {
       f("obLast", "اسم العائلة (للتهجئة)", p.last, { dir: "ltr" }),
       f("obCity", "مدينتك", p.city, { dir: "ltr" }),
       f("obTime", "موعد الدراسة اليومي", S.settings.studyTime, { attrs: { type: "time" } })),
+    el("p", { class: "muted sm" }, "تعرف بعض الألمانية؟ بعد الحفظ يمكنك إجراء «اختبار تحديد المستوى» من صفحة الدروس لتبدأ من الدرس المناسب."),
     el("div", { class: "row end" }, btn("حفظ وابدأ", { kind: "primary", icon: "check", on: () => {
       p.name = $("#obName").value.trim(); p.first = $("#obFirst").value.trim() || "Karim"; p.last = $("#obLast").value.trim(); p.city = $("#obCity").value.trim() || "Errachidia";
       S.settings.studyTime = $("#obTime").value || "19:00"; p.onboarded = true; save(); UI.refresh(); UI.toast("تم الحفظ — بالتوفيق!");
@@ -1856,15 +2684,27 @@ function barChart(data, labels) {
 /* ---------- COURSE ---------- */
 VIEWS.course = () => {
   const root = el("div", { class: "page" });
-  root.appendChild(el("header", { class: "ph-h" }, el("h1", null, "الدروس"), el("p", { class: "muted" }, "8 دروس مرتبة حسب كتاب DaF kompakt neu A1 — كل وحدة (A, B, C) جلسة يومية لساعة تقريبًا.")));
+  const levels = uniq(C.lessons.map((L) => L.level || "A1"));
+  root.appendChild(el("header", { class: "ph-h" }, el("h1", null, "الدروس"), el("p", { class: "muted" }, C.lessons.length + " درسًا: " + levels.map((lv) => lv + " (" + C.lessons.filter((L) => (L.level || "A1") === lv).length + ")").join(" · ") + " — كل وحدة (A, B, C) جلسة يومية لساعة تقريبًا.")));
+  root.appendChild(placementCard());
   const list = el("div", { class: "lessons" });
+  const from = (S.placement && S.placement.from) || 1;
+  let lastLevel = null;
   for (const L of C.lessons) {
+    const lv = L.level || "A1";
+    if (lv !== lastLevel) {
+      lastLevel = lv;
+      const ls = C.lessons.filter((x) => (x.level || "A1") === lv);
+      const done = ls.filter((x) => lessonDone(x.id)).length;
+      list.appendChild(el("div", { class: "lvl-h" }, el("b", null, "المستوى " + lv), el("small", { class: "muted" }, lv === "A1" ? "حسب كتاب DaF kompakt neu A1" : "منهج A2 (Goethe / ÖSD) — محتوى أصلي يكمل الكتاب"), el("span", { class: "chip" }, done + "/" + ls.length)));
+    }
     const pcts = L.units.map((u) => unitPct(u.id));
     const pct = pcts.reduce((a, b) => a + b, 0) / (pcts.length * 100);
-    const card = el("button", { class: "lesson-card" + (lessonDone(L.id) ? " done" : ""), type: "button" },
+    const skipped = +L.id < from && !lessonDone(L.id);
+    const card = el("button", { class: "lesson-card" + (lessonDone(L.id) ? " done" : "") + (skipped ? " skipped" : ""), type: "button" },
       el("span", { class: "l-num" }, L.id),
-      el("span", { class: "l-body" }, el("b", null, deSpan(L.de)), el("small", { class: "muted" }, L.ar), bar(pct),
-        el("span", { class: "l-units" }, L.units.map((u) => el("span", { class: "uchip" + (unitDone(u.id) ? " done" : unitPct(u.id) ? " half" : "") }, u.id.slice(1) + " ")))),
+      el("span", { class: "l-body" }, el("b", null, deSpan(L.de)), el("small", { class: "muted" }, L.ar + (skipped ? " · تجاوزته في اختبار المستوى" : "")), bar(pct),
+        el("span", { class: "l-units" }, L.units.map((u) => el("span", { class: "uchip" + (unitDone(u.id) ? " done" : unitPct(u.id) ? " half" : "") }, u.id.replace(/^\d+/, "") + " ")))),
       icon("next", "chev"));
     card.onclick = () => UI.go("lesson", { id: L.id });
     list.appendChild(card);
@@ -1880,6 +2720,7 @@ VIEWS.course = () => {
 /* ---------- LESSON ---------- */
 VIEWS.lesson = ({ id }) => {
   const L = LESSON[id]; const lp = lessonP(id);
+  Rec.prefetch(L.units[0].id);
   const root = el("div", { class: "page" });
   root.appendChild(el("header", { class: "ph-h lesson-h" }, el("span", { class: "l-num big" }, L.id), el("div", null, el("small", { class: "muted" }, "Lektion " + L.id + " · " + L.book), el("h1", null, deSpan(L.de)), el("p", { class: "lead" }, L.ar))));
   root.appendChild(el("section", { class: "card" }, el("h3", null, "ماذا ستتعلّم في هذا الدرس؟"), el("ul", { class: "goals" }, L.goals.map((g) => el("li", null, icon("check"), el("span", { html: fmt(g) }))))));
@@ -1890,7 +2731,7 @@ VIEWS.lesson = ({ id }) => {
   extra.appendChild(cardLink({ icon: "ear", title: "النطق: " + L.phon.de, sub: L.phon.ar, badge: lp.phon ? "✓" : null, on: () => UI.go("phon", { id }) }));
   L.write.forEach((w, k) => extra.appendChild(cardLink({ icon: "pencil", title: "مهمة كتابة " + (k + 1), sub: w.ar.slice(0, 90) + (w.ar.length > 90 ? "…" : ""), badge: lp.write && lp.write[k] && (lp.write[k].score != null ? lp.write[k].score + "/10" : lp.write[k].done ? "✓" : null), on: () => Writing.start(L, k) })));
   if (AI.available()) (L.tutor || []).forEach((t) => extra.appendChild(cardLink({ icon: "sparkle", title: "محادثة حرة: " + t.ar, sub: "تتحدث مع المدرّس الذكي في هذا الموقف", on: () => Tutor.chat(t) })));
-  extra.appendChild(cardLink({ icon: "flag", cls: "test", title: "اختبار الدرس " + L.id + " (20 سؤالًا)", sub: lp.test ? "أفضل نتيجة: " + lp.test.best + "% · آخر محاولة: " + lp.test.last + "%" : "يختبر كل وحدات الدرس — ركّز على نقاط ضعفك", badge: lp.test && lp.test.best >= 70 ? "✓" : null, on: () => Session.start({ title: "اختبار الدرس " + L.id, sub: deSpanText(L.de), items: lessonTest(L), passMark: 70, onFinish: (r) => { lp.test = { best: Math.max((lp.test && lp.test.best) || 0, r.pct), last: r.pct, ts: Date.now() }; save(); checkAchievements(); } }) }));
+  extra.appendChild(cardLink({ icon: "flag", cls: "test", title: "اختبار الدرس " + L.id + " (20 سؤالًا)", sub: lp.test ? "أفضل نتيجة: " + lp.test.best + "% · آخر محاولة: " + lp.test.last + "%" : "يختبر كل وحدات الدرس — ركّز على نقاط ضعفك", badge: lp.test && lp.test.best >= 70 ? "✓" : null, on: () => Session.start({ title: "اختبار الدرس " + L.id, sub: deSpanText(L.de), items: lessonTest(L), passMark: 70, onFinish: (r) => { const firstPass = r.pct >= 70 && !(lp.test && lp.test.best >= 70); lp.test = { best: Math.max((lp.test && lp.test.best) || 0, r.pct), last: r.pct, ts: Date.now() }; if (firstPass) Game.hook("lessonPass"); save(); checkAchievements(); } }) }));
   root.appendChild(extra);
   return root;
 };
@@ -1899,11 +2740,12 @@ function deSpanText(t) { return t; }
 /* ---------- UNIT ---------- */
 VIEWS.unit = ({ id, step }) => {
   const u = UNIT[id]; const L = LESSON[u.lesson];
+  Rec.prefetch([u.id, L.units[0].id]);
   const firstOpen = STEPS.find((s) => !stepDone(id, s.k));
   step = step || (firstOpen ? firstOpen.k : "g");
   const root = el("div", { class: "page unit" });
   root.appendChild(el("header", { class: "ph-h" },
-    el("button", { class: "crumb", type: "button", onclick: () => UI.go("lesson", { id: L.id }) }, "Lektion " + L.id + " · " + L.de),
+    el("button", { class: "crumb", type: "button", onclick: () => UI.go("lesson", { id: L.id }) }, el("bdi", { dir: "ltr" }, "Lektion " + L.id + " · " + L.de)),
     el("h1", null, el("span", { class: "u-id" }, u.id), " ", deSpan(u.de)), el("p", { class: "lead" }, u.ar), el("p", { class: "muted" }, u.summary)));
   const tabs = el("div", { class: "steps", role: "tablist" });
   STEPS.forEach((s, i) => {
@@ -1960,7 +2802,7 @@ function vocabRow(w) {
     el("button", { class: "w-main", type: "button", "aria-expanded": "false" },
       el("span", { class: "w-de" }, w.t === "n" && w.art ? el("span", { class: ART_CLASS[w.art] || "" }, w.art + " ") : null, deSpan(w.w),
         w.pl && w.pl !== w.w ? el("small", { class: "w-pl" }, deSpan(" · die " + w.pl)) : w.p === "Sg." ? el("small", { class: "w-pl muted" }, " · مفرد فقط") : w.p === "Pl." ? el("small", { class: "w-pl muted" }, " · جمع فقط") : (w.t === "v" || w.t === "c" || w.t === "p") && w.p ? el("small", { class: "w-pl" }, deSpan(" · " + w.p)) : null),
-      el("span", { class: "w-ar" }, w.ar)),
+      el("span", { class: "w-ar" }, picOf(w) ? el("span", { class: "pic", "aria-hidden": "true" }, picOf(w)) : null, w.ar)),
     playBtn(wordLabel(w), { small: true }));
   const wrap = el("div", { class: "witem" }, r, exRow);
   $(".w-main", r).onclick = () => { exRow.hidden = !exRow.hidden; $(".w-main", r).setAttribute("aria-expanded", String(!exRow.hidden)); if (!exRow.hidden) TTS.speak(w.ex); };
@@ -2052,6 +2894,7 @@ function unitQuizView(u) {
 /* ---------- PHONETICS (per lesson) ---------- */
 VIEWS.phon = ({ id }) => {
   const L = LESSON[id]; const P = L.phon;
+  Rec.prefetch(L.units[0].id);
   const root = el("div", { class: "page" });
   root.appendChild(el("header", { class: "ph-h" }, el("button", { class: "crumb", type: "button", onclick: () => UI.go("lesson", { id }) }, "Lektion " + id), el("h1", null, deSpan(P.de)), el("p", { class: "lead" }, P.ar)));
   const box = el("section", { class: "card" });
@@ -2064,11 +2907,228 @@ VIEWS.phon = ({ id }) => {
   return root;
 };
 
+/* ================= VIEWS (3): placement test, full timed mock exam, content reports ================= */
+
+/* ---------- placement test (adaptive by blocks of two lessons) ---------- */
+function placementItems(L, n) {
+  const ex = L.units.flatMap((u) => u.ex).filter((x) => (x.t === "mc" || x.t === "gap") && !/\{[A-Z]+\}/.test(x.s || ""));
+  const ls = L.units.flatMap((u) => u.listen).filter((x) => x.o && x.o.length >= 2);
+  const ws = L.units.flatMap((u) => u.words).filter((w) => w.t === "n" || w.t === "v");
+  const items = sample(ex, Math.max(1, n - 2)).concat(sample(ls, 1)).concat(sample(ws, 1).map((w) => genVocab(w, Math.random() < 0.5 ? "ar2de" : "de2ar")));
+  return items.filter(Boolean).slice(0, n).map((x) => Object.assign({}, x, { plLesson: L.id }));
+}
+const Placement = {
+  start() {
+    const lessons = C.lessons.map((L) => L);
+    const blocks = []; for (let i = 0; i < lessons.length; i += 2) blocks.push(lessons.slice(i, i + 2));
+    const scores = {}; let bi = 0;
+    const intro = el("div", { class: "session" });
+    intro.append(ovHeader("اختبار تحديد المستوى", "Einstufungstest"), el("div", { class: "s-body" }, el("div", { class: "result" },
+      icon("flag", "big"), el("h2", null, "أين تبدأ؟"),
+      el("p", { class: "muted" }, "أسئلة قصيرة من كل درس، من السهل إلى الصعب. يتوقّف الاختبار تلقائيًا عندما تصل إلى حدود مستواك. لا توجد إجابات تظهر أثناء الاختبار — أجب بما تعرفه، واضغط «لا أعرف» إن لم تعرف."),
+      el("p", { class: "muted sm" }, "المدة: 5 – 20 دقيقة (A1 ثم A2)."))),
+      el("div", { class: "s-foot sticky" }, btn("ابدأ الاختبار", { kind: "primary", cls: "wide", icon: "play", on: () => { Overlay.close(); setTimeout(runBlock, 60); } })));
+    Overlay.open(intro);
+    const runBlock = () => {
+      const blk = blocks[bi];
+      const items = shuffle(blk.flatMap((L) => placementItems(L, 4)));
+      Rec.prefetch(blk.map((L) => L.units[0].id));
+      Session.start({
+        title: "تحديد المستوى · " + (bi + 1) + "/" + blocks.length, sub: "الدروس " + blk.map((L) => L.id).join(" و"), items, exam: true, silentFinish: true,
+        onFinish: (r) => {
+          if (r.aborted) { setTimeout(() => Overlay.close(), 30); return; }
+          for (const L of blk) {
+            const mine = r.results.filter((z) => z.x.plLesson === L.id);
+            const tot = items.filter((x) => x.plLesson === L.id).length || 1;
+            scores[L.id] = Math.round(mine.reduce((a, z) => a + (z.res.frac != null ? z.res.frac : z.res.ok ? 1 : 0), 0) / tot * 100);
+          }
+          const blockPct = r.pct;
+          bi++;
+          setTimeout(() => { Overlay.close(); setTimeout(() => (blockPct >= 60 && bi < blocks.length ? runBlock() : this.result(scores)), 60); }, 30);
+        }
+      });
+    };
+  },
+  result(scores) {
+    const ids = C.lessons.map((L) => L.id);
+    let from = ids.find((id) => scores[id] == null || scores[id] < 67);
+    if (from == null) from = ids[ids.length - 1] + 1;
+    const level = from > 18 ? "A2 مكتمل — مستعدّ لـ B1" : from > 13 ? "A2.2" : from > 8 ? "A2.1 (أتقنت A1)" : from > 4 ? "A1.2" : from > 1 ? "A1.1 (متقدّم)" : "مبتدئ A1.1";
+    S.placement = { ts: Date.now(), from, scores, level }; save();
+    const wrap = el("div", { class: "session" });
+    const startL = LESSON[from];
+    wrap.append(ovHeader("نتيجة اختبار المستوى", null), el("div", { class: "s-body" },
+      el("div", { class: "result" }, icon("trophy", "big"), el("h2", null, "مستواك التقريبي: " + level),
+        el("p", { class: "muted" }, startL ? "ننصحك أن تبدأ من الدرس " + from + ": " : "أتقنت كل دروس هذا المستوى!", startL ? deSpan(startL.de) : null)),
+      el("div", { class: "skills" }, ids.filter((id) => scores[id] != null).map((id) => el("div", { class: "skill" }, el("span", null, "الدرس " + id), bar(scores[id] / 100, scores[id] >= 67 ? "good" : "bad"), el("small", { class: "muted" }, scores[id] + "%")))),
+      el("p", { class: "muted sm" }, "الدروس التي تجاوزتها تبقى مفتوحة، ويمكنك مراجعتها متى شئت. سيبدأ «درس اليوم» من الدرس المقترح.")),
+      el("div", { class: "s-foot sticky" },
+        btn("ابدأ من الدرس 1", { kind: "ghost", on: () => { S.placement.from = 1; save(); Overlay.close(); UI.go("home", null, { root: true }); } }),
+        btn(startL ? "ابدأ من الدرس " + from : "إلى الامتحان التجريبي", { kind: "primary", cls: "wide", icon: "play", on: () => { Overlay.close(); if (startL) UI.go("lesson", { id: from }); else UI.go("exam"); } })));
+    Overlay.open(wrap);
+  }
+};
+function placementCard() {
+  const p = S.placement;
+  return cardLink({ icon: "flag", title: p ? "اختبار المستوى: " + p.level : "اختبار تحديد المستوى", sub: p ? "تبدأ من الدرس " + p.from + " · أعد الاختبار في أي وقت" : "10 دقائق لمعرفة من أين تبدأ — مفيد إن كنت تعرف بعض الألمانية", on: () => Placement.start() });
+}
+
+/* ---------- full timed mock exam: Start Deutsch 1 ---------- */
+const Mock = {
+  start() {
+    const E = C.exam;
+    const H = E.parts.find((p) => p.id === "hoeren"), Le = E.parts.find((p) => p.id === "lesen"), W = E.parts.find((p) => p.id === "schreiben"), Sp = E.parts.find((p) => p.id === "sprechen");
+    const res = { ts: Date.now() };
+    const intro = el("div", { class: "session" });
+    intro.append(ovHeader("امتحان تجريبي كامل", "Modelltest Start Deutsch 1"), el("div", { class: "s-body" },
+      el("div", { class: "result" }, icon("flag", "big"), el("h2", null, "امتحان بالوقت مثل الحقيقي"),
+        el("p", { class: "muted" }, "أربعة أجزاء متتالية، لكل جزء 25 نقطة، والنجاح من 60/100. لا تظهر الإجابات إلا في النهاية.")),
+      el("ol", { class: "glist" }, el("li", null, el("b", null, "Hören"), " · الاستماع — 15 سؤالًا · 20 دقيقة"), el("li", null, el("b", null, "Lesen"), " · القراءة — 25 دقيقة"),
+        el("li", null, el("b", null, "Schreiben"), " · الكتابة: استمارة + رسالة قصيرة — 20 دقيقة"), el("li", null, el("b", null, "Sprechen"), " · المحادثة: تقديم نفسك، أسئلة وأجوبة، طلبات — تقييم ذاتي" + (AI.available() ? "" : ""))),
+      el("p", { class: "muted sm" }, "نصيحة: اجلس في مكان هادئ واستعمل السماعات. مدة الامتحان كاملة حوالي 75 دقيقة.")),
+      el("div", { class: "s-foot sticky" }, btn("ابدأ: الاستماع", { kind: "primary", cls: "wide", icon: "play", on: () => { Overlay.close(); setTimeout(hoeren, 60); } })));
+    Overlay.open(intro);
+    const A1U = UNITS.filter((u) => +u.lesson <= 8); // Start Deutsch 1 = A1 material only
+    Rec.prefetch(["x"].concat(A1U.slice(-9).map((u) => u.id)));
+    const sectionDone = (k, pct, nextFn, label) => { res[k] = clamp(Math.round(pct), 0, 100); setTimeout(() => { Overlay.close(); setTimeout(nextFn, 60); }, 30); };
+    const hoeren = () => {
+      const extra = sample(A1U.slice(9).flatMap((u) => u.listen).filter((x) => x.o && x.o.length >= 3), 15 - H.items.length);
+      Session.start({ title: "Hören · الاستماع", sub: "استمع مرتين على الأكثر ثم أجب", items: H.items.concat(extra), exam: true, silentFinish: true, timeLimit: 20 * 60, onFinish: (r) => { if (r.aborted) { setTimeout(() => Overlay.close(), 30); return; } sectionDone("h", r.pct, lesen); } });
+    };
+    const lesen = () => {
+      const extra = sample(A1U.slice(9).flatMap((u) => u.ex).filter((x) => x.t === "read"), 2);
+      Session.start({ title: "Lesen · القراءة", sub: "اقرأ النصوص وأجب", items: Le.items.concat(extra), exam: true, silentFinish: true, timeLimit: 25 * 60, onFinish: (r) => { if (r.aborted) { setTimeout(() => Overlay.close(), 30); return; } sectionDone("l", r.pct, schreiben); } });
+    };
+    const schreiben = () => {
+      const wrap = el("div", { class: "session" });
+      const timer = el("span", { class: "chip timer", dir: "ltr" });
+      const inputs = W.form.fields.map((f, i) => el("input", { class: "inp", id: "mf" + i, dir: "ltr", lang: "de", autocomplete: "off" }));
+      const ta = deInput({ area: true, ph: "اكتب رسالتك هنا (حوالي 30 كلمة)…" });
+      const wc = el("small", { class: "muted" }, "0 كلمة");
+      ta.addEventListener("input", () => { wc.textContent = (ta.value.trim().split(/\s+/).filter(Boolean).length) + " كلمة"; });
+      const end = Date.now() + 20 * 60 * 1000; let tId;
+      const fin = async () => {
+        clearInterval(tId);
+        let formOk = 0; W.form.fields.forEach((f, i) => { if (judge(inputs[i].value, f.a, { typo: true, ignoreCase: true }).ok) formOk++; });
+        let letter = 0, fb = null;
+        const text = ta.value.trim();
+        if (text && AI.available()) {
+          clear(foot).appendChild(el("p", { class: "muted thinking" }, icon("sparkle"), el("span", null, "المدرّس يصحّح رسالتك…")));
+          try { const r = await AI.correctWriting(W.letter, text); letter = clamp(+r.score || 0, 0, 10); fb = r; } catch (e) { fb = null; }
+        }
+        if (text && !fb) { // self assessment with the checklist
+          clear(wrap).append(ovHeader("Schreiben · تقييم ذاتي", "قارن رسالتك بقائمة التحقق"));
+          const checks = (W.letter.check || []).map((c) => { const i = el("input", { type: "checkbox" }); return { i, node: el("label", { class: "toggle" }, i, el("span", null, c)) }; });
+          wrap.append(el("div", { class: "s-body" }, el("div", { class: "read-t", dir: "ltr", lang: "de" }, text), el("p", { class: "muted" }, "ضع علامة على ما حقّقته رسالتك فعلًا:"), checks.map((c) => c.node),
+            el("details", { class: "box" }, el("summary", null, "نص نموذجي"), el("div", { class: "read-t", dir: "ltr", lang: "de", html: esc(fillPH(W.letter.model)).replace(/\n/g, "<br>") }))),
+            el("div", { class: "s-foot sticky" }, btn("التالي: المحادثة", { kind: "primary", cls: "wide", icon: "next", on: () => { const n = checks.filter((c) => c.i.checked).length; letter = Math.round(n / Math.max(1, checks.length) * 10); res.wDetail = { form: formOk, letter }; sectionDone("s", (formOk / W.form.fields.length * 5 + letter) / 15 * 100, sprechen); } })));
+          return;
+        }
+        res.wDetail = { form: formOk, letter, ai: !!fb };
+        sectionDone("s", (formOk / W.form.fields.length * 5 + letter) / 15 * 100, sprechen);
+      };
+      const foot = el("div", { class: "s-foot sticky" }, btn("سلّم الكتابة", { kind: "primary", cls: "wide", icon: "check", on: fin }));
+      wrap.append(ovHeader("Schreiben · الكتابة", "الجزء 1 والجزء 2", { right: timer }), el("div", { class: "s-body" },
+        el("h3", null, "الجزء 1: استمارة"), el("p", { class: "muted" }, W.form.ar), el("div", { class: "form2" }, W.form.fields.map((f, i) => el("label", { class: "fld" }, el("span", { dir: "ltr" }, f.label), inputs[i]))),
+        el("h3", null, "الجزء 2: رسالة قصيرة"), el("p", { class: "muted" }, W.letter.ar), el("p", { class: "muted sm" }, deSpan(W.letter.de)), ta, umlautBar(() => ta), wc), foot);
+      Overlay.open(wrap, () => clearInterval(tId));
+      const tick = () => { const left = Math.max(0, Math.round((end - Date.now()) / 1000)); timer.textContent = "⏱ " + Math.floor(left / 60) + ":" + pad2(left % 60); timer.classList.toggle("low", left <= 60); if (left <= 0) { UI.toast("انتهى وقت الكتابة", "warn"); fin(); } };
+      tick(); tId = setInterval(tick, 1000);
+    };
+    const sprechen = () => {
+      const wrap = el("div", { class: "session" });
+      const cards = sample(Sp.cards, 3), reqs = sample(Sp.requests, 3);
+      const rates = {};
+      const rater = (key) => {
+        const bs = [["✓ جيد", 2], ["جزئيًا", 1], ["✗ لم أستطع", 0]].map(([t, v]) => { const b = el("button", { class: "opt sm", type: "button" }, t); b.onclick = () => { rates[key] = v; bs.forEach((z) => z.classList.toggle("sel", z === b)); }; return b; });
+        return el("div", { class: "rq-b" }, bs);
+      };
+      const reveal = (nodes) => { const box = el("div", { class: "reveal", hidden: true }, nodes); const b = btn("اكشف النموذج", { kind: "ghost", cls: "sm", icon: "eye", on: () => { box.hidden = !box.hidden; } }); return [b, box]; };
+      wrap.append(ovHeader("Sprechen · المحادثة", "تكلّم بصوت عالٍ ثم قيّم نفسك بصدق"), el("div", { class: "s-body" },
+        el("h3", null, "الجزء 1: قدّم نفسك"), el("p", { class: "muted" }, Sp.intro.ar), el("div", { class: "keys", dir: "ltr" }, Sp.intro.keys.map((k) => el("span", { class: "key" }, k))),
+        ...reveal([el("div", { class: "row" }, deSpan(fillPH(Sp.intro.model)), playBtn(Sp.intro.model, { small: true }))]), rater("intro"),
+        el("h3", null, "الجزء 2: أسئلة وأجوبة"), el("p", { class: "muted" }, "لكل بطاقة: كوّن سؤالًا بالكلمة، ثم أجب عنه."),
+        cards.map((c, i) => el("div", { class: "box" }, el("small", { class: "muted" }, "Thema: " + c.theme), el("b", { dir: "ltr" }, " " + c.word), ...reveal([el("div", { class: "row" }, deSpan(c.q), playBtn(c.q, { small: true })), el("div", { class: "row" }, deSpan(c.a), playBtn(c.a, { small: true }))]), rater("c" + i))),
+        el("h3", null, "الجزء 3: اطلب شيئًا وردّ"), reqs.map((c, i) => el("div", { class: "box" }, el("b", { dir: "ltr" }, c.word), ...reveal([el("div", { class: "row" }, deSpan(c.a), playBtn(c.a, { small: true }))]), rater("r" + i)))),
+        el("div", { class: "s-foot sticky" }, btn("أنهِ الامتحان", { kind: "primary", cls: "wide", icon: "flag", on: () => {
+          const keys = ["intro"].concat(cards.map((c, i) => "c" + i), reqs.map((c, i) => "r" + i));
+          if (keys.some((k) => rates[k] == null)) { UI.toast("قيّم كل الأجزاء أولًا", "warn"); return; }
+          const w = { intro: 3 }; let got = 0, max = 0; keys.forEach((k) => { const m = w[k] || 1; got += rates[k] * m; max += 2 * m; });
+          res.sp = Math.round(got / max * 100);
+          Overlay.close(); setTimeout(() => this.finish(res), 60);
+        } })));
+      Overlay.open(wrap);
+    };
+  },
+  finish(r) {
+    const pts = (p) => Math.round((p || 0) / 4);
+    const total = pts(r.h) + pts(r.l) + pts(r.s) + pts(r.sp);
+    r.total = total;
+    S.mock = (S.mock || []).concat([r]).slice(-20); save(); Game.xp(60);
+    const pass = total >= 60;
+    const rows = [["Hören · الاستماع", r.h], ["Lesen · القراءة", r.l], ["Schreiben · الكتابة", r.s], ["Sprechen · المحادثة", r.sp]];
+    const weakest = rows.slice().sort((a, b) => a[1] - b[1])[0];
+    const wrap = el("div", { class: "session" });
+    wrap.append(ovHeader("نتيجة الامتحان التجريبي", null), el("div", { class: "s-body" },
+      el("div", { class: "result" }, ring(total / 100, 120, 10, total + "/100"), el("h2", null, pass ? "ناجح! Bestanden" : "غير ناجح بعد — Nicht bestanden"), el("p", { class: pass ? "pass" : "fail" }, pass ? "مستواك مناسب لامتحان Start Deutsch 1." : "تحتاج 60 نقطة. ركّز على: " + weakest[0])),
+      el("div", { class: "skills" }, rows.map(([t, p]) => el("div", { class: "skill" }, el("span", null, t), bar((p || 0) / 100, p >= 60 ? "good" : "bad"), el("small", { class: "muted" }, pts(p) + "/25")))),
+      el("p", { class: "muted sm" }, "الاستماع والقراءة: تصحيح آلي. الكتابة: " + (r.wDetail && r.wDetail.ai ? "تصحيح المدرّس الذكي" : "تصحيح آلي للاستمارة وتقييم ذاتي للرسالة") + ". المحادثة: تقييم ذاتي.")),
+      el("div", { class: "s-foot sticky" }, btn("إنهاء", { kind: "primary", cls: "wide", on: () => { Overlay.close(); UI.refresh(); } })));
+    Overlay.open(wrap);
+  }
+};
+function mockHistory() {
+  const m = S.mock || [];
+  if (!m.length) return null;
+  return el("section", { class: "card" }, el("h3", null, "نتائجك في الامتحانات التجريبية"),
+    el("div", { class: "skills" }, m.slice(-6).reverse().map((r) => el("div", { class: "skill" }, el("span", null, new Date(r.ts).toLocaleDateString("ar-MA")), bar(r.total / 100, r.total >= 60 ? "good" : "bad"), el("small", { class: "muted" }, r.total + "/100")))));
+}
+
+/* ---------- report a content mistake ---------- */
+function reportIssue(ctx) {
+  const m = $("#modal"); clear(m); m.hidden = false;
+  const ta = el("textarea", { class: "inp", rows: "4", placeholder: "ما الخطأ؟ (مثال: الترجمة غير دقيقة، الإجابة الصحيحة مرفوضة، النطق غير واضح…)" });
+  const kinds = [["answer", "إجابتي صحيحة لكنها رُفضت"], ["content", "خطأ في المحتوى أو الترجمة"], ["audio", "الصوت غير واضح أو خطأ"], ["other", "شيء آخر"]];
+  const sel = el("select", { class: "inp" }, kinds.map(([v, t]) => el("option", { value: v }, t)));
+  if (ctx && ctx.kind) sel.value = ctx.kind;
+  const done = () => { m.hidden = true; clear(m); };
+  const send = () => {
+    const rep = { ts: Date.now(), kind: sel.value, note: ta.value.trim(), where: ctx.where || (UI.cur && UI.cur.name) || "", id: ctx.id || null, text: ctx.text || null, user: ctx.user || null, correct: ctx.correct || null, v: APP_VERSION };
+    S.reports = (S.reports || []).concat([rep]).slice(-200); save();
+    done();
+    UI.toast("شكرًا! حُفظ البلاغ — سيُصحَّح في التحديث القادم.", "check");
+    if (ctx.item && sel.value === "answer" && ctx.user) { // accept the learner's answer for this item from now on
+      S.accepted = S.accepted || {}; const k = ctx.item.id; if (k) { (S.accepted[k] = S.accepted[k] || []).push(String(ctx.user)); save(); }
+    }
+  };
+  m.appendChild(el("div", { class: "modal-card", role: "dialog", "aria-modal": "true" },
+    el("h3", null, icon("flag"), " أبلغ عن خطأ"),
+    ctx.text ? el("p", { class: "muted sm" }, "السؤال: ", isLatin(ctx.text) ? deSpan(ctx.text) : ctx.text) : null,
+    el("label", { class: "fld" }, el("span", null, "نوع المشكلة"), sel), el("label", { class: "fld" }, el("span", null, "التفاصيل (اختياري)"), ta),
+    el("div", { class: "row end" }, btn("إلغاء", { kind: "ghost", on: done }), btn("أرسل البلاغ", { kind: "primary", icon: "check", on: send }))));
+  m.onclick = (e) => { if (e.target === m) done(); };
+  setTimeout(() => ta.focus(), 50);
+}
+function reportsCard() {
+  const r = S.reports || [];
+  const c = el("section", { class: "card" }, el("h3", null, icon("flag"), " بلاغاتك عن الأخطاء (" + r.length + ")"),
+    el("p", { class: "muted sm" }, "كل بلاغ يُحفظ مع تقدّمك. يمكنك إرسالها للمطوّر كتذكرة على GitHub أو نسخها."));
+  if (!r.length) return null;
+  const txt = r.map((x) => "- [" + x.kind + "] " + (x.where || "") + " " + (x.id || "") + (x.text ? " | " + x.text : "") + (x.user ? " | answer: " + x.user : "") + (x.correct ? " | expected: " + x.correct : "") + (x.note ? " | " + x.note : "")).join("\n");
+  c.append(el("details", { class: "box" }, el("summary", null, "اعرض البلاغات"), el("pre", { class: "rep-pre", dir: "ltr" }, txt)),
+    el("div", { class: "row wrap" },
+      el("a", { class: "btn ghost", href: "https://github.com/bghzmouhsine/Daf-kompakt/issues/new?title=" + encodeURIComponent("بلاغات أخطاء من التطبيق (" + r.length + ")") + "&body=" + encodeURIComponent(txt.slice(0, 6000)), target: "_blank", rel: "noopener" }, icon("upload"), el("span", null, "أرسل كتذكرة GitHub")),
+      btn("انسخ", { kind: "ghost", icon: "copy", on: async () => { try { await navigator.clipboard.writeText(txt); UI.toast("نُسخت", "check"); } catch (e) { UI.toast("تعذّر النسخ", "warn"); } } }),
+      btn("امسح البلاغات", { kind: "ghost", icon: "x", on: async () => { if (await UI.confirm("مسح كل البلاغات؟", null, "امسح", true)) { S.reports = []; save(); UI.refresh(); } } })));
+  return c;
+}
+
 /* ================= VIEWS (2): sounds, review, words, tutor, stats, settings, exam + boot ================= */
 
 /* ---------- DIFFICULT SOUNDS ---------- */
 VIEWS.sounds = ({ id }) => {
   const root = el("div", { class: "page" });
+  Rec.prefetch("x");
   if (id) {
     const s = C.sounds.find((x) => x.id === id);
     root.appendChild(el("header", { class: "ph-h" }, el("button", { class: "crumb", type: "button", onclick: () => UI.go("sounds", null, { replace: true }) }, "الأصوات الصعبة"), el("h1", null, deSpan(s.de)), el("p", { class: "lead" }, s.ar)));
@@ -2164,7 +3224,8 @@ VIEWS.tutor = () => {
   } else {
     root.appendChild(el("section", { class: "card note-card" }, icon("info"),
       el("div", null, el("b", null, AI.state === "denied" ? "المدرّس الذكي غير مسموح له حاليًا" : "المدرّس الذكي (محادثة حرة وتصحيح فوري)"),
-        el("p", { class: "muted" }, AI.state === "denied" ? "رفضت السماح للمدرّس الذكي في هذه الزيارة. أعد فتح الصفحة لاحقًا للسماح به." : "يعمل عند فتح التطبيق داخل Claude (الرابط المنشور). في النسخة المثبتة على الهاتف تعمل الحوارات الموجّهة أدناه مع التصحيح التلقائي، بدون محادثة حرة."))));
+        el("p", { class: "muted" }, AI.state === "denied" ? "رفضت السماح للمدرّس الذكي في هذه الزيارة. أعد فتح الصفحة لاحقًا للسماح به." : HAS_CLAUDE ? "غير متاح حاليًا. الحوارات الموجّهة أدناه تعمل مع التصحيح التلقائي." : "لتفعيله في هذا التطبيق اربط مفتاح Gemini المجاني (دقيقتان) — ستحصل على محادثة حرة، تصحيح الكتابة، شرح الأخطاء وتقييم النطق المتقدّم."),
+        !HAS_CLAUDE ? btn("فعّل المدرّس الذكي", { kind: "primary", icon: "sparkle", on: () => { UI.go("settings"); setTimeout(() => { const c = $("#aiCard"); c && c.scrollIntoView({ block: "start", behavior: "smooth" }); }, 250); } }) : null)));
   }
   root.appendChild(sectionTitle("الحوارات الموجّهة (" + UNITS.length + ")", "حوارات واقعية من مواضيع الكتاب — بثلاثة مستويات صعوبة"));
   root.appendChild(el("div", { class: "stack" }, UNITS.map((u) => { const d = S.dlg[u.id]; return cardLink({ icon: d ? "check" : "chat", cls: d ? "done" : "", title: u.id + " · " + u.dialog.title, sub: u.dialog.ar + " — المستوى المقترح: " + MODES[Dialog.recommend(u.id)], badge: d ? d.best + "%" : null, on: () => Dialog.start(u) }); })));
@@ -2182,6 +3243,10 @@ VIEWS.stats = (prm) => {
     tile("flame", streak(), "أيام متتالية", streak() >= 3 ? "hot" : ""), tile("clock", fmtMin(totalSec()), "إجمالي الدراسة"),
     tile("book", unitsDone + "/" + UNITS.length, "وحدات مكتملة"), tile("cards", knownCount() + "/" + seenCount(), "كلمات محفوظة/مراجَعة"),
     tile("pencil", tot.x, "إجابات"), tile("check", tot.x ? Math.round(tot.k / tot.x * 100) + "%" : "—", "الدقة العامة")));
+  root.appendChild(levelCard());
+  const lastWk = Game.weekStart(); lastWk.setDate(lastWk.getDate() - 7);
+  root.appendChild(el("section", { class: "card" }, sectionTitle("الأسبوع", "هدفك الأسبوعي وتقريرك"), weekGoalCard(),
+    el("div", { class: "row wrap" }, btn("تقرير الأسبوع الماضي", { kind: "ghost", icon: "chart", on: () => showWeeklyReport(lastWk) }), btn("هذا الأسبوع حتى الآن", { kind: "ghost", icon: "chart", on: () => showWeeklyReport(Game.weekStart()) }))));
   const L = S.log[dayKey()] || { s: 0, x: 0, k: 0, w: 0, u: [] };
   root.appendChild(el("section", { class: "card" }, el("h3", null, "اليوم — " + arDate()),
     el("div", { class: "today-grid" }, statLine("وقت الدراسة", Math.floor(L.s / 60) + " / " + S.settings.goalMin + " د"), statLine("إجابات", L.x + " (" + (L.x ? Math.round(L.k / L.x * 100) : 0) + "% صحيحة)"), statLine("كلمات جديدة", L.w || 0), statLine("وحدات أكملتها", (L.u || []).join("، ") || "—"))));
@@ -2277,7 +3342,9 @@ const PWA = {
     if (HAS_CLAUDE) return;
     window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); this.deferred = e; if (UI.cur && UI.cur.name === "settings") UI.refresh(); });
     if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+      const had = !!navigator.serviceWorker.controller;
       navigator.serviceWorker.register("sw.js").then((r) => { this.reg = r; if (S.settings.notify) this.periodic(); }).catch(() => { });
+      navigator.serviceWorker.addEventListener("controllerchange", () => { if (had) UI.toast("تم تحديث التطبيق إلى آخر نسخة ✓", "check"); });
     }
   },
   async periodic() {
@@ -2340,22 +3407,55 @@ VIEWS.settings = () => {
   root.appendChild(rem);
   // audio
   const vs = el("select", { class: "inp", id: "setVoice" }, el("option", { value: "" }, "تلقائي (أفضل صوت ألماني)"), TTS.voices.map((v) => el("option", { value: v.name, selected: v.name === s.voice ? true : null }, v.name + " (" + v.lang + ")")));
-  vs.onchange = () => { s.voice = vs.value; TTS.pick(); save(); TTS.speak("Guten Tag! Ich bin deine Stimme für Deutsch."); };
+  vs.onchange = () => { s.voice = vs.value; TTS.pick(); save(); const n = s.neural; s.neural = false; TTS.speak("Guten Tag! Ich bin deine Stimme für Deutsch.").then(() => { s.neural = n; }); };
   const rate = el("input", { type: "range", min: "0.6", max: "1.2", step: "0.05", value: s.rate, id: "setRate", class: "range" });
   const rateV = el("small", { class: "muted" }, Math.round(s.rate * 100) + "%");
   rate.oninput = () => { s.rate = +rate.value; rateV.textContent = Math.round(s.rate * 100) + "%"; }; rate.onchange = () => { save(); TTS.speak("Wie geht es dir?"); };
+  const neuT = el("input", { type: "checkbox", id: "setNeural", checked: s.neural !== false ? true : null });
+  neuT.onchange = () => { s.neural = neuT.checked; save(); UI.refresh(); };
+  const sayT = el("input", { type: "checkbox", id: "setAutoSay", checked: s.autoSay !== false ? true : null });
+  sayT.onchange = () => { s.autoSay = sayT.checked; save(); };
+  const recSt = el("p", { class: "muted sm", id: "recStatus" });
+  const dlBox = el("div", { class: "row wrap" });
+  const paintRec = async () => {
+    await Rec.init();
+    clear(recSt); clear(dlBox);
+    if (Rec.state !== "ready") { recSt.append(icon("info"), " الصوت المسجّل غير متاح الآن (لا يوجد اتصال أو الملفات غير موجودة) — سيُستعمل صوت الجهاز."); return; }
+    const tot = Rec.totalBytes(); const have = await Rec.cachedBytes();
+    const mb = (n) => (n / 1048576).toFixed(1) + " MB";
+    recSt.append(icon("check"), " صوت طبيعي مسجّل لكل الكلمات والجمل والحوارات: صوت رجل للراوي والشخصيات الذكورية وصوت امرأة للشخصيات النسائية. ", have >= tot * 0.99 ? el("b", null, "محفوظ في الجهاز كاملًا ✓") : "محفوظ في الجهاز: " + mb(have) + " من " + mb(tot) + ".");
+    if (have < tot * 0.99) {
+      const pr = bar(have / tot, "thin");
+      const dl = btn("نزّل كل الصوت للاستعمال دون إنترنت (" + mb(tot) + ")", { kind: "primary", icon: "download", on: async () => {
+        dl.disabled = true; dlBox.appendChild(pr);
+        try { await Rec.downloadAll((f) => { pr.firstChild.style.width = Math.round(f * 100) + "%"; dl.lastChild.textContent = "جارٍ التنزيل… " + Math.round(f * 100) + "%"; }); UI.toast("تم حفظ الصوت كاملًا في جهازك", "check"); }
+        catch (e) { UI.toast("انقطع التنزيل — حاول مرة أخرى عند توفر الإنترنت", "warn"); }
+        paintRec();
+      } });
+      dlBox.appendChild(dl);
+    }
+  };
+  setTimeout(paintRec, 0);
   root.appendChild(el("section", { class: "card" }, el("h3", null, icon("volume"), " الصوت والنطق"),
-    !TTS.ok ? el("p", { class: "note" }, icon("warn"), el("span", null, "متصفحك لا يدعم تحويل النص إلى كلام. استعمل Google Chrome.")) : null,
-    TTS.ok && !TTS.voices.length ? el("p", { class: "note" }, icon("info"), el("span", null, "لم يُعثر على صوت ألماني بعد. على أندرويد: الإعدادات ← تحويل النص إلى كلام ← Google ← ثبّت اللغة الألمانية. ثم أعد فتح التطبيق.")) : null,
-    el("div", { class: "form2" }, fld("الصوت الألماني", vs), fld("سرعة الكلام", el("div", { class: "row" }, rate, rateV))),
+    el("label", { class: "toggle" }, neuT, el("span", null, "استعمل الصوت الطبيعي المسجّل (موصى به)")),
+    recSt, dlBox,
+    el("label", { class: "toggle" }, sayT, el("span", null, "انطق الجملة الصحيحة تلقائيًا بعد كل إجابة")),
+    el("div", { class: "form2" }, fld("سرعة الكلام", el("div", { class: "row" }, rate, rateV)), fld("صوت الجهاز (للنصوص غير المسجّلة)", vs)),
+    !TTS.ok ? el("p", { class: "note" }, icon("warn"), el("span", null, "متصفحك لا يدعم تحويل النص إلى كلام — سيعمل الصوت المسجّل فقط.")) : null,
+    TTS.ok && !TTS.voices.length ? el("p", { class: "note" }, icon("info"), el("span", null, "لا يوجد صوت ألماني في جهازك للنصوص غير المسجّلة (ردود المدرّس الذكي). على أندرويد: الإعدادات ← تحويل النص إلى كلام ← Google ← ثبّت اللغة الألمانية.")) : null,
     el("div", { class: "row wrap" }, btn("اختبر الصوت", { kind: "ghost", icon: "volume", on: () => TTS.speak("Hallo! Herzlich willkommen im Deutschkurs.") }),
+      btn("صوت الشخصيات النسائية", { kind: "ghost", icon: "volume", on: () => TTS.speak("Hallo! Herzlich willkommen im Deutschkurs.", { voice: "f" }) }),
       btn("اختبر الميكروفون", { kind: "ghost", icon: "mic", on: () => { if (!SR.Ctor) { UI.toast("التعرّف على الصوت غير مدعوم هنا — استعمل Chrome", "warn"); return; } UI.toast("قل: Guten Morgen", "mic"); SR.listen((a) => UI.toast("سمعت: " + a[0], "check"), (e) => UI.toast(e === "not-allowed" || e === "service-not-allowed" ? "الميكروفون محجوب في هذه النسخة" : "لم أسمع شيئًا", "warn")); } }))));
   // AI
   const aiT = el("input", { type: "checkbox", id: "setAI", checked: s.aiCheck ? true : null });
   aiT.onchange = () => { s.aiCheck = aiT.checked; save(); };
-  root.appendChild(el("section", { class: "card" }, el("h3", null, icon("sparkle"), " المدرّس الذكي"),
-    el("p", { class: "muted" }, AI.available() ? "متاح: محادثة حرة، تصحيح الكتابة والترجمة والردود الحرة في الحوارات." : AI.state === "denied" ? "غير مسموح في هذه الزيارة." : "غير متاح في هذه النسخة (يعمل داخل Claude فقط)."),
-    el("label", { class: "toggle" }, aiT, el("span", null, "صحّح إجاباتي الحرة تلقائيًا بالمدرّس الذكي عندما لا تطابق الإجابة النموذجية"))));
+  const aiCard = el("section", { class: "card", id: "aiCard" }, el("h3", null, icon("sparkle"), " المدرّس الذكي"));
+  if (HAS_CLAUDE) aiCard.append(el("p", { class: "muted" }, AI.available() ? "متاح عبر Claude: محادثة حرة، تصحيح الكتابة والترجمة والردود الحرة في الحوارات." : AI.state === "denied" ? "غير مسموح في هذه الزيارة." : "غير متاح حاليًا."));
+  else aiCard.appendChild(ownAIBox());
+  aiCard.appendChild(el("label", { class: "toggle" }, aiT, el("span", null, "صحّح إجاباتي الحرة تلقائيًا بالمدرّس الذكي عندما لا تطابق الإجابة النموذجية")));
+  root.appendChild(aiCard);
+  if (!HAS_CLAUDE) { root.appendChild(azureBox()); root.appendChild(gistBox()); }
+  const rc = reportsCard(); if (rc) root.appendChild(rc);
   // profile
   const pf = el("div", { class: "form2" }, fld("اسمك للتحية", inp("pName", p.name)), fld("الاسم باللاتينية (للحوارات)", inp("pFirst", p.first, { dir: "ltr" })), fld("اسم العائلة (للتهجئة)", inp("pLast", p.last, { dir: "ltr" })), fld("بلدك بالألمانية", inp("pLand", p.land, { dir: "ltr" })), fld("مدينتك", inp("pCity", p.city, { dir: "ltr" })));
   $$("input", pf).forEach((i) => i.addEventListener("change", () => { p.name = $("#pName").value.trim(); p.first = $("#pFirst").value.trim(); p.last = $("#pLast").value.trim(); p.land = $("#pLand").value.trim() || "Marokko"; p.city = $("#pCity").value.trim(); p.onboarded = true; save(); UI.toast("تم الحفظ"); }));
@@ -2387,8 +3487,12 @@ VIEWS.settings = () => {
 /* ---------- EXAM PRACTICE ---------- */
 VIEWS.exam = () => {
   const E = C.exam; const ep = S.progress.exam || (S.progress.exam = {});
+  Rec.prefetch("x");
   const root = el("div", { class: "page" });
   root.appendChild(el("header", { class: "ph-h" }, el("h1", null, "Start Deutsch 1"), el("p", { class: "lead" }, E.title), el("p", { class: "muted" }, E.intro)));
+  root.appendChild(el("section", { class: "card exam-hero" }, el("div", null, el("h3", null, icon("flag"), " امتحان تجريبي كامل بالوقت"), el("p", { class: "muted" }, "الأجزاء الأربعة متتالية كالامتحان الحقيقي (حوالي 75 دقيقة)، مع النقاط من 100 ونتيجة النجاح.")), btn("ابدأ الامتحان التجريبي", { kind: "primary", icon: "play", on: () => Mock.start() })));
+  const mh = mockHistory(); if (mh) root.appendChild(mh);
+  root.appendChild(sectionTitle("تدرّب على كل جزء وحده", null));
   const parts = el("div", { class: "stack" });
   for (const P of E.parts) {
     if (P.items) parts.appendChild(cardLink({ icon: P.id === "hoeren" ? "ear" : "book", title: P.ar + " · " + P.de, sub: P.info, badge: ep[P.id] != null ? ep[P.id] + "%" : null, on: () => Session.start({ title: "Start Deutsch 1 · " + P.de, items: P.items.slice(), passMark: 60, onFinish: (r) => { ep[P.id] = Math.max(ep[P.id] || 0, r.pct); save(); } }) }));
@@ -2415,6 +3519,105 @@ VIEWS.exam = () => {
   return root;
 };
 
+
+/* ---------- settings: own AI key, Azure pronunciation, Gist sync ---------- */
+function fld(lab, input, hint) { return el("label", { class: "fld" }, el("span", null, lab), input, hint ? el("small", { class: "muted" }, hint) : null); }
+function secretInp(id, val, ph) { return el("input", { class: "inp", id, type: "password", value: val || "", placeholder: ph || "", dir: "ltr", autocomplete: "off", spellcheck: "false" }); }
+function ownAIBox() {
+  const box = el("div");
+  const cfg = Keys.ai();
+  if (cfg && cfg.key) {
+    box.append(el("p", null, icon("check"), " متصل بـ ", el("b", null, Providers[cfg.provider].label), " · النموذج: ", el("code", { dir: "ltr" }, cfg.model || "")),
+      el("p", { class: "muted sm" }, "المدرّس يعمل الآن: محادثة حرة، تصحيح الكتابة، شرح الأخطاء، تصحيح الترجمة والردود الحرة" + (cfg.provider === "gemini" ? "، وتقييم نطقك بدقة من التسجيل الصوتي." : ".")),
+      el("div", { class: "row wrap" }, btn("اختبر المدرّس", { kind: "ghost", icon: "sparkle", on: () => Tutor.ask("قل لي جملة تشجيع قصيرة بالألمانية مع ترجمتها") }),
+        btn("افصل المفتاح", { kind: "ghost", icon: "x", on: async () => { if (await UI.confirm("فصل المفتاح؟", "سيُحذف المفتاح من هذا الجهاز.", "افصل")) { OwnAI.disconnect(); AI.init(); UI.refresh(); } } })));
+    return box;
+  }
+  const prov = el("select", { class: "inp", id: "aiProv" }, Object.keys(Providers).map((k) => el("option", { value: k }, Providers[k].label)));
+  const key = secretInp("aiKey", "", "الصق المفتاح هنا");
+  const model = el("input", { class: "inp", id: "aiModel", dir: "ltr", placeholder: "تلقائي" });
+  const base = el("input", { class: "inp", id: "aiBase", dir: "ltr", placeholder: "https://openrouter.ai/api/v1" });
+  const baseF = fld("عنوان الخدمة (Base URL)", base); baseF.hidden = true;
+  const help = el("div", { class: "box sm" });
+  const paintHelp = () => {
+    baseF.hidden = prov.value !== "openai";
+    key.placeholder = Providers[prov.value].keyHint;
+    clear(help).append(...({
+      gemini: [el("b", null, "مجاني — موصى به: "), "افتح ", el("a", { href: "https://aistudio.google.com/apikey", target: "_blank", rel: "noopener" }, "aistudio.google.com/apikey"), " بحساب Google، اضغط Create API key، انسخ المفتاح والصقه هنا. يعطيك المدرّس الذكي وتقييم النطق المتقدّم مجانًا ضمن حدود الاستعمال اليومية."],
+      anthropic: ["أنشئ مفتاحًا من ", el("a", { href: "https://console.anthropic.com/settings/keys", target: "_blank", rel: "noopener" }, "console.anthropic.com"), " (مدفوع حسب الاستعمال، تكلفة الدراسة اليومية بضعة سنتات)."],
+      openai: ["أي خدمة متوافقة مع OpenAI: اكتب عنوانها واسم النموذج، مثل OpenRouter أو Groq أو OpenAI."]
+    }[prov.value]));
+  };
+  prov.onchange = paintHelp; paintHelp();
+  const go = btn("احفظ واختبر الاتصال", { kind: "primary", icon: "check", on: async () => {
+    if (!key.value.trim()) { UI.toast("الصق المفتاح أولًا", "warn"); return; }
+    go.disabled = true; go.lastChild.textContent = "جارٍ الاختبار…";
+    try {
+      const c = await OwnAI.connect({ provider: prov.value, key: key.value.trim(), model: model.value.trim() || null, base: base.value.trim() || null });
+      await AI.init(); UI.toast("تم الاتصال بالمدرّس الذكي (" + c.model + ")", "check"); UI.refresh();
+    } catch (e) { UI.toast(e.code === "bad_key" ? "المفتاح غير صالح" : e.code === "not_found" ? "النموذج غير موجود — اتركه فارغًا ليُختار تلقائيًا" : "تعذّر الاتصال: " + (e.message || "").slice(0, 80), "warn"); go.disabled = false; go.lastChild.textContent = "احفظ واختبر الاتصال"; }
+  } });
+  box.append(el("p", { class: "muted" }, "في التطبيق المثبّت يعمل المدرّس الذكي بمفتاحك الخاص. المفتاح يُحفظ في هذا الجهاز فقط ولا يُرسل إلا إلى الخدمة التي تختارها."),
+    el("div", { class: "form2" }, fld("الخدمة", prov), fld("المفتاح (API key)", key), fld("النموذج (اختياري)", model), baseF), help, el("div", { class: "row wrap" }, go));
+  return box;
+}
+function azureBox() {
+  const az = Keys.azure();
+  const c = el("section", { class: "card" }, el("h3", null, icon("mic"), " تقييم النطق المتقدّم"));
+  const mode = ProEval.mode();
+  c.appendChild(el("p", { class: "muted" }, mode ? "مفعّل عبر " + ProEval.label() + ": عند الضغط على الميكروفون يُسجَّل صوتك ويُحلَّل نطق كل كلمة، مع درجات الدقة والطلاقة والاكتمال ونصائح بالعربية، ويمكنك سماع تسجيلك ومقارنته بالنموذج." : "اربط مفتاح Gemini (أعلاه) أو مفتاح Microsoft Azure Speech لتحليل نطقك كلمة بكلمة. بدونه يقارن التطبيق ما سمعه المتصفح بالجملة الصحيحة."));
+  const d = el("details", { class: "box" }, el("summary", null, az && az.key ? "Azure Speech متصل ✓ (" + az.region + ")" : "اختياري: Microsoft Azure Speech (الأدق صوتيًا)"));
+  if (az && az.key) d.appendChild(btn("افصل Azure", { kind: "ghost", icon: "x", on: () => { Keys.set({ azure: null }); UI.refresh(); } }));
+  else {
+    const k = secretInp("azKey", "", "Speech key"), r = el("input", { class: "inp", id: "azRegion", dir: "ltr", placeholder: "westeurope" });
+    d.append(el("p", { class: "muted sm" }, "أنشئ مورد Speech في بوابة Azure (الطبقة المجانية F0 تكفي: 5 ساعات شهريًا)، ثم انسخ Key والمنطقة Region."),
+      el("div", { class: "form2" }, fld("المفتاح", k), fld("المنطقة", r)),
+      btn("احفظ", { kind: "primary", icon: "check", on: () => { if (!k.value.trim() || !r.value.trim()) { UI.toast("أدخل المفتاح والمنطقة", "warn"); return; } Keys.set({ azure: { key: k.value.trim(), region: r.value.trim().toLowerCase().replace(/\s+/g, "") } }); UI.toast("تم الحفظ — جرّب الميكروفون في أي تمرين نطق", "check"); UI.refresh(); } }));
+  }
+  c.appendChild(d);
+  return c;
+}
+function gistBox() {
+  const g = Keys.gist();
+  const c = el("section", { class: "card" }, el("h3", null, icon("cloud"), " مزامنة تقدّمك بين أجهزتك"));
+  if (g && g.id) {
+    c.append(el("p", null, icon("check"), " متزامن عبر GitHub", g.login ? " (" + g.login + ")" : "", " — يُدمج تقدّم كل جهاز تلقائيًا دون فقدان شيء."),
+      el("p", { class: "muted sm" }, Gist.status === "err" ? "آخر محاولة فشلت (لا إنترنت؟) — ستُعاد تلقائيًا." : Gist.status === "bad" ? "الرمز لم يعد صالحًا — أعد الربط." : Gist.last ? "آخر رفع: " + new Date(Gist.last).toLocaleTimeString("ar-MA") : "يُزامَن عند الفتح وبعد كل تقدّم."),
+      el("div", { class: "row wrap" }, btn("زامن الآن", { kind: "ghost", icon: "review", on: async () => { await Gist.sync(true); UI.toast(Gist.status === "ok" ? "تمت المزامنة" : "تعذّرت المزامنة", Gist.status === "ok" ? "check" : "warn"); UI.refresh(); } }),
+        btn("إيقاف المزامنة", { kind: "ghost", icon: "x", on: () => { Gist.disconnect(); UI.refresh(); } })));
+    return c;
+  }
+  const t = secretInp("ghTok", "", "ghp_… أو github_pat_…");
+  const go = btn("اربط وزامن", { kind: "primary", icon: "cloud", on: async () => {
+    if (!t.value.trim()) { UI.toast("الصق الرمز أولًا", "warn"); return; }
+    go.disabled = true;
+    try { await Gist.connect(t.value); UI.toast("تم الربط — تقدّمك متزامن الآن", "check"); UI.refresh(); }
+    catch (e) { UI.toast(e.code === "bad_key" ? "الرمز غير صالح أو ينقصه إذن gist" : "تعذّر الربط: " + (e.message || "").slice(0, 80), "warn"); go.disabled = false; }
+  } });
+  c.append(el("p", { class: "muted" }, "تقدّمك محفوظ تلقائيًا في هذا الجهاز. لمزامنته مع هاتف أو حاسوب آخر: اربط حساب GitHub مجاني بملف خاص (Gist) لا يراه غيرك."),
+    el("ol", { class: "glist sm" }, el("li", null, "افتح ", el("a", { href: "https://github.com/settings/tokens/new?scopes=gist&description=Deutschstunde", target: "_blank", rel: "noopener" }, "github.com/settings/tokens"), " (Classic token)."),
+      el("li", null, "اختر الصلاحية gist فقط ومدة No expiration، ثم Generate token."), el("li", null, "انسخ الرمز والصقه هنا. افعل الشيء نفسه في جهازك الآخر.")),
+    el("div", { class: "form2" }, fld("رمز GitHub", t)), el("div", { class: "row wrap" }, go));
+  return c;
+}
+
+
+/* ---------- what's new (shown once after the v2 update) ---------- */
+function showWhatsNew() {
+  const wrap = el("div", { class: "session" });
+  const items = [
+    ["volume", "صوت طبيعي مسجّل", "كل الكلمات والجمل والحوارات بصوت ألماني طبيعي (رجل وامرأة حسب الشخصية)، ويمكن تنزيله للاستعمال دون إنترنت."],
+    ["book", "المستوى A2 كاملًا", "10 دروس جديدة (9–18) بعد كتاب A1: الصحة، العمل، السكن، الأعياد، السفر، الإعلام، الطبخ، التعليم، البيئة، الحياة في ألمانيا."],
+    ["star", "نقاط ومستويات ومهام يومية", "اربح XP مع كل تمرين، ارتقِ في المستويات، أنجز 3 مهام كل يوم، واحمِ سلسلتك بالتجميد ❄."],
+    ["flag", "اختبار المستوى والامتحان التجريبي", "اختبار يحدد من أين تبدأ، وامتحان Start Deutsch 1 كامل بالوقت والنقاط."],
+    ["sparkle", "المدرّس الذكي في كل مكان", HAS_CLAUDE ? "يعمل هنا داخل Claude. وفي التطبيق المثبّت يعمل بمفتاح Gemini مجاني." : "اربط مفتاح Gemini المجاني من الإعدادات: محادثة حرة، تصحيح، وتقييم نطق متقدّم."],
+    ["chart", "تقرير أسبوعي", "كل أسبوع تقرير بوقتك ونقاط قوتك وضعفك وخطة للأسبوع القادم."]
+  ];
+  wrap.append(ovHeader("ما الجديد؟", "Deutschstunde 2.0"), el("div", { class: "s-body" },
+    el("div", { class: "stack" }, items.map(([ic, t, d]) => el("div", { class: "card row-card" }, icon(ic), el("div", null, el("b", null, t), el("p", { class: "muted sm" }, d)))))),
+    el("div", { class: "s-foot sticky" }, btn("هيا نبدأ!", { kind: "primary", cls: "wide", icon: "play", on: () => Overlay.close() })));
+  Overlay.open(wrap);
+}
 /* ---------- BOOT ---------- */
 function boot() {
   buildIndex();
@@ -2426,12 +3629,22 @@ function boot() {
   Activity.start();
   PWA.init();
   UI.go("home", null, { root: true });
+  try { // app shortcuts: ?go=today | review | tutor | stats …
+    const go = new URLSearchParams(location.search).get("go");
+    if (go === "today") setTimeout(startToday, 300);
+    else if (go && VIEWS[go]) UI.go(go);
+    if (go && history.replaceState) history.replaceState(history.state, "", location.pathname);
+  } catch (e) { }
+  if (!S.seenV2 && Object.keys(S.log).length) { S.seenV2 = Date.now(); save(); setTimeout(showWhatsNew, 1200); } else if (!S.seenV2) { S.seenV2 = Date.now(); save(); }
   setInterval(() => Reminder.check(), 30000);
   Store.initCloud(() => { TTS.pick(); UI.refresh(); UI.tick(); });
   AI.init();
-  setTimeout(() => { checkAchievements(); Reminder.check(); }, 1500);
+  if (Gist.on()) Gist.sync();
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && Gist.on() && Date.now() - Gist.last > 120000) Gist.sync(); });
+  Game.applyFreezes();
+  setTimeout(() => { checkAchievements(); Reminder.check(); Game.maybeWeeklyReport(); }, 1500);
   window.addEventListener("pagehide", () => Store.flush());
-  if (window.__DS_TEST) window.__DS = { Session, Flash, Dialog, UNITS, LESSON, UI, Overlay, Writing, Pron, C, vocabQuiz, unitQuiz, lessonTest, genVocab, getItem, judge, judgePatterns, pluralOf, state: () => S };
+  if (window.__DS_TEST) window.__DS = { Session, Flash, Dialog, UNITS, UNIT, LESSON, UI, Overlay, Writing, Pron, C, vocabQuiz, unitQuiz, lessonTest, genVocab, getItem, judge, judgePatterns, pluralOf, Rec, TTS, Game, Placement, Mock, AudioKey, mergeStates, showWeeklyReport, showWhatsNew, reportIssue, state: () => S };
 }
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 
